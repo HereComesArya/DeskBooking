@@ -19,7 +19,7 @@ const useCheckAuth = () => {
         }
   
         setUser(null);
-        setLocation("/");
+        setLocation("/login");
         return;
       });
     }, []);

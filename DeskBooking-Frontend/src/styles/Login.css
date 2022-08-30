@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Karla:ital,wght@1,500&display=swap');
+
 .ant-btn {
     /* display: inline-block;
     vertical-align: middle; */
@@ -15,16 +17,30 @@
     
 }
 
+.full-page {
+        
+    /* filter: blur(2px);
+    -webkit-filter: blur(2px); */
+    background-position: center;
+    background-size: cover;
+    background-repeat: repeat;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-color: #a8cce4;
+    background-blend-mode: multiply;
+}
+
 .card {
     text-align: center;
     /* margin: auto; */
-    margin-left: 13%;
+    margin-left: 10%;
     margin-top: 7%;
     border-radius: 20px;
     padding-top: 22px;
     box-shadow: 0 4px 8px 0 rgba(28, 27, 27, 0.604), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     /* padding-bottom: 1%; */
-    width: 400px;
+    width: 3400px;
     height: 340px;
 }
 
@@ -53,9 +69,24 @@
     width: 60%;
 }
 
+.slogan{
+    font-family: 'Karla', sans-serif;
+    margin-right: 10%;
+    font-size: 130px;
+    /* margin-top: 10%; */
+    /* margin: auto; */
+    /* text-shadow: 0 4px 8px 0 rgba(28, 27, 27, 1), 0 6px 20px 0 rgba(0, 0, 0, 0.19); */
+    /* text-shadow: 5px 5px 10px black; */
+    word-spacing: 10px;
+    margin-top: 3%;
+    line-height: 1.3;
+    margin-left: 10%;
+    box-sizing: border-box;
+}
 
 
 
+/* For Phones */
 @media only screen and (max-width: 600px) {
     .slogan {
         display: none;
@@ -82,8 +113,8 @@
 }
 
 
-
-@media only screen and (max-width: 800px) {
+/*For Tablets*/
+@media only screen and (min-width: 601px) and (max-width: 1200px) {
     .slogan {
         display: none;
     }
@@ -91,10 +122,10 @@
         /* text-align: center; */
         /* margin: auto;
         margin-top: 5%; */
-        width: 305px;
+        width: 450px;
         margin: auto;
         margin-top: 20%;
-        height: 360px;
+        height: 405px;
         /* margin-left: auto;
         margin-right: auto; */
     }
