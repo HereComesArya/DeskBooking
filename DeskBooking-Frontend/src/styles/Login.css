@@ -1,0 +1,111 @@
+.ant-btn {
+    /* display: inline-block;
+    vertical-align: middle; */
+    background: #fff;
+    color: rgba(0,0,0,0.54);
+    box-shadow: rgba(0,0,0,0.2) 1px 1px 5px 0;
+    border-color: transparent;
+    text-align: center;
+    /* border-radius: 3px;
+    width: 99%; 
+    height: 39px;
+    padding-top: 0;
+    margin-bottom: 12px;
+    padding: 15px */
+    
+}
+
+.card {
+    text-align: center;
+    /* margin: auto; */
+    margin-left: 13%;
+    margin-top: 7%;
+    border-radius: 20px;
+    padding-top: 22px;
+    box-shadow: 0 4px 8px 0 rgba(28, 27, 27, 0.604), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    /* padding-bottom: 1%; */
+    width: 400px;
+    height: 340px;
+}
+
+.login-text{
+    margin-bottom: 8%;
+    margin-top: 5%;
+    font-family: Trebuchet MS;
+    text-align: center;
+    font-size: 19px;
+}
+
+.Login-button {
+    
+    margin-bottom: 24px;
+    font-family: "Trebuchet MS";
+    font-weight: 600;
+    width: 320px;
+    height: 50px;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.teknorix-logo{
+    width: 60%;
+}
+
+
+
+
+@media only screen and (max-width: 600px) {
+    .slogan {
+        display: none;
+    }
+    .card {
+        /* text-align: center; */
+        /* margin: auto;
+        margin-top: 5%; */
+        width: 305px;
+        margin: auto;
+        margin-top: 20%;
+        height: 360px;
+        /* margin-left: auto;
+        margin-right: auto; */
+    }
+    .login-text{
+        margin-bottom: 12%;
+        margin-top: 12%;
+    }
+    .teknorix-logo{
+        width: 80%;
+        /* display: none; */
+    }
+}
+
+
+
+@media only screen and (max-width: 800px) {
+    .slogan {
+        display: none;
+    }
+    .card {
+        /* text-align: center; */
+        /* margin: auto;
+        margin-top: 5%; */
+        width: 305px;
+        margin: auto;
+        margin-top: 20%;
+        height: 360px;
+        /* margin-left: auto;
+        margin-right: auto; */
+    }
+    .login-text{
+        margin-bottom: 12%;
+        margin-top: 12%;
+    }
+    .teknorix-logo{
+        width: 80%;
+        /* display: none; */
+    }
+}
+/* 
+pos rel, mar au, w 200 */

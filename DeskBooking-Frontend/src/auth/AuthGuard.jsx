@@ -1,9 +1,12 @@
-import {React, useContext, useLocation} from 'react';
+import {React, useContext, useEffect, useState} from 'react';
+import { Link, Route, useLocation } from "wouter";
 import {getUserInfo} from "../utils/getUserInfo";
-import {UserContext} from "../app"
+import {UserContext} from "../App"
 const useCheckAuth = () => {
-    const { user, setUser } = useContext(UserContext);
-    const [, setLocation] = useLocation();
+    // const [user,setUser] = useState(null)
+    const { user,setUser} = useContext(UserContext);
+    console.log(user);
+    const [location, setLocation] = useLocation();
     useEffect(() => {
       if (user) {   
         return;
