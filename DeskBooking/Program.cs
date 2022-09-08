@@ -1,8 +1,10 @@
 global using FastEndpoints;
+using DeskBooking.Data;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,6 +40,7 @@ builder.Services.AddAuthentication(options =>
     {
         if (ctx.Request.Path.StartsWithSegments("/api/signin-google"))
         {
+            
             ctx.Response.Redirect(ctx.RedirectUri);
             return Task.CompletedTask;
         }
@@ -67,7 +70,12 @@ builder.Services.AddAuthentication(options =>
         ctx.Response.StatusCode = 401;
         return Task.CompletedTask;
     };
-}); 
+});
+
+builder.Services.AddDbContext<DataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("MySqlString"));
+});
 
 builder.Services.AddSpaStaticFiles(config =>
 {

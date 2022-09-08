@@ -18,7 +18,7 @@ namespace DeskBooking.Auth.Endpoints
 
             await SendAsync(new
             {
-                Name = User.GetUsername()!,
+                Name = User.GetFirstName()!,
             }, 200, ct);
         }
     }
