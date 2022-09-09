@@ -2,6 +2,7 @@
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -19,7 +20,10 @@ namespace DeskBooking.Controllers
         {
             return await _context.Bookings.ToListAsync();
         }
-        [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")]
+
+        [HttpGet("getbydate")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
         {
             DateTime startDate = DateTime.Parse(start);
@@ -27,5 +31,27 @@ namespace DeskBooking.Controllers
             var bookings = await _context.Bookings.Where(b => b.EndTime > startDate && b.StartTime < endDate).ToListAsync();
             return bookings;
         }
+
+        [HttpGet("{UserId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByUserId(int UserId)
+        {
+            var Booking = await _context.Bookings.FindAsync(UserId);
+            return Booking == null ? NotFound() : Ok(Booking);
+        }
+
+        [HttpGet("getbydeskid")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int DeskId)
+        {
+            DateTime nowtime = DateTime.Now;
+            int idofdesk = DeskId;
+            var bookings = await _context.Bookings.Where(b => b.DeskId == idofdesk && b.StartTime > nowtime).ToListAsync();
+            return bookings;
+        }
+
+
     }
 }
