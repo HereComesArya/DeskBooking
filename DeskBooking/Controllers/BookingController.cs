@@ -22,8 +22,7 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("getbydate")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
         {
             DateTime startDate = DateTime.Parse(start);
@@ -33,8 +32,7 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("{UserId}")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
         public async Task<IActionResult> GetByUserId(int UserId)
         {
             var Booking = await _context.Bookings.FindAsync(UserId);
@@ -42,13 +40,10 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("getbydeskid")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int DeskId)
+        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int deskId)
         {
-            DateTime nowtime = DateTime.Now;
-            int idofdesk = DeskId;
-            var bookings = await _context.Bookings.Where(b => b.DeskId == idofdesk && b.StartTime > nowtime).ToListAsync();
+            
+            var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
             return bookings;
         }
 
