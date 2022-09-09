@@ -19,5 +19,13 @@ namespace DeskBooking.Controllers
         {
             return await _context.Bookings.ToListAsync();
         }
+        [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")]
+        public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
+        {
+            DateTime startDate = DateTime.Parse(start);
+            DateTime endDate = DateTime.Parse(end);
+            var bookings = await _context.Bookings.Where(b => b.EndTime > startDate && b.StartTime < endDate).ToListAsync();
+            return bookings;
+        }
     }
 }
