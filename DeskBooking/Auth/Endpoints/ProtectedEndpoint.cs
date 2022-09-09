@@ -12,13 +12,14 @@ namespace DeskBooking.Auth.Endpoints
 
         public override async Task HandleAsync(CancellationToken ct)
         {
-            var userId = User.GetGoogleIdentitfier();
-          
-            ArgumentNullException.ThrowIfNull(userId);
+            //var userId = User.GetGoogleIdentitfier();
+
+            //ArgumentNullException.ThrowIfNull(userId);
+            var user = User;
 
             await SendAsync(new
             {
-                Name = User.GetFirstName()!,
+                Name = User.GetUserId(),
             }, 200, ct);
         }
     }

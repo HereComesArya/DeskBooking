@@ -1,15 +1,20 @@
 ﻿using DeskBooking.Data;
 using DeskBooking.Extensions;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
 
 namespace DeskBooking.Auth.Endpoints
 {
     public class AddUserEndpoint : EndpointWithoutRequest
     {
         private readonly DataContext _context;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public AddUserEndpoint(DataContext context)
+        public AddUserEndpoint(DataContext context, IHttpContextAccessor httpContext)
         {
             _context = context;
+            _httpContext = httpContext;
         }
         public override void Configure()
         {
@@ -19,6 +24,8 @@ namespace DeskBooking.Auth.Endpoints
 
         public override async Task HandleAsync(CancellationToken ct)
         {
+            var redirectUrl = Query<string>("returnUrl") ?? "/";
+            string curUserId;
             var email = User.GetEmail();
             var firstName = User.GetFirstName();
             var lastName = User.GetLastName();
@@ -26,17 +33,20 @@ namespace DeskBooking.Auth.Endpoints
             if (!userFound.Any())
             {
                 Models.User user = new() { Email = email!, FirstName = firstName!, LastName = lastName! };
-                _context.Users.Add(user);
+                _context.Users.Add(user);                
                 await _context.SaveChangesAsync(ct);
+                curUserId = user.UserId.ToString();
             }
-            var redirectUrl = Query<string>("returnUrl") ?? "/";
+            else
+            {
+                curUserId = userFound.FirstOrDefault()!.UserId.ToString();
+            }
+            ClaimsIdentity claimsIdentity = new(CookieAuthenticationDefaults.AuthenticationScheme);
+            claimsIdentity.AddClaim(new Claim("UserId", curUserId));
+            User.AddIdentity(claimsIdentity);
+            await _httpContext.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
             await SendRedirectAsync(redirectUrl,cancellation: ct);
-            //await SendAsync(Response);
-            //await SendAsync(new
-            //{
-            //    Name = email!,
-            //    Claims = claims,
-            //}, 200, ct);
         }
+
     }
 }

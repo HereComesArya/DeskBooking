@@ -72,6 +72,8 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("MySqlString"));

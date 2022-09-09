@@ -3,9 +3,10 @@
 namespace DeskBooking.Extensions;
 public static class UserExtensions
 {
-    public static string? GetGoogleIdentitfier(this ClaimsPrincipal user)
+    public static string? GetUserId(this ClaimsPrincipal user)
     {
-        return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        return user?.Claims.FirstOrDefault(c=> c.Type == "UserId").Value;
+        //return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
     }
 
     public static string? GetFirstName(this ClaimsPrincipal user)
