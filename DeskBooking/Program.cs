@@ -72,7 +72,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {

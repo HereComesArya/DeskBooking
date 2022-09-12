@@ -9,12 +9,10 @@ namespace DeskBooking.Auth.Endpoints
     public class AddUserEndpoint : EndpointWithoutRequest
     {
         private readonly DataContext _context;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AddUserEndpoint(DataContext context, IHttpContextAccessor httpContext)
+        public AddUserEndpoint(DataContext context)
         {
             _context = context;
-            _httpContextAccessor = httpContext;
         }
         public override void Configure()
         {
@@ -44,7 +42,7 @@ namespace DeskBooking.Auth.Endpoints
             ClaimsIdentity claimsIdentity = new(CookieAuthenticationDefaults.AuthenticationScheme);
             claimsIdentity.AddClaim(new Claim("UserId", curUserId));
             User.AddIdentity(claimsIdentity);
-            await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
             await SendRedirectAsync(redirectUrl,cancellation: ct);
         }
 
