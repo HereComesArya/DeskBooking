@@ -6,7 +6,7 @@ const useCheckAuth = () => {
     // const [user,setUser] = useState(null)
     const { user,setUser} = useContext(UserContext);
     console.log(user);
-    const [location, setLocation] = useLocation();
+    const [,setLocation] = useLocation();
     useEffect(() => {
       if (user) {   
         return;

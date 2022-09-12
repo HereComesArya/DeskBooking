@@ -19,10 +19,12 @@ namespace DeskBooking.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet("getall")]
         public async Task<IEnumerable<Booking>> GetAllBookings()
         {
-            return await _context.Bookings.ToListAsync();
+            return await _context.Bookings.Include(b=>b.User).ToListAsync();
         }
 
-        [HttpGet("getbydate")]
+
+
+        [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")] 
 
         public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
         {

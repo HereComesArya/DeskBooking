@@ -9,12 +9,6 @@ namespace DeskBooking.Controllers
 {
     public class AuthController : ControllerBase
     {
-        private readonly DataContext _context;
-
-        public AuthController(DataContext context)
-        {
-            _context = context;
-        }
         [Microsoft.AspNetCore.Mvc.HttpGet("/api/signin-google")]
         public IActionResult SignInGoogle(string returnUrl = "/")
         {

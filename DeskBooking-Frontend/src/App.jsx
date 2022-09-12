@@ -3,7 +3,7 @@ import Login from "./pages/Login";
 import { createContext, useState, React } from "react";
 import AuthGuard from "./auth/AuthGuard";
 import { Redirect, Route, useLocation } from "wouter";
-import Home from "./pages/Home";
+import MainApp from './pages/MainApp/MainApp';
 const UserContext = createContext({ user: null });
 function App() {
   const [user, setUser] = useState(null);
@@ -16,14 +16,14 @@ function App() {
           setUser,
         }}
       >
-        <Route path="/">
+        {/* <Route path="/">
           <Redirect to="/home"/>
         </Route>
-        <Route path="/home">
+        <Route path="/home"> */}
           <AuthGuard>
-            <Home></Home>
+            <MainApp></MainApp>
           </AuthGuard> 
-          </Route>
+          {/* </Route> */}
         <Route path="/login">
           <Login></Login>
         </Route>

@@ -60,6 +60,7 @@ builder.Services.AddAuthentication(options =>
 {
     microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
     microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+    microsoftOptions.SaveTokens = true;
 
     microsoftOptions.Events.OnRedirectToAuthorizationEndpoint = (ctx) =>
     {
@@ -74,7 +75,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
