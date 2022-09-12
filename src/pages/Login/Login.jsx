@@ -1,12 +1,12 @@
 import { Card, Button, Tooltip } from "antd";
 import React from "react";
 import "antd/dist/antd.css";
-import "../styles/Login.css";
+import "./Login.css";
 
-import Background from "../assets/images/floor-background.webp";
-import TeknorixLogo from "../assets/images/teknorix-logo.svg";
-import GoogleLogo from "../assets/images/icons8-google.svg";
-import MicrosoftLogo from "../assets/images/icons8-microsoft.svg";
+import Background from "../../assets/images/floor-background.webp";
+import TeknorixLogo from "../../assets/images/teknorix-logo.svg";
+import GoogleLogo from "../../assets/images/icons8-google.svg";
+import MicrosoftLogo from "../../assets/images/icons8-microsoft.svg";
 
 const Login = () => {
   return (
