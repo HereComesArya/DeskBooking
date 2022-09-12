@@ -58,6 +58,7 @@ builder.Services.AddAuthentication(options =>
 {
     microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
     microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
+    microsoftOptions.SaveTokens = true;
 
     microsoftOptions.Events.OnRedirectToAuthorizationEndpoint = (ctx) =>
     {

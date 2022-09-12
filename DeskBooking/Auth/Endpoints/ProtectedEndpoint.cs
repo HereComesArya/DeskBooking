@@ -46,3 +46,4 @@ namespace DeskBooking.Auth.Endpoints
         }
     }
 }
+    
