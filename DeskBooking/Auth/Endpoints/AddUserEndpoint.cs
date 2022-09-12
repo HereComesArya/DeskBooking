@@ -1,5 +1,6 @@
 ﻿using DeskBooking.Data;
 using DeskBooking.Extensions;
+using DeskBooking.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
@@ -30,6 +31,7 @@ namespace DeskBooking.Auth.Endpoints
             var firstName = User.GetFirstName();
             var lastName = User.GetLastName();
             var userFound = _context.Users.Where(u => u.Email == email);
+            
             if (!userFound.Any())
             {
                 Models.User user = new() { Email = email!, FirstName = firstName!, LastName = lastName! };
@@ -41,8 +43,15 @@ namespace DeskBooking.Auth.Endpoints
             {
                 curUserId = userFound.FirstOrDefault()!.UserId.ToString();
             }
+            
             ClaimsIdentity claimsIdentity = new(CookieAuthenticationDefaults.AuthenticationScheme);
             claimsIdentity.AddClaim(new Claim("UserId", curUserId));
+
+            var adminfound = _context.AuthUsers.Where(a => (a.UserId.ToString() == curUserId && a.IsAdmin == true ));
+            if (adminfound.Any())
+            {
+                claimsIdentity.AddClaim(new Claim("Auth", "Admin User"));
+            }
             User.AddIdentity(claimsIdentity);
             await _httpContextAccessor.HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, User);
             await SendRedirectAsync(redirectUrl,cancellation: ct);

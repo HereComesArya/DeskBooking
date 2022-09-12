@@ -4,7 +4,9 @@ using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Authentication.MicrosoftAccount;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +86,11 @@ builder.Services.AddSpaStaticFiles(config =>
     config.RootPath = "dist";
 });
 builder.Services.AddControllers();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("Admin", policy => policy.RequireClaim("Auth"));
+});
 
 var app = builder.Build();
 

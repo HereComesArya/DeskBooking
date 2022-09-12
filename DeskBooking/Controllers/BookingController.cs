@@ -1,5 +1,6 @@
 ﻿using DeskBooking.Data;
 using DeskBooking.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
