@@ -22,6 +22,7 @@
         {
             public Metadata metadata { get; set; }
             public string url { get; set; }
+            public bool? @default { get; set; }
         }
     }
 }

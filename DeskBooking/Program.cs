@@ -79,7 +79,7 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("MySqlString"));
+    options.UseSqlServer(builder.Configuration["ConnectionStrings:MySqlString"]);
 });
 
 builder.Services.AddSpaStaticFiles(config =>

@@ -5,7 +5,7 @@ import {UserContext} from "../App"
 const useCheckAuth = () => {
     // const [user,setUser] = useState(null)
     const { user,setUser} = useContext(UserContext);
-    console.log(user);
+    //console.log(user);
     const [,setLocation] = useLocation();
     useEffect(() => {
       if (user) {   
@@ -18,7 +18,7 @@ const useCheckAuth = () => {
           return;
         }
   
-        setUser(null);
+        setUser(false);
         setLocation("/login");
         return;
       });
@@ -28,9 +28,12 @@ const useCheckAuth = () => {
   };
   const AuthGuard = ({ children }) => {
     const user = useCheckAuth();
-  
-    if (!user) {
+    //console.log("user: ",user);
+    if (user == null) {
       return <div>Loading...</div>;
+    }
+    if(user === false){
+      return<></>
     }
   
     return children;

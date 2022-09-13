@@ -46,7 +46,7 @@ function MainApp() {
       ]}
     ></Menu>
   );
-  return (
+  return ( 
     <div className="MainApp">
       <NavBar menu={SideMenu} />
       <Layout>

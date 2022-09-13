@@ -18,6 +18,10 @@ namespace DeskBooking.Auth.Endpoints
             Get("/api/userinfo");
             Summary(b => b.Description = "Returns User Information");
         }
+        public string pictureFromInitials()
+        {
+                return $"https://ui-avatars.com/api/?background=random&size=100&name={User.GetFirstName()}+{User.GetLastName()}";
+        }
 
         public override async Task HandleAsync(CancellationToken ct)
         {
@@ -34,7 +38,16 @@ namespace DeskBooking.Auth.Endpoints
                 
                 var photosResponse = await client.GetFromJsonAsync<PeopleApiPhotos>(
                         $"https://people.googleapis.com/v1/people/{googleAccountId}?personFields=photos&key={peopleApiKey}");
-                    pictureUri = photosResponse?.photos.FirstOrDefault()?.url ?? "";
+                pictureUri = photosResponse?.photos.FirstOrDefault()?.url ?? "";
+                if (photosResponse.photos.FirstOrDefault()!.@default != null)
+                {
+                    pictureUri = pictureFromInitials();
+                }     
+                
+            }
+            else
+            {
+                pictureUri = pictureFromInitials();
             }
             var obj = new
             {

@@ -7,7 +7,7 @@ import MainApp from './pages/MainApp/MainApp';
 const UserContext = createContext({ user: null });
 function App() {
   const [user, setUser] = useState(null);
-  const [, setLocation] = useLocation();  
+  const [location, setLocation] = useLocation();  
   return (
     <>
       <UserContext.Provider
@@ -16,16 +16,12 @@ function App() {
           setUser,
         }}
       >
-        {/* <Route path="/">
-          <Redirect to="/home"/>
-        </Route>
-        <Route path="/home"> */}
           <AuthGuard>
             <MainApp></MainApp>
-          </AuthGuard> 
+          </AuthGuard>
           {/* </Route> */}
         <Route path="/login">
-          <Login></Login>
+          {user?<Redirect to="/" /> : <Login />}
         </Route>
       </UserContext.Provider>
     </>

@@ -12,7 +12,6 @@ public static class UserExtensions
         return user?.Claims.FirstOrDefault(c=> c.Type == "UserId").Value;
         //return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
     }
-
     public static string? GetFirstName(this ClaimsPrincipal user)
     {
         return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.GivenName)?.Value ?? user.Identity?.Name;
