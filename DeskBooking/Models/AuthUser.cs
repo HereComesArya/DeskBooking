@@ -7,6 +7,6 @@ namespace DeskBooking.Models
         [Key]   
         public int UserId { get; set; }
         [Required]
-        public bool IsAdmin { get; set; }
+        public string EmailIdOfAdmin { get; set; }
     }
 }

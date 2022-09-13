@@ -45,7 +45,7 @@ namespace DeskBooking.Auth.Endpoints
             ClaimsIdentity claimsIdentity = new(CookieAuthenticationDefaults.AuthenticationScheme);
             claimsIdentity.AddClaim(new Claim("UserId", curUserId));
 
-            var adminfound = _context.AuthUsers.Where(a => (a.UserId.ToString() == curUserId && a.IsAdmin == true ));
+            var adminfound = _context.AuthUsers.Where(a => a.EmailIdOfAdmin == email);
             if (adminfound.Any())
             {
                 claimsIdentity.AddClaim(new Claim("Auth", "Admin User"));
