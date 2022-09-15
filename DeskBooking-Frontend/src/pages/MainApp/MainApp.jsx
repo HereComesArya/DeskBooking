@@ -1,4 +1,4 @@
-import React,{ useContext } from "react";
+import React, { useContext } from "react";
 import { Route, useLocation } from "wouter";
 
 import { Layout, Menu } from "antd";
@@ -11,7 +11,7 @@ import {
 
 import NavBar from "../../components/responsive-sidebar/NavBar/NavBar";
 import SideBar from "../../components/responsive-sidebar/SideBar/SideBar";
-import ViewBookings from "../../components/ViewBookings/ViewBookings";
+import Bookings from "../../components/Bookings/Bookings";
 
 import "./MainApp.css";
 import "antd/dist/antd.css";
@@ -20,19 +20,17 @@ import { UserContext } from "../../App";
 
 function MainApp() {
   const [, setLocation] = useLocation();
-  const {user,setUser} = useContext(UserContext);
+  const { user, setUser } = useContext(UserContext);
   const SideMenu = (
     <Menu
       defaultSelectedKeys={["/"]}
       mode={"inline"}
       onClick={({ key }) => {
         if (key === "/signout") {
-          signOut().then(()=>
-            {
-              setUser(false);
-              setLocation("/login");
-            }
-          )       
+          signOut().then(() => {
+            setUser(false);
+            setLocation("/login");
+          });
         } else {
           setLocation(key);
         }
@@ -54,7 +52,7 @@ function MainApp() {
       ]}
     ></Menu>
   );
-  return ( 
+  return (
     <div className="MainApp">
       <NavBar menu={SideMenu} />
       <Layout>
@@ -64,12 +62,11 @@ function MainApp() {
           <Route path="/">
             <h1>Dashboard</h1>
           </Route>
-          <Route path="/bookings" component={ViewBookings}></Route>
+          <Route path="/bookings" component={Bookings}></Route>
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>
           <Route path="/signout">
-      
             <h1>Signout</h1>
           </Route>
           {/* </Routes> */}

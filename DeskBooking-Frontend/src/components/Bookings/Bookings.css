@@ -1,0 +1,16 @@
+.header {
+    background-color: white !important;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: x-large !important;
+}
+.header-text{
+    font-weight: 800 !important;
+}
+
+.add-bookings-button{
+    background-color: #22D167 !important;
+    margin-right: 10px !important;
+}
