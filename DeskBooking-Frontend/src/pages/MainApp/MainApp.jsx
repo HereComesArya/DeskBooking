@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useContext } from "react";
 import { Route, useLocation } from "wouter";
 
 import { Layout, Menu } from "antd";
@@ -15,16 +15,24 @@ import ViewBookings from "../../components/ViewBookings/ViewBookings";
 
 import "./MainApp.css";
 import "antd/dist/antd.css";
+import { signOut } from "../../utils/signOut";
+import { UserContext } from "../../App";
 
 function MainApp() {
   const [, setLocation] = useLocation();
+  const {user,setUser} = useContext(UserContext);
   const SideMenu = (
     <Menu
       defaultSelectedKeys={["/"]}
       mode={"inline"}
       onClick={({ key }) => {
-        if (key === "signout") {
-          //signout
+        if (key === "/signout") {
+          signOut().then(()=>
+            {
+              setUser(false);
+              setLocation("/login");
+            }
+          )       
         } else {
           setLocation(key);
         }
@@ -61,6 +69,7 @@ function MainApp() {
             <h1>Profile</h1>
           </Route>
           <Route path="/signout">
+      
             <h1>Signout</h1>
           </Route>
           {/* </Routes> */}
