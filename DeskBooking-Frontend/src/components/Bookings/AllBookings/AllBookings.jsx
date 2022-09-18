@@ -8,66 +8,65 @@ import "./AllBookings.css";
 import "antd/dist/antd.css";
 
 const App = () => {
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState([]);
   useEffect(() => {
     axios.get("/api/booking/getall").then((res) => {
       setPost(res.data);
     });
   }, []);
 
-  console.log(post);
-
-  const data = [
-    {
-      bookingId: 0,
-      user: {
-        userId: 0,
-        email: "bobvance@vancerefrigiration.com",
-        firstName: "Bob",
-        lastName: "Vance",
-      },
-      userId: 0,
-      startTime: "2022-08-14T10:00:30Z",
-      endTime: "2022-08-14T11:30:00Z",
-      desk: null,
-      deskId: 0,
-      roomId: 0,
-    },
-    {
-      bookingId: 1,
-      user: {
-        userId: 0,
-        email: "nevan@nevan",
-        firstName: "Nevan",
-        lastName: "Nevan",
-      },
-      userId: 2,
-      startTime: "2022-09-09T10:30Z",
-      endTime: "2022-09-09T12:00Z",
-      desk: null,
-      deskId: 1,
-      roomId: 0,
-    },
-    {
-      bookingId: 2,
-      user: {
-        userId: 3,
-        email: "jam@jam.com",
-        firstName: "jam",
-        lastName: "jam",
-      },
-      userId: 3,
-      startTime: "2022-09-13T09:00:30Z",
-      endTime: "2022-09-13T10:00:00Z",
-      desk: null,
-      deskId: 2,
-      roomId: 0,
-    },
-  ];
+  const data = post;
+  // const data = [
+  //   {
+  //     bookingId: 0,
+  //     user: {
+  //       userId: 0,
+  //       email: "bobvance@vancerefrigiration.com",
+  //       firstName: "Bob",
+  //       lastName: "Vance",
+  //     },
+  //     userId: 0,
+  //     startTime: "2022-08-14T10:00:30Z",
+  //     endTime: "2022-08-14T11:30:00Z",
+  //     desk: null,
+  //     deskId: 0,
+  //     roomId: 0,
+  //   },
+  //   {
+  //     bookingId: 1,
+  //     user: {
+  //       userId: 0,
+  //       email: "nevan@nevan",
+  //       firstName: "Nevan",
+  //       lastName: "Nevan",
+  //     },
+  //     userId: 2,
+  //     startTime: "2022-09-09T10:30Z",
+  //     endTime: "2022-09-09T12:00Z",
+  //     desk: null,
+  //     deskId: 1,
+  //     roomId: 0,
+  //   },
+  //   {
+  //     bookingId: 2,
+  //     user: {
+  //       userId: 3,
+  //       email: "jam@jam.com",
+  //       firstName: "jam",
+  //       lastName: "jam",
+  //     },
+  //     userId: 3,
+  //     startTime: "2022-09-13T09:00:30Z",
+  //     endTime: "2022-09-13T10:00:00Z",
+  //     desk: null,
+  //     deskId: 2,
+  //     roomId: 0,
+  //   },
+  // ];
 
   const newData = [];
   {
-    data.map((dataItem, index) => {
+    data && data.map((dataItem, index) => {
       const {
         userId,
         bookingId,
@@ -207,16 +206,16 @@ const App = () => {
       sorter: (a, b) => a.deskId - b.deskId,
       ...getColumnSearchProps("deskId"),
     },
-    {
-      //checked
-      title: "Room ID",
-      dataIndex: "roomId",
-      key: "index",
-      id: "index",
-      width: "10%",
-      sorter: (a, b) => a.roomId - b.roomId,
-      ...getColumnSearchProps("roomId"),
-    },
+    // {
+    //   //checked
+    //   title: "Room ID",
+    //   dataIndex: "roomId",
+    //   key: "index",
+    //   id: "index",
+    //   width: "10%",
+    //   sorter: (a, b) => a.roomId - b.roomId,
+    //   ...getColumnSearchProps("roomId"),
+    // },
     {
       //Checked
       title: "User",
@@ -272,7 +271,6 @@ const App = () => {
     //     sortDirections: ["descend", "ascend"],
     // },
   ];
-  console.log("hi");
 
   return (
     <Table
