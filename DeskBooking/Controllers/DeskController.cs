@@ -29,22 +29,71 @@ namespace DeskBooking.Controllers
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("/add")]
-        public async Task<IEnumerable<Desk>> AddDesks(int roomId, IEnumerable<Desk> desks)
+        [Microsoft.AspNetCore.Mvc.HttpPost("/edit")]
+        public async Task<ActionResult<IEnumerable<Desk>>> AddDesks(int roomId, IEnumerable<Desk> desks)
         {
-            //await _context.Desks.AddRangeAsync(desks);
-            var newDeskList = new List<Desk>();
-            foreach (var d in desks)
+            try
             {
-                if(!_context.Desks.Any(desk => desk.DeskId == d.DeskId))
-                {
-                    newDeskList.Add(d);
-                }
-            }
-            await _context.Desks.AddRangeAsync(newDeskList);
-            await _context.SaveChangesWithIdentityInsertAsync<Desk>();
-            return await _context.Desks.ToListAsync();
+                var deskList = await _context.Desks.ToListAsync();
+                var intersect = deskList.IntersectBy(desks.Select(t => t.DeskId), d => d.DeskId);
+                var deletedDesks = deskList.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
+                var addedDesks = desks.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
 
+                await _context.Desks.AddRangeAsync(addedDesks);
+                _context.Desks.RemoveRange(deletedDesks);
+                await _context.SaveChangesWithIdentityInsertAsync<Desk>();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest(new
+                {
+                    title = "Cannot add desk",
+                    status = 400
+                });
+            }
+            
+            return await _context.Desks.ToListAsync();
+            //return deletedDesks;
+        }
+
+
+        [Microsoft.AspNetCore.Mvc.HttpPost("/add")]
+        public async Task<ActionResult<IEnumerable<Desk>>> AddDesksAgain(int roomId, IEnumerable<Desk> desks)
+        {
+            try
+            {
+                await _context.Desks.AddRangeAsync(desks);
+                await _context.SaveChangesWithIdentityInsertAsync<Desk>();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest(new
+                {
+                    title= "Cannot add desk",
+                    status = 400
+                });
+            }           
+            return await _context.Desks.ToListAsync();
+            //return deletedDesks;
+        }
+
+        [Microsoft.AspNetCore.Mvc.HttpPost("/del")]
+        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesksAgain(int roomId, IEnumerable<Desk> desks)
+        {
+            try
+            {
+                _context.Desks.RemoveRange(desks);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest();
+            }
+            return await _context.Desks.ToListAsync();
+            //return deletedDesks;
         }
     }
 }
