@@ -19,7 +19,7 @@ const NavBar = ({ menu }) => {
         placement="left"
         onClick={() => setVisible(false)}
         onClose={() => setVisible(false)}
-        visible={visible}
+        open={visible}
       >
         {menu}
       </Drawer>

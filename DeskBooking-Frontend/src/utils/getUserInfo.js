@@ -9,7 +9,7 @@ export const getUserInfo = async () => {
 
     if (resp.ok) {
       const user = await resp.json();
-      return user.name;
+      return user;
     }
 
     return null;
