@@ -7,11 +7,16 @@ import {
   PoweroffOutlined,
   UserAddOutlined,
   UnorderedListOutlined,
+  PlusCircleFilled,
+  PlusOutlined,
+  EditOutlined,
+  BuildOutlined,
 } from "@ant-design/icons";
 
 import NavBar from "../../components/responsive-sidebar/NavBar/NavBar";
 import SideBar from "../../components/responsive-sidebar/SideBar/SideBar";
 import Bookings from "../../components/Bookings/Bookings";
+import AddSpaces from "../../components/Spaces/AddSpaces/AddSpaces";
 
 import "./MainApp.css";
 import "antd/dist/antd.css";
@@ -21,6 +26,7 @@ import { UserContext } from "../../App";
 function MainApp() {
   const [, setLocation] = useLocation();
   const { user, setUser } = useContext(UserContext);
+  setUser(true); //remove
   const SideMenu = (
     <Menu
       defaultSelectedKeys={["/"]}
@@ -41,6 +47,22 @@ function MainApp() {
           label: "Bookings",
           key: "/bookings",
           icon: <UnorderedListOutlined />,
+        },
+        user && {
+          label: "Manage Spaces",
+          icon: <BuildOutlined />,
+          children: [
+            {
+              label: "Add Space",
+              key: "/add-space",
+              icon: <PlusOutlined />,
+            },
+            {
+              label: "Modify Space",
+              key: "/modify-space",
+              icon: <EditOutlined />,
+            },
+          ],
         },
         { label: "Profile", key: "/profile", icon: <UserAddOutlined /> },
         {
@@ -63,6 +85,7 @@ function MainApp() {
             <h1>Dashboard</h1>
           </Route>
           <Route path="/bookings" component={Bookings}></Route>
+          <Route path="/add-space" component={AddSpaces}></Route>
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>

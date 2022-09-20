@@ -1,0 +1,15 @@
+Line 19-22 App.jsx
+put maainApp in AuthGuard and uncomment routes
+
+Line 68: AddSpaces.jsx
+const addRef = useRef(true); //change to false
+  
+Line 21: MainApp.jsx
+setUser(true); //remove
+
+
+Line 7: AddSpaces.jsx
+useEffect(() => {
+    //to fetch desk list in manage desks
+    //remove for add desks after copying to manage spaces
+  }, []);

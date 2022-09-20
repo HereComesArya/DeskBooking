@@ -66,39 +66,40 @@ const App = () => {
 
   const newData = [];
   {
-    data && data.map((dataItem, index) => {
-      const {
-        userId,
-        bookingId,
-        roomId,
-        startTime,
-        endTime,
-        deskId,
-        user: { firstName },
-        user: { lastName },
-      } = dataItem;
+    data &&
+      data.map((dataItem, index) => {
+        const {
+          userId,
+          bookingId,
+          roomId,
+          startTime,
+          endTime,
+          deskId,
+          user: { firstName },
+          user: { lastName },
+        } = dataItem;
 
-      const booking = new Object();
-      booking.key = index;
-      booking.deskId = deskId;
-      booking.name = firstName + " " + lastName;
-      booking.userId = userId;
-      booking.roomId = roomId;
-      booking.bookingId = bookingId;
-      booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
-      booking.date = moment(startTime);
-      booking.startTimeFormatted = moment(startTime).format("h: mm A");
-      booking.startTime = moment(startTime);
-      booking.endTimeFormatted = moment(endTime).format("h: mm A");
-      booking.endTime = moment(endTime);
+        const booking = new Object();
+        booking.key = index;
+        booking.deskId = deskId;
+        booking.name = firstName + " " + lastName;
+        booking.userId = userId;
+        booking.roomId = roomId;
+        booking.bookingId = bookingId;
+        booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
+        booking.date = moment(startTime);
+        booking.startTimeFormatted = moment(startTime).format("h: mm A");
+        booking.startTime = moment(startTime);
+        booking.endTimeFormatted = moment(endTime).format("h: mm A");
+        booking.endTime = moment(endTime);
 
-      newData.push(booking);
-      // console.log(newData);
-      // console.log("start " + booking.startTimeFormatted);
-      // console.log("end " + booking.endTimeFormatted);
-      // console.log("date  " + booking.date);
-      // console.log("date  " + booking.dateFormatted);
-    });
+        newData.push(booking);
+        // console.log(newData);
+        // console.log("start " + booking.startTimeFormatted);
+        // console.log("end " + booking.endTimeFormatted);
+        // console.log("date  " + booking.date);
+        // console.log("date  " + booking.dateFormatted);
+      });
   }
 
   const [searchText, setSearchText] = useState("");

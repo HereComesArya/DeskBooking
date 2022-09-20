@@ -16,11 +16,11 @@ function App() {
           setUser,
         }}
       >
-        <AuthGuard>
-          <MainApp></MainApp>
-        </AuthGuard>
-        {/* </Route> */}
-        <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route>
+        {/* <AuthGuard>
+
+        </AuthGuard> */}
+        <MainApp></MainApp>
+        {/* <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route> */}
       </UserContext.Provider>
     </>
   );
