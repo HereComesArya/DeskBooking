@@ -1,5 +1,6 @@
 global using FastEndpoints;
 using DeskBooking.Data;
+using DeskBooking.DTOs;
 using FastEndpoints.Swagger;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -62,7 +63,6 @@ builder.Services.AddAuthentication(options =>
 {
     microsoftOptions.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"];
     microsoftOptions.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"];
-    microsoftOptions.SaveTokens = true;
 
     microsoftOptions.Events.OnRedirectToAuthorizationEndpoint = (ctx) =>
     {
