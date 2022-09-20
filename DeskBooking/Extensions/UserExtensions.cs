@@ -24,4 +24,8 @@ public static class UserExtensions
     {
         return user?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
     }
+    public static bool IsAdmin(this ClaimsPrincipal user)
+    {
+        return user?.Claims.FirstOrDefault(c => c.Type == "Auth") != null ? true : false;
+    }
 }

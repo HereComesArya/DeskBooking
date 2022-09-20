@@ -18,9 +18,28 @@ namespace DeskBooking.Auth.Endpoints
             Get("/api/userinfo");
             Summary(b => b.Description = "Returns User Information");
         }
-        public string pictureFromInitials()
+        public async Task<string> GetPicture()
         {
-                return $"https://ui-avatars.com/api/?background=random&size=100&name={User.GetFirstName()}+{User.GetLastName()}";
+
+            string pictureFromInititals = $"https://ui-avatars.com/api/?background=random&size=100&name={User.GetFirstName()}+{User.GetLastName()}";
+
+            var client = _httpClientFactory.CreateClient();
+            var googleAccountId = User.GetOauthIdentifier();
+            
+            if (User.Identity!.AuthenticationType.ToLower() == "google")
+            {
+                //client.BaseAddress = new Uri("");
+                string peopleApiKey = _configuration["GoogleApiKey:PeopleApiKey"];
+
+                var photosResponse = await client.GetFromJsonAsync<PeopleApiPhotos>(
+                        $"https://people.googleapis.com/v1/people/{googleAccountId}?personFields=photos&key={peopleApiKey}");
+                if (photosResponse.photos.FirstOrDefault()!.@default != null)
+                {
+                    return pictureFromInititals;
+                }
+                return photosResponse?.photos.FirstOrDefault()?.url ?? "";          
+            }
+              return pictureFromInititals;
         }
 
         public override async Task HandleAsync(CancellationToken ct)
@@ -28,32 +47,13 @@ namespace DeskBooking.Auth.Endpoints
             //var userId = User.GetGoogleIdentitfier();
 
             //ArgumentNullException.ThrowIfNull(userId);
-            var client =  _httpClientFactory.CreateClient();
-            var googleAccountId = User.GetOauthIdentifier();
-            string pictureUri = string.Empty;
-            if (User.Identity!.AuthenticationType.ToLower() == "google")
-            {
-                //client.BaseAddress = new Uri("");
-                string peopleApiKey = _configuration["GoogleApiKey:PeopleApiKey"];
-                
-                var photosResponse = await client.GetFromJsonAsync<PeopleApiPhotos>(
-                        $"https://people.googleapis.com/v1/people/{googleAccountId}?personFields=photos&key={peopleApiKey}");
-                pictureUri = photosResponse?.photos.FirstOrDefault()?.url ?? "";
-                if (photosResponse.photos.FirstOrDefault()!.@default != null)
-                {
-                    pictureUri = pictureFromInitials();
-                }     
-                
-            }
-            else
-            {
-                pictureUri = pictureFromInitials();
-            }
+            string pictureUri = await GetPicture();
             var obj = new
             {
-                Name = pictureUri,
+                Name = User.GetFirstName(),
                 //LastName = User.GetLastName(),
-                //PhotoUri = pictureUri.ToString()
+                PhotoUri = pictureUri.ToString(),
+                IsAdmin = User.IsAdmin()
             };
             await SendAsync(obj, 200, ct);
         }

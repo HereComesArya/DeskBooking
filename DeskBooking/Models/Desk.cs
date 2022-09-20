@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DeskBooking.Models
 {
@@ -8,7 +9,7 @@ namespace DeskBooking.Models
         [Required]
         public int DeskId { get; set; }
         [Required]
-        public int RoomId { get; set; }
+        public int SpaceId { get; set; }
         [Required]
         public float Xcoordinate { get; set; }
         [Required]
