@@ -27,16 +27,23 @@ namespace DeskBooking.Controllers
 
 
         [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")]
-
-        public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
+        
+        public async Task<ActionResult<IEnumerable<Booking>>> GetBookingsByDate(string start, string end)
         {
             DateTime startDate = DateTime.Parse(start);
             DateTime endDate = DateTime.Parse(end);
             var bookings = await _context.Bookings.Where(b => b.EndTime > startDate && b.StartTime < endDate).ToListAsync();
-            return bookings;
+            if (bookings.Any())
+            {
+                return Ok(bookings);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
-        [HttpGet("{UserId}")]
+        [HttpGet("getbyuserid")]
 
         public async Task<IActionResult> GetByUserId(int userId)
         {
@@ -52,14 +59,22 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("getbydeskid")]
-        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int deskId)
+        public async Task<ActionResult<IEnumerable<Booking>>> GetBookingByDeskId(int deskId)
         {
 
             var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
-            return bookings;
+            if (bookings.Any())
+            {
+                return Ok(bookings);
+            }
+            else
+            {
+                return BadRequest();
+            }
         }
 
-        [HttpPost("/deletebookings")]
+        [HttpDelete("/deletebookingsbydesk")]
+        //[Authorize(Policy = "Admin")]
         public async Task<IEnumerable<Booking>> DeleteBooking(int deskId)
         {
             var bookingstodelete = await _context.Bookings.Where(b => b.DeskId == deskId).ToListAsync();
@@ -67,24 +82,31 @@ namespace DeskBooking.Controllers
             if (bookingstodelete.Any())
             {
                 _context.Bookings.RemoveRange(bookingstodelete);
+                
             }
-            return _context.Bookings;
+            await _context.SaveChangesAsync();
+            return await _context.Bookings.ToListAsync();
         }
         [HttpDelete("/deleteoldbookings")]
-
+        //[Authorize(Policy = "Admin")]
         public async Task<ActionResult<IEnumerable<Booking>>> DeleteOldbookings()
         {
-            DateTime onedayago = DateTime.Now.AddDays(-1);
-            var oldbookings = await _context.Bookings.Where(d => d.StartTime < onedayago).ToListAsync();
+            //DateTime onedayago = DateTime.Now.AddDays(-1);
+            var oldbookings = await _context.Bookings.Where(d => d.StartTime < DateTime.Now.AddDays(-1)).ToListAsync();
 
             if (oldbookings.Any())
             {
                 _context.Bookings.RemoveRange(oldbookings);
+                await _context.SaveChangesAsync();
                 return Ok();
             }
             else
             {
-                return BadRequest();
+                return BadRequest(new
+                {
+                    title = "No old bookings found",
+                    StatusCode = 404
+                }) ;
             }
 
         }
