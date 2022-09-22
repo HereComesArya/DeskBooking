@@ -92,7 +92,7 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("ifexists")]
-         public async Task <ActionResult<IEnumerable<Space>>> IfExists(string name)
+         public async Task <bool> IfExists(string name)
         {
             bool exists = false;
             var anydata = _context.Spaces.Where(s => s.Name == name);
@@ -101,7 +101,7 @@ namespace DeskBooking.Controllers
             {
                 exists = true;  
             }
-            return Ok(exists);
+            return exists;
         }
     }
 }
