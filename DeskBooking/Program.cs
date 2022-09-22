@@ -79,6 +79,7 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddHttpClient();
 
+
 builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["ConnectionStrings:MySqlString"]);

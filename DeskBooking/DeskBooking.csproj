@@ -21,4 +21,8 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.8" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ImageFolder\" />
+  </ItemGroup>
+
 </Project>

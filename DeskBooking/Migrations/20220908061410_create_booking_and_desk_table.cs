@@ -51,12 +51,12 @@ namespace DeskBooking.Migrations
                         principalTable: "Users",
                         principalColumn: "UserId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
+ /*                   table.ForeignKey(
                      name: "FK_Bookings_AuthUsers_UserId",
                     column: x => x.UserId,
                     principalTable: "AuthUsers",
                     principalColumn: "UserId",
-                    onDelete: ReferentialAction.Cascade);
+                    onDelete: ReferentialAction.Cascade);*/
                 });
 
             migrationBuilder.CreateIndex(
