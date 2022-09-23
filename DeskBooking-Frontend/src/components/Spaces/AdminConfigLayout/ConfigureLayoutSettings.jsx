@@ -1,8 +1,15 @@
 import React, { useContext, useState, useEffect } from "react";
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
-import { CheckOutlined, CloseOutlined, PlusOutlined } from "@ant-design/icons";
+import RoomImage from "../../../assets/images/empty-grid.jpg";
+import {
+  CheckOutlined,
+  CloseOutlined,
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import ImagePanZoomFunction from "../../ImagePanZoom/ImagePanZoomFunction";
 import { Route, Redirect, useLocation } from "wouter";
+import axios from "axios";
 
 import { Switch, Button, Input, Layout, message, Upload, Form } from "antd";
 const { Header } = Layout;
@@ -11,17 +18,24 @@ import "./ConfigureLayoutSettings.css";
 import "antd/dist/antd.css";
 
 const ConfigureLayoutSettings = () => {
+  const [post, setPost] = useState([]);
+  const [, setLocation] = useLocation();
+  const [defaultName, setDefaultName] = useState("");
+  const [imageFile, setImageFile] = useState([]);
   useEffect(() => {
-    const val = 0;
     //to fetch number of spaces to set defaullt name in add spaces
+    axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+      setPost(res.data.map((val) => val.name));
+    });
   }, []);
 
-  const [, setLocation] = useLocation();
-  const [spaceId, setSpaceId] = useState(0);
-  const [defaultName, setDefaultName] = useState(
-    `Example Space ${spaceId + 1}`
-  );
-  const [isNameNotTaken, setIsNameNotTaken] = useState(false);
+  useEffect(() => {
+    // setPost(data);
+    setDefaultName(`Example Space ${post.length + 1}`);
+  }, [post]);
+
+  const [form] = Form.useForm();
+  useEffect(() => form.resetFields(), [defaultName]);
 
   const {
     spaceName,
@@ -36,6 +50,8 @@ const ConfigureLayoutSettings = () => {
     setIsDeleting,
     image,
     setImage,
+    isDefaultImage,
+    setIsDefaultImage,
     deskName,
     setDeskName,
     addRef,
@@ -44,16 +60,104 @@ const ConfigureLayoutSettings = () => {
     deskRef,
   } = useContext(LayoutConfigContext);
 
-  function handleImageupload(e) {
-    console.log(e.target.files);
-    setImage(URL.createObjectURL(e.target.files[0]));
-  }
+  const dummyRequest = async ({ file, onSuccess }) => {
+    setTimeout(() => {
+      onSuccess("ok");
+    }, 0);
+  };
+
+  // function getBase64(file) {
+  //   var reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = function () {
+  //     setResult(reader.result);
+  //   };
+  //   reader.onerror = function (error) {
+  //     console.log("Error: ", error);
+  //   };
+  // }
+
+  // const getBase64 = (file) =>
+  //   new Promise((resolve, reject) => {
+  //     const reader = new FileReader();
+  //     reader.readAsDataURL(file);
+  //     reader.onload = () => resolve(reader.result);
+  //     reader.onerror = (error) => reject(error);
+  //     console.log(reader.result);
+  //     return reader.result;
+  //   });
+
+  // const getBase64 = (file) => {
+  //   const reader = new FileReader();
+  //   reader.readAsDataURL(file);
+  //   reader.onload = () => reader.result;
+  //   reader.onerror = (error) => reject(error);
+
+  //   return reader.result;
+  // };
+
+  const imageUploadProps = {
+    name: "file",
+    multiple: false,
+    maxCount: 1,
+    customRequest: dummyRequest,
+
+    beforeUpload(file, fileList) {
+      //check file type
+      console.log("checking file");
+    },
+
+    onRemove(file) {
+      setImage(RoomImage);
+      setIsDefaultImage(true);
+    },
+
+    onChange(info) {
+      const { status } = info.file;
+
+      /*converting to base 64*/
+      if (status === "done") {
+        message.success(`${info.file.name} file uploaded successfully.`);
+        setIsDefaultImage(false);
+        // getBase64(info.file.originFileObj);
+        const file = info.file.originFileObj;
+
+        let data = new FormData();
+        // data.append("fileName", file.name);
+        data.append("file", file);
+
+        setImageFile(data);
+        setImage(URL.createObjectURL(file));
+      } else if (status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+
+    onDrop(e) {
+      console.log("Dropped files", e.dataTransfer.files);
+    },
+  };
+
+  // useEffect(() => {
+  //   console.log(imageFile);
+  //   // setImage(result);
+  // }, [imageFile]);
 
   return (
     <>
+      <h1>{String(isDefaultImage)}</h1>
       <Form
+        form={form}
         onFinish={(e) => {
-          console.log({ desklist: deskRef, name: e.spacename });
+          //on successful submit
+          console.log("submit");
+          console.log({
+            desklist: deskRef,
+            name: e.spacename,
+            defaultImage: isDefaultImage,
+            ...(!isDefaultImage && { image: imageFile }),
+          });
+          // console.log(result);
         }}
       >
         <div>
@@ -64,11 +168,12 @@ const ConfigureLayoutSettings = () => {
               type="primary"
               shape="round"
               icon={<PlusOutlined />}
-              onClick={() => {
-                const data = [];
-                console.log("clicked");
-                // window.location.reload(false);
-              }}
+              // onClick={() => {
+              //   const data = [];
+              //   console.log("clicked");
+              //   console.log(post);
+              //   // window.location.reload(false);
+              // }}
               htmlType="submit"
             >
               Add New Space
@@ -96,8 +201,14 @@ const ConfigureLayoutSettings = () => {
                     message: "Please input the Space Name!",
                   },
                   {
-                    required: isNameNotTaken,
-                    message: "This name is already in use!",
+                    message: "Name is already used.",
+                    validator: (_, value) => {
+                      if (!post.includes(value)) {
+                        return Promise.resolve();
+                      } else {
+                        return Promise.reject();
+                      }
+                    },
                   },
                 ]}
               >
@@ -106,7 +217,9 @@ const ConfigureLayoutSettings = () => {
             </div>
             <div>
               <h3>Add Image:</h3>
-              <input type="file" onChange={handleImageupload} />
+              <Upload {...imageUploadProps}>
+                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+              </Upload>
             </div>
             {/* <img src={image} /> */}
             <div>
@@ -121,7 +234,6 @@ const ConfigureLayoutSettings = () => {
                   setIsDeleting(false);
                 }}
               />
-              <h3>{String(isAdding)}</h3>
             </div>
             <div>
               <h3>Delete Desks</h3>
@@ -135,7 +247,6 @@ const ConfigureLayoutSettings = () => {
                   setIsAdding(false);
                 }}
               />
-              <h3>{String(isDeleting)}</h3>
             </div>
           </div>
           <div>

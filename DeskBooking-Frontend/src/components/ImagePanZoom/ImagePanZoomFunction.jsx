@@ -5,6 +5,7 @@ import { List } from "antd";
 
 import "./ImagePanZoomFunction.css";
 import "antd/dist/antd.css";
+import { CaretLeftFilled } from "@ant-design/icons";
 
 const ImagePanZoomFunction = () => {
   const {
@@ -68,6 +69,12 @@ const ImagePanZoomFunction = () => {
     // [Viewer]
     // [window.innerWidth, window.innerHeight]
   );
+
+  useEffect(() => {
+    console.log("object");
+    console.log(deskRef.current);
+  }, [deskList]);
+
   useEffect(() => {
     renderCircles(deskList);
   }, []);
@@ -80,8 +87,7 @@ const ImagePanZoomFunction = () => {
   var Viewer = null;
 
   useEffect(() => {
-    console.log("2");
-    //clgs are test, fitToViewer is required
+    //fitToViewer
     Viewer.fitToViewer();
   }, [Viewer]);
 
@@ -102,7 +108,7 @@ const ImagePanZoomFunction = () => {
   const executeAction = (e) => {
     // e.target.style.fill = "black";
     console.log(e.target.id); //gives id of node
-
+    console.log("del");
     if (deleteRef.current) {
       removeCircle(e);
     }
@@ -136,15 +142,30 @@ const ImagePanZoomFunction = () => {
         "title"
       );
 
-      newElement.innerHTML = desk.id;
+      newElement.innerHTML = `Desk #${desk.id}`;
       circle.appendChild(newElement);
 
-      circle.addEventListener("click", executeAction);
+      circle.addEventListener("dblclick", executeAction);
 
       node.after(circle);
 
       console.log("Created a circle");
     });
+  };
+
+  const handleClick = (e) => {
+    console.log(e);
+    switch (e.detail) {
+      case 1:
+        return 1;
+        break;
+      case 2:
+        console.log("double click");
+        break;
+      case 3:
+        console.log("triple click");
+        break;
+    }
   };
 
   return (
@@ -166,8 +187,15 @@ const ImagePanZoomFunction = () => {
               background="#FFF"
               detectAutoPan={false}
               onClick={(event) => {
-                // console.log("coordinates clicked = " + event.x, event.y);
+                console.log("coordinates clicked = " + event.x, event.y);
                 if (isAdding) addDesks(event.x, event.y);
+
+                // console.log(event.originalEvent.detail);
+                if (event.originalEvent.detail === 2) {
+                  console.log("double click");
+                } else {
+                  console.log("single click");
+                }
               }}
               miniatureProps={{
                 position: "none",

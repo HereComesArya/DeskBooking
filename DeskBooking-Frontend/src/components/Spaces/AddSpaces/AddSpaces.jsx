@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ConfigureLayoutSettings from "../AdminConfigLayout/ConfigureLayoutSettings";
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
+import axios from "axios";
 
 const AddSpaces = () => {
   useEffect(() => {
@@ -15,6 +16,9 @@ const AddSpaces = () => {
 
   /*Image inside viewer*/
   const [image, setImage] = useState(RoomImage);
+
+  /*Use default image*/
+  const [isDefaultImage, setIsDefaultImage] = useState(true);
 
   //holds the id of the last desk, equal to length of desklist
   const [id, setId] = useState(1);
@@ -107,6 +111,8 @@ const AddSpaces = () => {
     setIsDeleting,
     image,
     setImage,
+    isDefaultImage,
+    setIsDefaultImage,
     deskName,
     setDeskName,
     addRef,
