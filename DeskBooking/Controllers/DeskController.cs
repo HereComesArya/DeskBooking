@@ -1,4 +1,5 @@
 ﻿using DeskBooking.Data;
+using DeskBooking.DTOs;
 using DeskBooking.Extensions;
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -95,6 +96,12 @@ namespace DeskBooking.Controllers
             }
             return await _context.Desks.ToListAsync();
             //return deletedDesks;
+        }
+        [Microsoft.AspNetCore.Mvc.HttpGet("getdeskbyspace")]
+        public async Task<IEnumerable<Desk>> GetDeskBySpace(int spaceId)
+        {
+            var returnData = _context.Desks.Where(d => d.SpaceId == spaceId);
+            return returnData;
         }
     }
 }

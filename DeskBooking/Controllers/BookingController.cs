@@ -42,8 +42,31 @@ namespace DeskBooking.Controllers
         [HttpGet("getbydeskid")]
         public async Task<IEnumerable<Booking>> GetBookingByDeskId(int deskId)
         {          
-            var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
+            var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now && (b.StartTime < DateTime.Now && b.EndTime > DateTime.Now)).ToListAsync();
             return bookings;
+        }
+        [Microsoft.AspNetCore.Mvc.HttpGet("getbyspace")]
+        public async Task<IActionResult> GetBySpace(int spaceId)
+        {
+            var deskswewant = await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
+            if (deskswewant.Any())
+            {
+                List<Booking> bookingswewant = new List<Booking>();
+                foreach (var desk in deskswewant)
+                {
+                    var d = desk.DeskId;
+                    bookingswewant.Concat(_context.Bookings.Where(b => b.DeskId == d));
+                }
+                return Ok(bookingswewant);
+            }
+            else
+            {
+                return BadRequest("No data");
+            }
+            //return Ok(bookingswewant);
+            //var deskswewant = await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
+            //_context.Bookings.Where(b => deskswewant.);
+            //return await _context.Bookings.ToListAsync();
         }
     }
 }

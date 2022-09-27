@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeskBooking.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220920070513_enforce_space_rename")]
-    partial class enforce_space_rename
+    [Migration("20220927075107_i_hate_my_life")]
+    partial class i_hate_my_life
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,8 +45,17 @@ namespace DeskBooking.Migrations
                     b.Property<int>("DeskId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("date");
+
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRepeating")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("date");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -93,15 +102,20 @@ namespace DeskBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpaceId"), 1L, 1);
 
-                    b.Property<string>("FloorImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("DefaultImage")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("FloorImage")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("SpaceId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Spaces");
                 });
