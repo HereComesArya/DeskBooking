@@ -21,8 +21,8 @@ namespace DeskBooking.Models
         [Required]
         public bool IsRepeating { get; set; }
         [Required]
-        public DateOnly StartDate { get; set; }
+        public DateTime StartDate { get; set; }
         [Required]
-        public DateOnly EndDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

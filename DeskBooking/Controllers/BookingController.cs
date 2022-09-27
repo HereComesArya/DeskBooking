@@ -19,7 +19,7 @@ namespace DeskBooking.Controllers
         [Microsoft.AspNetCore.Mvc.HttpGet("getall")]
         public async Task<IEnumerable<Booking>> GetAllBookings()
         {
-            return await _context.Bookings.Include(b=>b.User).ToListAsync();
+            return await _context.Bookings.Include(b => b.User).ToListAsync();
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")] 
@@ -42,22 +42,23 @@ namespace DeskBooking.Controllers
         [HttpGet("getbydeskid")]
         public async Task<IEnumerable<Booking>> GetBookingByDeskId(int deskId)
         {          
-            var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now && (b.StartTime < DateTime.Now && b.EndTime > DateTime.Now)).ToListAsync();
+            var bookings = await _context.Bookings.Where(b => b.DeskId == deskId ).ToListAsync();
             return bookings;
         }
         [Microsoft.AspNetCore.Mvc.HttpGet("getbyspace")]
-        public async Task<IActionResult> GetBySpace(int spaceId)
+        public async Task<ActionResult<IEnumerable<Booking>>> GetBySpace(int spaceId)
         {
             var deskswewant = await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
             if (deskswewant.Any())
             {
-                List<Booking> bookingswewant = new List<Booking>();
+                List<Booking> bookingswewant = new();
                 foreach (var desk in deskswewant)
                 {
+                    
                     var d = desk.DeskId;
-                    bookingswewant.Concat(_context.Bookings.Where(b => b.DeskId == d));
+                    bookingswewant.AddRange(_context.Bookings.Where(b => b.DeskId == d));
                 }
-                return Ok(bookingswewant);
+                return bookingswewant;
             }
             else
             {
