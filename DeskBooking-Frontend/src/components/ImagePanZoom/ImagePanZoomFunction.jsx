@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE } from "react-svg-pan-zoom";
 import { LayoutConfigContext } from "../../helpers/contexts/AdminLayoutConfigContext";
-import { List } from "antd";
+import useClickPreventionOnDoubleClick from "../../helpers/hooks/UseClickPreventionOnDoubleClick";
 
 import "./ImagePanZoomFunction.css";
 import "antd/dist/antd.css";
@@ -12,26 +12,27 @@ const ImagePanZoomFunction = () => {
     setDeskList,
     id,
     setId,
-    isAdding,
-    setIsAdding,
-    isDeleting,
-    setIsDeleting,
     image,
     setImage,
-    deskName,
-    setDeskName,
-    addRef,
-    deleteRef,
+    initialDeskNumber,
+    setInitialDeskNumber,
     // imgRef,
     deskRef,
   } = useContext(LayoutConfigContext);
 
+  const [deskName, setDeskName] = useState(1);
+  useEffect(() => {
+    setDeskName(initialDeskNumber);
+    console.log(deskName);
+  }, [initialDeskNumber]);
+
+  /* For viewer */
   const [tool, setTool] = useState(TOOL_NONE);
   const [value, setValue] = useState(INITIAL_VALUE);
 
   /* Set svg Width and Height. Triggers on window resize */
-  const [width, setWidth] = React.useState(window.innerWidth / 2);
-  const [height, setHeight] = React.useState(window.innerHeight / 2);
+  const [width, setWidth] = React.useState(window.innerWidth / 1.216);
+  const [height, setHeight] = React.useState(window.innerHeight / 1.2);
 
   // /*image inside viewer*/
   // const [image, setImage] = useState(RoomImage); //copied
@@ -68,13 +69,20 @@ const ImagePanZoomFunction = () => {
     // [Viewer]
     // [window.innerWidth, window.innerHeight]
   );
+
+  useEffect(() => {
+    console.log(deskRef.current);
+  }, [deskList]);
+
   useEffect(() => {
     renderCircles(deskList);
+    // setDeskName(initialDeskNumber);
   }, []);
 
   const updateWidthAndHeight = () => {
-    setWidth(window.innerWidth);
+    setWidth(window.innerWidth / 1);
     setHeight(window.innerHeight / 2);
+    console.log("width, height update");
   };
 
   var Viewer = null;
@@ -88,7 +96,6 @@ const ImagePanZoomFunction = () => {
   const addDesks = (x, y) => {
     const desk = {
       id: id,
-      name: "", //Name of the desk provided by ADMIN
       x: x,
       y: y,
     };
@@ -101,11 +108,10 @@ const ImagePanZoomFunction = () => {
 
   const executeAction = (e) => {
     // e.target.style.fill = "black";
-    console.log(e.target.id); //gives id of node
-
-    if (deleteRef.current) {
-      removeCircle(e);
-    }
+    console.log("delete node id", e.target.id); //gives id of node
+    console.log(e);
+    setTimeout(removeCircle(e), 1000);
+    console.log("after rem circles");
   };
 
   const removeCircle = (e) => {
@@ -115,12 +121,26 @@ const ImagePanZoomFunction = () => {
     setDeskList(neDeskList);
   };
 
+  const reRenderCircles = () => {
+    //reset Id state
+    // setDeskName(initialId);!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    //renderCircles with new desklist
+  };
+
   const renderCircles = (desks) => {
     console.log("In render circles function");
 
     var svgns = "http://www.w3.org/2000/svg";
     const node = imgRef.current;
     desks.forEach((desk, index) => {
+      // const svg = document.createElementNS(svgns, "svg");
+      // svg.setAttributeNS(null, "overflow", visible);
+
+      /* Create an svg element for each node. 
+        Add a circle and text element.
+        
+      */
+
       const circle = document.createElementNS(svgns, "circle");
 
       circle.setAttributeNS(null, "key", index);
@@ -130,22 +150,55 @@ const ImagePanZoomFunction = () => {
       circle.setAttributeNS(null, "r", 30);
       circle.setAttributeNS(null, "fill", "red");
       circle.setAttributeNS(null, "stroke", "black");
+      circle.addEventListener("dblclick", executeAction);
 
-      var newElement = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "title"
-      );
+      var title = document.createElementNS(svgns, "title");
+      title.innerHTML = `D${deskName}`;
 
-      newElement.innerHTML = desk.id;
-      circle.appendChild(newElement);
+      // const text = document.createElementNS(svgns, "text");
+      // text.innerHTML = `D${deskName}`;
+      // text.setAttributeNS(null, "x", desk.x);
+      // text.setAttributeNS(null, "y", desk.y);
+      // text.setAttributeNS(null, "font-size", "100");
+      // // var textNode = document.createTextNode("val");
 
-      circle.addEventListener("click", executeAction);
+      setDeskName((prev) => prev + 1);
+
+      // console.log("deskname ", deskName);
+      // newElement.innerHTML = `Desk #${desk.name}`;
+
+      circle.appendChild(title);
+      // text.appendChild(textNode);
+      // svg.appendChild(circle);
+      // svg.appendChild(text);
+      // node.after(svg);
 
       node.after(circle);
 
       console.log("Created a circle");
     });
   };
+
+  const singleClick = (event) => {
+    // console.log(event);
+    if (event.originalEvent.detail === 1) {
+      console.log("singleClick ran");
+      console.log("coordinates clicked = " + event.x, event.y);
+      addDesks(event.x, event.y);
+      console.log("clicked ", event.originalEvent.detail, " times");
+    }
+  };
+
+  const doubleClick = () => {
+    {
+      console.log("doubleClick ran");
+    }
+  };
+
+  const [handleClick, handleDoubleClick] = useClickPreventionOnDoubleClick(
+    singleClick,
+    doubleClick
+  );
 
   return (
     <>
@@ -163,12 +216,11 @@ const ImagePanZoomFunction = () => {
               onChangeTool={(tool) => setTool(tool)}
               value={value}
               onChangeValue={(value) => setValue(value)}
-              background="#FFF"
+              background="#616264"
               detectAutoPan={false}
-              onClick={(event) => {
-                // console.log("coordinates clicked = " + event.x, event.y);
-                if (isAdding) addDesks(event.x, event.y);
-              }}
+              onClick={(e) => handleClick(e)}
+              onDoubleClick={handleDoubleClick}
+              // onClick={(e) => console.log(e.originalEvent.detail)}
               miniatureProps={{
                 position: "none",
               }}

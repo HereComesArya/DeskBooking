@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ConfigureLayoutSettings from "../AdminConfigLayout/ConfigureLayoutSettings";
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
+import axios from "axios";
 
 const AddSpaces = () => {
   useEffect(() => {
@@ -16,11 +17,14 @@ const AddSpaces = () => {
   /*Image inside viewer*/
   const [image, setImage] = useState(RoomImage);
 
+  /*Use default image*/
+  const [isDefaultImage, setIsDefaultImage] = useState(true);
+
   //holds the id of the last desk, equal to length of desklist
   const [id, setId] = useState(1);
 
-  //Name of the desk provided by ADMIN
-  const [deskName, setDeskName] = useState("");
+  //Starting desk number
+  const [initialDeskNumber, setInitialDeskNumber] = useState(1);
 
   //List of desks(id, name, x, y)
   const [deskList, setDeskList] = useState([
@@ -62,14 +66,6 @@ const AddSpaces = () => {
   // const removedDesksRef = useRef([]);
   // removedDesksRef.current = removedDesks;
 
-  const [isAdding, setIsAdding] = useState(true); //change to false later
-  const [isDeleting, setIsDeleting] = useState(false);
-
-  const addRef = useRef(true); //change to false later
-  const deleteRef = useRef(true);
-  deleteRef.current = isDeleting;
-  addRef.current = isAdding;
-
   /* Ref for embedded image*/
   const imgRef = useRef();
 
@@ -101,16 +97,12 @@ const AddSpaces = () => {
     setDeskList,
     id,
     setId,
-    isAdding,
-    setIsAdding,
-    isDeleting,
-    setIsDeleting,
+    initialDeskNumber,
+    setInitialDeskNumber,
     image,
     setImage,
-    deskName,
-    setDeskName,
-    addRef,
-    deleteRef,
+    isDefaultImage,
+    setIsDefaultImage,
     // imgRef,
     deskRef,
   };

@@ -25,10 +25,11 @@
     margin-right: 10px !important;
 }
 
-.ant-form-item-required span {
+
+.bar .ant-form-item-required span {
     display: none;
   }
   
-  .ant-form-item-required:after {
+.bar .ant-form-item-required:after {
     display: none;
   }
