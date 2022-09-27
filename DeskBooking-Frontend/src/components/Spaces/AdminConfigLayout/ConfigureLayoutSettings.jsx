@@ -24,7 +24,7 @@ const ConfigureLayoutSettings = () => {
   const [imageFile, setImageFile] = useState([]);
   useEffect(() => {
     //to fetch number of spaces to set defaullt name in add spaces
-    axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+    axios.get("/api/space/getall").then((res) => {
       setPost(res.data.map((val) => val.name));
     });
   }, []);
@@ -122,11 +122,11 @@ const ConfigureLayoutSettings = () => {
         // getBase64(info.file.originFileObj);
         const file = info.file.originFileObj;
 
-        let data = new FormData();
-        // data.append("fileName", file.name);
-        data.append("file", file);
+        // let data = new FormData();
+        // // data.append("fileName", file.name);
+        // data.append("file", file);
 
-        setImageFile(data);
+        setImageFile(file);
         setImage(URL.createObjectURL(file));
       } else if (status === "error") {
         message.error(`${info.file.name} file upload failed.`);
@@ -145,18 +145,30 @@ const ConfigureLayoutSettings = () => {
 
   return (
     <>
-      <h1>{String(isDefaultImage)}</h1>
       <Form
         form={form}
         onFinish={(e) => {
           //on successful submit
           console.log("submit");
           console.log({
-            desklist: deskRef,
+            desklist: deskRef.current,
             name: e.spacename,
             defaultImage: isDefaultImage,
             ...(!isDefaultImage && { image: imageFile }),
           });
+
+          
+
+          let data = new FormData();
+          data.append("name", e.spacename);
+          data.append("deskList", deskRef.current);
+          data.append("defaultImage", isDefaultImage);
+          !isDefaultImage && data.append("image", imageFile);
+        
+          axios.post('/api/space/addwithdesks',data).then((res)=>
+          console.log(res)).catch(err=>{
+            console.log(err)
+          })
           // console.log(result);
         }}
       >

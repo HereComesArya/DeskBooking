@@ -6,7 +6,7 @@ import axios from "axios";
 
 const AddSpaces = () => {
   useEffect(() => {
-    //to fetch desk list in manage desks
+    
   }, []);
 
   /*Name of the new space*/
@@ -27,26 +27,7 @@ const AddSpaces = () => {
   const [deskName, setDeskName] = useState("");
 
   //List of desks(id, name, x, y)
-  const [deskList, setDeskList] = useState([
-    // {
-    //   id: 1,
-    //   name: "",
-    //   x: 700.9661705006765,
-    //   y: 976.1921515561569,
-    // },
-    // {
-    //   id: 2,
-    //   name: "",
-    //   x: 890.1840324763193,
-    //   y: 597.7564276048714,
-    // },
-    // {
-    //   id: 3,
-    //   name: "",
-    //   x: 1156.8092016238159,
-    //   y: 838.5791610284167,
-    // },
-  ]);
+  const [deskList, setDeskList] = useState([]);
 
   /* Ref for deskList*/
   const deskRef = useRef([]);

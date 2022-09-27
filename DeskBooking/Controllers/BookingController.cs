@@ -23,18 +23,16 @@ namespace DeskBooking.Controllers
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("getbydate")] 
-
         public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
         {
-  
             DateTime startDate = DateTime.Parse(start);
             DateTime endDate = DateTime.Parse(end);
+            
             var bookings = await _context.Bookings.Where(b => b.EndTime > startDate && b.StartTime < endDate).ToListAsync();
             return bookings;
         }
 
-        [HttpGet("{UserId}")]
-
+        [HttpGet("{UserId}")]   
         public async Task<IActionResult> GetByUserId(int UserId)
         {
             var Booking = await _context.Bookings.FindAsync(UserId);
@@ -43,8 +41,7 @@ namespace DeskBooking.Controllers
 
         [HttpGet("getbydeskid")]
         public async Task<IEnumerable<Booking>> GetBookingByDeskId(int deskId)
-        {
-            
+        {          
             var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
             return bookings;
         }

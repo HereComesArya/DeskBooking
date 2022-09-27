@@ -16,8 +16,8 @@ namespace DeskBooking.Models
         [Required]
         public DateTime EndTime { get; set; }
         [Required]
-
         public Desk Desk { get; set; }
+        
         public int DeskId { get; set; }
     }
 }
