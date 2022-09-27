@@ -45,7 +45,7 @@ builder.Services.AddAuthentication(options =>
     {
         if (ctx.Request.Path.StartsWithSegments("/api/signin-google"))
         {
-            
+                 
             ctx.Response.Redirect(ctx.RedirectUri);
             return Task.CompletedTask;
         }

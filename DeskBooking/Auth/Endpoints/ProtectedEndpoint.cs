@@ -25,6 +25,7 @@ namespace DeskBooking.Auth.Endpoints
 
             var client = _httpClientFactory.CreateClient();
             var googleAccountId = User.GetOauthIdentifier();
+           
             
             if (User.Identity!.AuthenticationType.ToLower() == "google")
             {

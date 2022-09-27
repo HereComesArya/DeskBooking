@@ -45,7 +45,5 @@ namespace DeskBooking.Controllers
             var bookings = await _context.Bookings.Where(b => b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
             return bookings;
         }
-
-
     }
 }
