@@ -21,11 +21,20 @@ const ImagePanZoomFunction = () => {
     deskRef,
   } = useContext(LayoutConfigContext);
 
-  const [deskName, setDeskName] = useState(1);
+  /* Ref for starting Desk Number */
+  const initialDeskNumberRef = useRef(1);
+
+  /* Ref for new desk svg*/
+  const imgRef = useRef();
+
   useEffect(() => {
-    setDeskName(initialDeskNumber);
-    console.log(deskName);
+    initialDeskNumberRef.current = initialDeskNumber;
+    changeTitles(imgRef.current.parentNode.lastChild, true);
   }, [initialDeskNumber]);
+
+  // useEffect(() => {
+  //   console.log(initialDeskNumberRef.current);
+  // }, [deskName]);
 
   /* For viewer */
   const [tool, setTool] = useState(TOOL_NONE);
@@ -50,9 +59,6 @@ const ImagePanZoomFunction = () => {
   // deleteRef.current = isDeleting;
   // addRef.current = isAdding;
   // //copied
-
-  // /* Ref for new desk svg*/
-  const imgRef = useRef(); //copied
 
   // /* Ref for deskList*/
   // const deskRef = useRef([]);
@@ -108,29 +114,42 @@ const ImagePanZoomFunction = () => {
 
   const executeAction = (e) => {
     // e.target.style.fill = "black";
-    console.log("delete node id", e.target.id); //gives id of node
-    console.log(e);
-    setTimeout(removeCircle(e), 1000);
-    console.log("after rem circles");
+    // console.log("delete node id", e.target.id); //gives id of node
+    // console.log(e);
+    setTimeout(removeCircle(e), 100);
+    // console.log("after rem circles");
   };
 
   const removeCircle = (e) => {
     console.log("in removeCircle");
-    e.target.remove();
     const neDeskList = deskRef.current.filter((desk) => desk.id != e.target.id);
     setDeskList(neDeskList);
+    // console.log(imgRef.current.parentNode.lastChild);
+    // console.log(imgRef.current);
+    changeTitles(e.target, false);
+    e.target.remove();
+    initialDeskNumberRef.current--;
   };
 
-  const reRenderCircles = () => {
-    //reset Id state
-    // setDeskName(initialId);!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    //renderCircles with new desklist
+  const changeTitles = (element, fromEffect) => {
+    if (element.localName === "circle") {
+      let id = fromEffect
+        ? initialDeskNumber
+        : parseInt(element.innerHTML.slice(8, -8));
+      let sibling = fromEffect ? element : element.previousSibling;
+      while (sibling.localName === "circle") {
+        sibling.innerHTML = `<title>D${id}</title>`;
+        sibling = sibling.previousSibling;
+        id++;
+        fromEffect && initialDeskNumberRef.current++;
+      }
+    }
   };
 
   const renderCircles = (desks) => {
     console.log("In render circles function");
 
-    var svgns = "http://www.w3.org/2000/svg";
+    let svgns = "http://www.w3.org/2000/svg";
     const node = imgRef.current;
     desks.forEach((desk, index) => {
       // const svg = document.createElementNS(svgns, "svg");
@@ -152,8 +171,8 @@ const ImagePanZoomFunction = () => {
       circle.setAttributeNS(null, "stroke", "black");
       circle.addEventListener("dblclick", executeAction);
 
-      var title = document.createElementNS(svgns, "title");
-      title.innerHTML = `D${deskName}`;
+      const title = document.createElementNS(svgns, "title");
+      title.innerHTML = `D${initialDeskNumberRef.current}`;
 
       // const text = document.createElementNS(svgns, "text");
       // text.innerHTML = `D${deskName}`;
@@ -162,7 +181,8 @@ const ImagePanZoomFunction = () => {
       // text.setAttributeNS(null, "font-size", "100");
       // // var textNode = document.createTextNode("val");
 
-      setDeskName((prev) => prev + 1);
+      // setDeskName((prev) => prev + 1);
+      initialDeskNumberRef.current += 1;
 
       // console.log("deskname ", deskName);
       // newElement.innerHTML = `Desk #${desk.name}`;
@@ -182,16 +202,15 @@ const ImagePanZoomFunction = () => {
   const singleClick = (event) => {
     // console.log(event);
     if (event.originalEvent.detail === 1) {
-      console.log("singleClick ran");
-      console.log("coordinates clicked = " + event.x, event.y);
+      // console.log("singleClick ran");
+      // console.log("coordinates clicked = " + event.x, event.y);
       addDesks(event.x, event.y);
-      console.log("clicked ", event.originalEvent.detail, " times");
+      // console.log("clicked ", event.originalEvent.detail, " times");
     }
   };
 
   const doubleClick = () => {
     {
-      console.log("doubleClick ran");
     }
   };
 
@@ -202,6 +221,8 @@ const ImagePanZoomFunction = () => {
 
   return (
     <>
+      <p>initialDeskNumberRef: {initialDeskNumberRef.current}</p>
+      <p>initialDeskNumber: {initialDeskNumber}</p>
       <div className="container">
         <div className="item">
           <div>

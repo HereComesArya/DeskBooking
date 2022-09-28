@@ -6,7 +6,7 @@ import { Redirect, Route, useLocation } from "wouter";
 import MainApp from "./pages/MainApp/MainApp";
 const UserContext = createContext({ user: null });
 function App() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState({ isAdmin: true });
   const [location, setLocation] = useLocation();
   return (
     <>
@@ -16,11 +16,11 @@ function App() {
           setUser,
         }}
       >
-        <AuthGuard>
+        {/* <AuthGuard> */}
         <MainApp></MainApp>
-        </AuthGuard>
-        
-        <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route>
+        {/* </AuthGuard> */}
+
+        {/* <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route> */}
       </UserContext.Provider>
     </>
   );

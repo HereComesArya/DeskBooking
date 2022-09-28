@@ -16,5 +16,20 @@ useEffect(() => {
 
 
 
-//NEW COMMIT - 22/09/22
+//NEW COMMIT - 27/09/22
+Line 9: App.jsx
+is ==>>  const [user, setUser] = useState({ isAdmin: true })
+revert to -->  const [user, setUser] = useState(null);
 
+
+Line 19-23: App.jsx
+uncomment AuthGuard and routes
+
+
+Line 55: ConfigureLayoutSettings.jsx
+==>>     axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+revert to -->    axios.get("/api/space/getall").then((res) => {
+
+
+Line 167 & 175: ConfigureLayoutSettings.jsx
+Add a new field to the table to store the starting desk number. Refer to these lines

@@ -19,8 +19,7 @@ namespace DeskBooking.Controllers
         {
             _context = context;
         }
-
-        [Microsoft.AspNetCore.Mvc.HttpGet("/getall")]
+        [Microsoft.AspNetCore.Mvc.HttpGet("getall")]
         public async Task<IEnumerable<Desk>> GetDesks(int? spaceId)
         {
             if (spaceId != null)
@@ -31,8 +30,8 @@ namespace DeskBooking.Controllers
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("/edit")]
-        public async Task<ActionResult<IEnumerable<Desk>>> AddDesks(int spaceId, IEnumerable<Desk> desks)
+        [Microsoft.AspNetCore.Mvc.HttpPost("edit")]
+        public async Task<ActionResult<IEnumerable<Desk>>> EditDesks(int spaceId, IEnumerable<Desk> desks)
         {
             try
             {
@@ -60,8 +59,8 @@ namespace DeskBooking.Controllers
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("/add")]
-        public async Task<ActionResult<IEnumerable<Desk>>> AddDesksAgain(int spaceId, IEnumerable<Desk> desks)
+        [Microsoft.AspNetCore.Mvc.HttpPost("add")]
+        public async Task<ActionResult<IEnumerable<Desk>>> AddDesksAsync(int spaceId, IEnumerable<Desk> desks)
         {
             try
             {
@@ -81,8 +80,8 @@ namespace DeskBooking.Controllers
             //return deletedDesks;
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("/del")]
-        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesksAgain(int spaceId, IEnumerable<Desk> desks)
+        [Microsoft.AspNetCore.Mvc.HttpPost("del")]
+        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks(int spaceId, IEnumerable<Desk> desks)
         {
             try
             {

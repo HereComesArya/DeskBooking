@@ -60,9 +60,9 @@ const ConfigureLayoutSettings = () => {
   useEffect(() => {
     setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
     setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
-    console.log(post);
-    console.log(initialDeskNumber);
-    console.log(defaultName);
+    // console.log(post);
+    // console.log(initialDeskNumber);
+    // console.log(defaultName);
   }, [post]);
 
   const [form] = Form.useForm();
@@ -164,6 +164,7 @@ const ConfigureLayoutSettings = () => {
             desklist: deskRef.current,
             name: e.spacename,
             defaultImage: isDefaultImage,
+            startingDesk: initialDeskNumber,
             ...(!isDefaultImage && { image: imageFile }),
           });
 
@@ -171,6 +172,7 @@ const ConfigureLayoutSettings = () => {
           data.append("name", e.spacename);
           data.append("deskList", deskRef.current);
           data.append("defaultImage", isDefaultImage);
+          data.append("startingDesk", initialDeskNumber);
           !isDefaultImage && data.append("image", imageFile);
 
           axios

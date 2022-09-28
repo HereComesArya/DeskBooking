@@ -84,7 +84,9 @@ function MainApp() {
             <h1>Dashboard</h1>
           </Route>
           <Route path="/bookings" component={Bookings}></Route>
-          {user.isAdmin && <Route path="/add-space" component={AddSpaces}></Route> }
+          {user.isAdmin && (
+            <Route path="/add-space" component={AddSpaces}></Route>
+          )}
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>
