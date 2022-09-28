@@ -161,7 +161,7 @@ const ConfigureLayoutSettings = () => {
           //on successful submit
           console.log("submit");
           console.log({
-            desklist: deskRef,
+            desklist: deskRef.current,
             name: e.spacename,
             defaultImage: isDefaultImage,
             ...(!isDefaultImage && { image: imageFile }),
@@ -169,9 +169,17 @@ const ConfigureLayoutSettings = () => {
 
           let data = new FormData();
           data.append("name", e.spacename);
-          data.append("desklist", deskRef.current);
+          data.append("deskList", deskRef.current);
           data.append("defaultImage", isDefaultImage);
-          !isDefaultImage && data.append("file", imageFile);
+          !isDefaultImage && data.append("image", imageFile);
+
+          axios
+            .post("/api/space/addwithdesks", data)
+            .then((res) => console.log(res))
+            .catch((err) => {
+              console.log(err);
+            });
+          // console.log(result);
         }}
       >
         <div>
@@ -182,11 +190,12 @@ const ConfigureLayoutSettings = () => {
               type="primary"
               shape="round"
               icon={<PlusOutlined />}
-              onClick={() => {
-                const data = [];
-                console.log("clicked");
-                // window.location.reload(false);
-              }}
+              // onClick={() => {
+              //   const data = [];
+              //   console.log("clicked");
+              //   console.log(post);
+              //   // window.location.reload(false);
+              // }}
               htmlType="submit"
             >
               Add New Space

@@ -5,6 +5,7 @@ import useClickPreventionOnDoubleClick from "../../helpers/hooks/UseClickPrevent
 
 import "./ImagePanZoomFunction.css";
 import "antd/dist/antd.css";
+import { CaretLeftFilled } from "@ant-design/icons";
 
 const ImagePanZoomFunction = () => {
   const {
@@ -88,8 +89,7 @@ const ImagePanZoomFunction = () => {
   var Viewer = null;
 
   useEffect(() => {
-    console.log("2");
-    //clgs are test, fitToViewer is required
+    //fitToViewer
     Viewer.fitToViewer();
   }, [Viewer]);
 

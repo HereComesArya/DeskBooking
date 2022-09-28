@@ -26,7 +26,6 @@ import { UserContext } from "../../App";
 function MainApp() {
   const [, setLocation] = useLocation();
   const { user, setUser } = useContext(UserContext);
-  setUser(true); //remove
   const SideMenu = (
     <Menu
       defaultSelectedKeys={["/"]}
@@ -48,7 +47,7 @@ function MainApp() {
           key: "/bookings",
           icon: <UnorderedListOutlined />,
         },
-        user && {
+        user.isAdmin && {
           label: "Manage Spaces",
           icon: <BuildOutlined />,
           children: [
@@ -85,7 +84,7 @@ function MainApp() {
             <h1>Dashboard</h1>
           </Route>
           <Route path="/bookings" component={Bookings}></Route>
-          <Route path="/add-space" component={AddSpaces}></Route>
+          {user.isAdmin && <Route path="/add-space" component={AddSpaces}></Route> }
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>
