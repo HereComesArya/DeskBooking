@@ -14,15 +14,18 @@ namespace DeskBooking.Models
         public DateTime StartTime { get; set; }
         [Required]
         public DateTime EndTime { get; set; }
-        [Required]
+
+
+        [ForeignKey("SpaceId,DeskId")]
         public Desk Desk { get; set; }
+        public int SpaceId { get; set; }
         public int DeskId { get; set; }
 
         [Required]
         public bool IsRepeating { get; set; }
         [Required]
-        public DateOnly StartDate { get; set; }
+        public DateTime StartDate { get; set; } 
         [Required]
-        public DateOnly EndDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

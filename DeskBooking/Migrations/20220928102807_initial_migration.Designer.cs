@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeskBooking.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20220920070513_enforce_space_rename")]
-    partial class enforce_space_rename
+    [Migration("20220928102807_initial_migration")]
+    partial class initial_migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -45,7 +45,19 @@ namespace DeskBooking.Migrations
                     b.Property<int>("DeskId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRepeating")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("StartTime")
@@ -56,22 +68,19 @@ namespace DeskBooking.Migrations
 
                     b.HasKey("BookingId");
 
-                    b.HasIndex("DeskId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("SpaceId", "DeskId");
 
                     b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("DeskBooking.Models.Desk", b =>
                 {
-                    b.Property<int>("DeskId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("SpaceId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeskId"), 1L, 1);
-
-                    b.Property<int>("SpaceId")
+                    b.Property<int>("DeskId")
                         .HasColumnType("int");
 
                     b.Property<float>("Xcoordinate")
@@ -80,7 +89,7 @@ namespace DeskBooking.Migrations
                     b.Property<float>("Ycoordinate")
                         .HasColumnType("real");
 
-                    b.HasKey("DeskId");
+                    b.HasKey("SpaceId", "DeskId");
 
                     b.ToTable("Desks");
                 });
@@ -93,15 +102,20 @@ namespace DeskBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SpaceId"), 1L, 1);
 
-                    b.Property<string>("FloorImage")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<bool>("DefaultImage")
+                        .HasColumnType("bit");
+
+                    b.Property<byte[]>("FloorImage")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("SpaceId");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Spaces");
                 });
@@ -136,15 +150,15 @@ namespace DeskBooking.Migrations
 
             modelBuilder.Entity("DeskBooking.Models.Booking", b =>
                 {
-                    b.HasOne("DeskBooking.Models.Desk", "Desk")
-                        .WithMany()
-                        .HasForeignKey("DeskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DeskBooking.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DeskBooking.Models.Desk", "Desk")
+                        .WithMany()
+                        .HasForeignKey("SpaceId", "DeskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

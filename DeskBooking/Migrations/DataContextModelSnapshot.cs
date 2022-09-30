@@ -44,7 +44,7 @@ namespace DeskBooking.Migrations
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
@@ -52,8 +52,11 @@ namespace DeskBooking.Migrations
                     b.Property<bool>("IsRepeating")
                         .HasColumnType("bit");
 
+                    b.Property<int>("SpaceId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
-                        .HasColumnType("date");
+                        .HasColumnType("datetime2");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
@@ -63,22 +66,19 @@ namespace DeskBooking.Migrations
 
                     b.HasKey("BookingId");
 
-                    b.HasIndex("DeskId");
-
                     b.HasIndex("UserId");
+
+                    b.HasIndex("SpaceId", "DeskId");
 
                     b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("DeskBooking.Models.Desk", b =>
                 {
-                    b.Property<int>("DeskId")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int>("SpaceId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DeskId"), 1L, 1);
-
-                    b.Property<int>("SpaceId")
+                    b.Property<int>("DeskId")
                         .HasColumnType("int");
 
                     b.Property<float>("Xcoordinate")
@@ -87,7 +87,7 @@ namespace DeskBooking.Migrations
                     b.Property<float>("Ycoordinate")
                         .HasColumnType("real");
 
-                    b.HasKey("DeskId");
+                    b.HasKey("SpaceId", "DeskId");
 
                     b.ToTable("Desks");
                 });
@@ -148,15 +148,15 @@ namespace DeskBooking.Migrations
 
             modelBuilder.Entity("DeskBooking.Models.Booking", b =>
                 {
-                    b.HasOne("DeskBooking.Models.Desk", "Desk")
-                        .WithMany()
-                        .HasForeignKey("DeskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DeskBooking.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DeskBooking.Models.Desk", "Desk")
+                        .WithMany()
+                        .HasForeignKey("SpaceId", "DeskId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

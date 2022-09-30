@@ -1,5 +1,5 @@
 ﻿using DeskBooking.Data;
-using DeskBooking.DTOs;
+using DeskBooking.DTOs.Space;
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -69,7 +69,7 @@ namespace DeskBooking.Controllers
         {
             DeskController desk = new(_context);
             var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.Image);
-            await desk.AddDesksAsync(addedSpace.Value.SpaceId, uploadRequestDto.DeskList);
+            await desk.AddDesksAsync(uploadRequestDto.DeskList);
             return Created("Successfully created", addedSpace);
         }
 

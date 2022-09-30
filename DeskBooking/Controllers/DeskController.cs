@@ -1,10 +1,13 @@
 ﻿using DeskBooking.Data;
+using DeskBooking.DTOs.Desk;
 using DeskBooking.Extensions;
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -19,7 +22,7 @@ namespace DeskBooking.Controllers
         {
             _context = context;
         }
-        [Microsoft.AspNetCore.Mvc.HttpGet("getall")]
+        [HttpGet("getall")]
         public async Task<IEnumerable<Desk>> GetDesks(int? spaceId)
         {
             if (spaceId != null)
@@ -30,12 +33,37 @@ namespace DeskBooking.Controllers
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("edit")]
+        [HttpGet("/getavail")]
+        public async Task<IEnumerable<AvailableDeskDto>> GetAvailable(int spaceId, DateTime startDate, DateTime endDate, DateTime startTime, DateTime endTime)
+        {
+            var desks = await GetDesks(spaceId);
+            var spaceBookings = await _context.Bookings.Where(b => b.SpaceId == spaceId).ToListAsync();
+            var bookings = spaceBookings.Where(b => b.StartDate <= endDate && b.EndDate >= startDate &&
+                                                b.StartTime <= endTime && b.EndTime >= startTime).ToList();
+            return desks.Select(d => bookings.Any(b => b.DeskId == d.DeskId) ? new
+            AvailableDeskDto()
+            {
+                DeskId = d.DeskId,
+                X = d.Xcoordinate,
+                Y = d.Ycoordinate,
+                IsAvailable = false
+            } : new
+           AvailableDeskDto()
+            {
+                DeskId = d.DeskId,
+                X = d.Xcoordinate,
+                Y = d.Ycoordinate,
+                IsAvailable = true
+            }
+            );
+        }
+
+        [HttpPost("edit")]
         public async Task<ActionResult<IEnumerable<Desk>>> EditDesks(int spaceId, IEnumerable<Desk> desks)
         {
             try
             {
-                var deskList = await _context.Desks.ToListAsync();
+                var deskList = await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
                 var intersect = deskList.IntersectBy(desks.Select(t => t.DeskId), d => d.DeskId);
                 var deletedDesks = deskList.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
                 var addedDesks = desks.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
@@ -53,34 +81,35 @@ namespace DeskBooking.Controllers
                     status = 400
                 });
             }
-            
+
             return await _context.Desks.ToListAsync();
             //return deletedDesks;
         }
 
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("add")]
-        public async Task<ActionResult<IEnumerable<Desk>>> AddDesksAsync(int spaceId, IEnumerable<Desk> desks)
+        [HttpPost("add")]
+        public async Task<ActionResult<IEnumerable<Desk>>> AddDesksAsync(IEnumerable<Desk> desks)
         {
             try
             {
                 await _context.Desks.AddRangeAsync(desks);
-                await _context.SaveChangesWithIdentityInsertAsync<Desk>();
+                // await _context.SaveChangesWithIdentityInsertAsync<Desk>();
+                await _context.SaveChangesAsync();
             }
             catch (Exception)
             {
 
                 return BadRequest(new
                 {
-                    title= "Cannot add desk",
+                    title = "Cannot add desk",
                     status = 400
                 });
-            }           
+            }
             return await _context.Desks.ToListAsync();
             //return deletedDesks;
         }
 
-        [Microsoft.AspNetCore.Mvc.HttpPost("del")]
+        [HttpPost("del")]
         public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks(int spaceId, IEnumerable<Desk> desks)
         {
             try
