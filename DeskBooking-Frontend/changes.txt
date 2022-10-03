@@ -33,3 +33,11 @@ revert to -->    axios.get("/api/space/getall").then((res) => {
 
 Line 167 & 175: ConfigureLayoutSettings.jsx
 Add a new field to the table to store the starting desk number. Refer to these lines
+
+
+
+Line 226: ManageSpaces.jsx
+fix set location. pass state to add-space without showing parameters in url
+
+Line 109: ManageSpaces.jsx
+onDelete function - Need to add "axios.delete" call.

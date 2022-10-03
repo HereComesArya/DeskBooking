@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE } from "react-svg-pan-zoom";
-import { LayoutConfigContext } from "../../helpers/contexts/AdminLayoutConfigContext";
+import { BookingsConfigContext } from "../../helpers/contexts/AddBookingsLayoutConfig";
 import useClickPreventionOnDoubleClick from "../../helpers/hooks/UseClickPreventionOnDoubleClick";
 
-import "./ImagePanZoomFunction.css";
+import "./ImagePanZoomAddBookings.css";
 import "antd/dist/antd.css";
 import { CaretLeftFilled } from "@ant-design/icons";
 
 const ImagePanZoomFunction = () => {
   const {
+    spaceName,
+    setSpaceName,
     deskList,
     setDeskList,
-    id,
-    setId,
-    image,
-    setImage,
+    selectedDesk,
+    setSelectedDesk,
     initialDeskNumber,
     setInitialDeskNumber,
-    // imgRef,
-    deskRef,
-  } = useContext(LayoutConfigContext);
+    image,
+    setImage,
+  } = useContext(BookingsConfigContext);
 
   /* Ref for starting Desk Number */
   const initialDeskNumberRef = useRef(1);
@@ -31,10 +31,6 @@ const ImagePanZoomFunction = () => {
     initialDeskNumberRef.current = initialDeskNumber;
     changeTitles(imgRef.current.parentNode.lastChild, true);
   }, [initialDeskNumber]);
-
-  // useEffect(() => {
-  //   console.log(initialDeskNumberRef.current);
-  // }, [deskName]);
 
   /* For viewer */
   const [tool, setTool] = useState(TOOL_NONE);
@@ -98,19 +94,6 @@ const ImagePanZoomFunction = () => {
     //fitToViewer
     Viewer.fitToViewer();
   }, [Viewer]);
-
-  const addDesks = (x, y) => {
-    const desk = {
-      id: id,
-      x: x,
-      y: y,
-    };
-    setId((id) => id + 1);
-
-    const newDeskList = [...deskList, desk];
-    setDeskList(newDeskList);
-    renderCircles([desk]);
-  };
 
   const executeAction = (e) => {
     // e.target.style.fill = "black";
@@ -199,25 +182,28 @@ const ImagePanZoomFunction = () => {
     });
   };
 
+  /*Book Desk*/
   const singleClick = (event) => {
-    // console.log(event);
-    if (event.originalEvent.detail === 1) {
-      // console.log("singleClick ran");
-      // console.log("coordinates clicked = " + event.x, event.y);
-      addDesks(event.x, event.y);
-      // console.log("clicked ", event.originalEvent.detail, " times");
-    }
+    // // console.log(event);
+    // if (event.originalEvent.detail === 1) {
+    //   // console.log("singleClick ran");
+    //   // console.log("coordinates clicked = " + event.x, event.y);
+    //   addDesks(event.x, event.y);
+    //   // console.log("clicked ", event.originalEvent.detail, " times");
+    // }
+    console.log(event);
+    // setSelectedDesk()
   };
 
-  const doubleClick = () => {
-    {
-    }
-  };
+  //   const doubleClick = () => {
+  //     {
+  //     }
+  //   };
 
-  const [handleClick, handleDoubleClick] = useClickPreventionOnDoubleClick(
-    singleClick,
-    doubleClick
-  );
+  //   const [handleClick, handleDoubleClick] = useClickPreventionOnDoubleClick(
+  //     singleClick,
+  //     doubleClick
+  //   );
 
   return (
     <>
@@ -239,8 +225,8 @@ const ImagePanZoomFunction = () => {
               onChangeValue={(value) => setValue(value)}
               background="#616264"
               detectAutoPan={false}
-              onClick={(e) => handleClick(e)}
-              onDoubleClick={handleDoubleClick}
+              onClick={(e) => singleClick(e)}
+              //   onDoubleClick={handleDoubleClick}
               // onClick={(e) => console.log(e.originalEvent.detail)}
               miniatureProps={{
                 position: "none",

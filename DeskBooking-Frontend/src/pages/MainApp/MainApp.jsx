@@ -22,6 +22,7 @@ import "./MainApp.css";
 import "antd/dist/antd.css";
 import { signOut } from "../../utils/signOut";
 import { UserContext } from "../../App";
+import ManageSpaces from "../../components/Spaces/ManageSpaces";
 
 function MainApp() {
   const [, setLocation] = useLocation();
@@ -58,7 +59,7 @@ function MainApp() {
             },
             {
               label: "Modify Space",
-              key: "/modify-space",
+              key: "/manage-spaces",
               icon: <EditOutlined />,
             },
           ],
@@ -77,7 +78,7 @@ function MainApp() {
     <div className="MainApp">
       <NavBar menu={SideMenu} />
       <Layout>
-        <SideBar menu={SideMenu} />
+        <SideBar style={{ height: "100%" }} menu={SideMenu} />
         <Layout className="content" style={{ backgroundColor: "white" }}>
           {/* <Routes> */}
           <Route path="/">
@@ -85,8 +86,9 @@ function MainApp() {
           </Route>
           <Route path="/bookings" component={Bookings}></Route>
           {user.isAdmin && (
-            <Route path="/add-space" component={AddSpaces}></Route>
+            <Route path="/manage-spaces" component={ManageSpaces}></Route>
           )}
+          <Route path="/add-space" component={AddSpaces}></Route>
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>

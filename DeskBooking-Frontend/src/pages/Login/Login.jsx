@@ -27,13 +27,21 @@ const Login = () => {
           <Card className="card">
             <img className="teknorix-logo" src={TeknorixLogo}></img>
             <p className="login-text">Log in to DeskBooker</p>
-            <Button className="Login-button" block href="/api/signin-google?returnUrl=/home">
+            <Button
+              className="Login-button"
+              block
+              href="/api/signin-google?returnUrl=/home"
+            >
               <span style={{ marginRight: 10 }}>
                 <img src={GoogleLogo}></img>
               </span>
               <span>Continue with Google</span>
             </Button>
-            <Button className="Login-button" block href="/api/signin-ms?returnUrl=/home">
+            <Button
+              className="Login-button"
+              block
+              href="/api/signin-ms?returnUrl=/home"
+            >
               <span style={{ marginRight: 10 }}>
                 <img src={MicrosoftLogo}></img>
               </span>
