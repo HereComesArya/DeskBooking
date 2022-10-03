@@ -7,8 +7,6 @@ import {
   PlusOutlined,
   UploadOutlined,
   InfoCircleOutlined,
-  EditOutlined,
-  DeleteOutlined,
 } from "@ant-design/icons";
 import ImagePanZoomFunction from "../../ImagePanZoom/ImagePanZoomFunction";
 import { Route, Redirect, useLocation } from "wouter";
@@ -30,7 +28,35 @@ const { Header } = Layout;
 import "./ConfigureLayoutSettings.css";
 import "antd/dist/antd.css";
 
+import {useQuill } from "react-quilljs";
+import "quill/dist/quill.snow.css";
+
 const ConfigureLayoutSettings = () => {
+
+//add states, functions, useeffects...
+const theme = "snow";
+  const modules = {
+    toolbar: [
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ size: [] }],
+      [{ align: [] }],
+    , [{ font: [] }],
+      [{ list: 'ordered'}, { list: 'bullet' }],
+      [{ indent: '-1'}, { indent: '+1' }],
+      [{ header: [1, 2, 3, 4, 5, 6] }],
+      ['link'],
+      [{ color: [] }, { background: [] }],
+    ],
+    
+    clipboard: {
+      matchVisual: false,
+    },
+  
+  };
+  
+  const placeholder = "Compose an epic...";
+  const formats = ["bold", "italic", "underline", "strike","align","list",'indent', 'header','link', 'color', 'background','size','font'];
+  const { quillRef } = useQuill({ theme, modules, formats, placeholder });
   const {
     spaceName,
     setSpaceName,
@@ -55,7 +81,6 @@ const ConfigureLayoutSettings = () => {
   useEffect(() => {
     //to fetch number of spaces to set defaullt name in add spaces
     axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
-      // axios.get("/api/space/getall").then((res) => {
       setPost(res.data);
     });
   }, []);
@@ -194,7 +219,7 @@ const ConfigureLayoutSettings = () => {
               className="add-bookings-button"
               type="primary"
               shape="round"
-              // icon={<PlusOutlined />}
+              icon={<PlusOutlined />}
               // onClick={() => {
               //   const data = [];
               //   console.log("clicked");
@@ -203,7 +228,7 @@ const ConfigureLayoutSettings = () => {
               // }}
               htmlType="submit"
             >
-              Save Changes
+              Add New Space
             </Button>
           </Header>
           <div
@@ -293,6 +318,13 @@ const ConfigureLayoutSettings = () => {
             </div>
             {/* <img src={image} /> */}
           </div>
+          <div>
+            {/*Rich text component*/}
+            <div className="rte" style={{ width: 800, height: 200 , marginLeft:'200px',paddingBottom: '50px',justifyContent:"space-between"}}>
+          <div ref={quillRef} />{" "}
+        </div>
+          </div>
+                  
           <div>
             <ImagePanZoomFunction></ImagePanZoomFunction>
           </div>
