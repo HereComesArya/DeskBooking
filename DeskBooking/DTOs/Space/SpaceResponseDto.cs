@@ -1,4 +1,4 @@
-﻿namespace DeskBooking.DTOs
+﻿namespace DeskBooking.DTOs.Space
 {
     public class SpaceResponseDto
     {

@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DeskBooking.Models
 {
     public class Desk
-    {
-        [Key]
+    {       
         [Required]
         public int DeskId { get; set; }
         [Required]

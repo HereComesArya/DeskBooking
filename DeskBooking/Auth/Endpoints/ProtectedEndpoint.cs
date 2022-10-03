@@ -22,7 +22,6 @@ namespace DeskBooking.Auth.Endpoints
         {
 
             string pictureFromInititals = $"https://ui-avatars.com/api/?background=random&size=100&name={User.GetFirstName()}+{User.GetLastName()}";
-
             var client = _httpClientFactory.CreateClient();
             var googleAccountId = User.GetOauthIdentifier();
            

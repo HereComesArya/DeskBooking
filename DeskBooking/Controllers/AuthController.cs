@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeskBooking.Controllers
 {
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AuthController : ControllerBase
     {
         [Microsoft.AspNetCore.Mvc.HttpGet("/api/signin-google")]

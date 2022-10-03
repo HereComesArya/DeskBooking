@@ -13,27 +13,20 @@ namespace DeskBooking.Data
         public DbSet<Desk> Desks { get; set; }
         public DbSet<AdminUser> AdminUsers { get; set; }
         public DbSet<Space> Spaces { get; set; }
-
-
-        protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            builder.Properties<DateOnly>()
-                .HaveConversion<DateOnlyConverter>()
-                .HaveColumnType("date");
-        }
-    }
+            modelBuilder.Entity<Desk>()
+                .HasKey(d => new { d.SpaceId, d.DeskId });
 
-    /// <summary>
-    /// Converts <see cref="DateOnly" /> to <see cref="DateTime"/> and vice versa.
-    /// </summary>
-    public class DateOnlyConverter : ValueConverter<DateOnly, DateTime>
-    {
-        /// <summary>
-        /// Creates a new instance of this converter.
-        /// </summary>
-        public DateOnlyConverter() : base(
-                d => d.ToDateTime(TimeOnly.MinValue),
-                d => DateOnly.FromDateTime(d))
-        { }
+            modelBuilder
+                .Entity<Booking>()
+                .Property(b => b.StartDate)
+                .HasConversion(d => d.Date, d => d);
+
+            modelBuilder
+                .Entity<Booking>()
+                .Property(b => b.EndDate)
+                .HasConversion(d => d.Date, d => d);
+        }
     }
 }
