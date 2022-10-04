@@ -22,12 +22,11 @@ namespace DeskBooking.Controllers
             _context = context;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
-        public async Task<ActionResult<Space>> AddSpaceAsync(string name, IFormFile? formFile)
+        public async Task<ActionResult<Space>> AddSpaceAsync(string name,int initialDeskNo, IFormFile? formFile)
         {
             var file = new Space();
             if (formFile != null)
-            {
-             
+            {          
                 using (var memoryStream = new MemoryStream())
                 {
                     await formFile.CopyToAsync(memoryStream);
@@ -38,6 +37,7 @@ namespace DeskBooking.Controllers
                         file = new Space()
                         {
                             Name = name,
+                            InitialDeskNo = initialDeskNo,
                             FloorImage = memoryStream.ToArray(),
                             DefaultImage = false
                         };
@@ -53,6 +53,7 @@ namespace DeskBooking.Controllers
                 file = new Space()
                 {
                     Name = name,
+                    InitialDeskNo = initialDeskNo,
                     DefaultImage = true 
                 };
             }
@@ -68,7 +69,7 @@ namespace DeskBooking.Controllers
         public async Task<ActionResult> AddSpaceWithDesksAsync([FromForm] SpaceUploadRequestDto uploadRequestDto)
         {
             DeskController desk = new(_context);
-            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.Image);
+            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.InitialDeskNo, uploadRequestDto.Image);
             if (addedSpace.Value == null)
             {
                 return BadRequest(addedSpace.Result);

@@ -60,6 +60,7 @@ namespace DeskBooking.Controllers
             );
         }
 
+
         [HttpPost("edit")]
         public async Task<ActionResult<IEnumerable<Desk>>> EditDesks(int spaceId, IEnumerable<Desk> desks)
         {
