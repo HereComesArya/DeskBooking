@@ -22,7 +22,7 @@ namespace DeskBooking.Controllers
             _context = context;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
-        public async Task<ActionResult<Space>> AddSpaceAsync(string name, IFormFile? formFile)
+        public async Task<ActionResult<Space>> AddSpaceAsync(string name,int initialDeskNo, IFormFile? formFile)
         {
             var file = new Space();
             if (formFile != null)
@@ -38,6 +38,7 @@ namespace DeskBooking.Controllers
                         file = new Space()
                         {
                             Name = name,
+                            InitialDeskNo = initialDeskNo,
                             FloorImage = memoryStream.ToArray(),
                             DefaultImage = false
                         };
@@ -53,6 +54,7 @@ namespace DeskBooking.Controllers
                 file = new Space()
                 {
                     Name = name,
+                    InitialDeskNo = initialDeskNo,
                     DefaultImage = true 
                 };
             }
