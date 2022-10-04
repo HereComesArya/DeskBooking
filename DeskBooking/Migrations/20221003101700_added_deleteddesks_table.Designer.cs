@@ -4,6 +4,7 @@ using DeskBooking.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeskBooking.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221003101700_added_deleteddesks_table")]
+    partial class added_deleteddesks_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -75,37 +77,41 @@ namespace DeskBooking.Migrations
 
             modelBuilder.Entity("DeskBooking.Models.DeletedBooking", b =>
                 {
-                    b.Property<int>("DBookingId")
+                    b.Property<int>("BookingId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DBookingId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"), 1L, 1);
 
-                    b.Property<int>("DDeskId")
+                    b.Property<int>("DeskId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DEndDate")
+                    b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DEndTime")
+                    b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<bool>("DIsRepeating")
+                    b.Property<bool>("IsRepeating")
                         .HasColumnType("bit");
 
-                    b.Property<int>("DSpaceId")
+                    b.Property<int>("SpaceId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("DStartDate")
+                    b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("DStartTime")
+                    b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DUserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("DBookingId");
+                    b.HasKey("BookingId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("SpaceId", "DeskId");
 
                     b.ToTable("DeletedBookings");
                 });
@@ -184,6 +190,25 @@ namespace DeskBooking.Migrations
                 });
 
             modelBuilder.Entity("DeskBooking.Models.Booking", b =>
+                {
+                    b.HasOne("DeskBooking.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DeskBooking.Models.Desk", "Desk")
+                        .WithMany()
+                        .HasForeignKey("SpaceId", "DeskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Desk");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.DeletedBooking", b =>
                 {
                     b.HasOne("DeskBooking.Models.User", "User")
                         .WithMany()

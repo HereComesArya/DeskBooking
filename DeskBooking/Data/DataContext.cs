@@ -13,6 +13,7 @@ namespace DeskBooking.Data
         public DbSet<Desk> Desks { get; set; }
         public DbSet<AdminUser> AdminUsers { get; set; }
         public DbSet<Space> Spaces { get; set; }
+        public DbSet<DeletedBooking> DeletedBookings { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Desk>()

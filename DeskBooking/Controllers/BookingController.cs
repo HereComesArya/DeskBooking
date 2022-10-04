@@ -12,6 +12,7 @@ using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using IMapper = AutoMapper.IMapper;
 using DeskBooking.DTOs.Booking;
+using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -103,8 +104,14 @@ namespace DeskBooking.Controllers
             catch (Exception)
             {
                 return BadRequest();
-            }
+            }       
             
+        }
+
+        [HttpPut("meow")]
+        public async Task<string> Meow()
+        {
+            return ("Meow");
         }
     }
 }
