@@ -18,9 +18,6 @@ namespace DeskBooking.Data
         {
             modelBuilder.Entity<Desk>()
                 .HasKey(d => new { d.SpaceId, d.DeskId });
-            //modelBuilder.Entity<Booking>()
-            //    .HasOne(b => b.Desk)
-            //    .WithMany()
 
             modelBuilder
                 .Entity<Booking>()

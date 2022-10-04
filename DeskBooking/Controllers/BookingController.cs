@@ -107,5 +107,11 @@ namespace DeskBooking.Controllers
             }       
             
         }
+
+        [HttpPut("meow")]
+        public async Task<string> Meow()
+        {
+            return ("Meow");
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace DeskBooking.Models
 
 
         [ForeignKey("SpaceId,DeskId")]
-        public virtual Desk Desk { get; set; }
+        public Desk Desk { get; set; }
         public int SpaceId { get; set; }
         public int DeskId { get; set; }
 
