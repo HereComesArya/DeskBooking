@@ -17,6 +17,7 @@ import NavBar from "../../components/responsive-sidebar/NavBar/NavBar";
 import SideBar from "../../components/responsive-sidebar/SideBar/SideBar";
 import Bookings from "../../components/Bookings/Bookings";
 import AddSpaces from "../../components/Spaces/AddSpaces/AddSpaces";
+import ModifySpaces from "../../components/Spaces/ModifySpaces/ModifySpaces";
 
 import "./MainApp.css";
 import "antd/dist/antd.css";
@@ -50,6 +51,7 @@ function MainApp() {
         },
         user.isAdmin && {
           label: "Manage Spaces",
+          // key: "/manage-spaces",
           icon: <BuildOutlined />,
           children: [
             {
@@ -64,6 +66,23 @@ function MainApp() {
             },
           ],
         },
+        // user.isAdmin && {
+        //   label: "Modify Space",
+        //   key: "/modify-space",
+        //   icon: <BuildOutlined />,
+        //   // children: [
+        //   //   {
+        //   //     label: "Add Space",
+        //   //     key: "/add-space",
+        //   //     icon: <PlusOutlined />,
+        //   //   },
+        //   //   {
+        //   //     label: "Modify Space",
+        //   //     key: "/manage-spaces",
+        //   //     icon: <EditOutlined />,
+        //   //   },
+        //   // ],
+        // },
         { label: "Profile", key: "/profile", icon: <UserAddOutlined /> },
         {
           label: "Signout",
@@ -88,6 +107,12 @@ function MainApp() {
           {user.isAdmin && (
             <Route path="/manage-spaces" component={ManageSpaces}></Route>
           )}
+          {user.isAdmin && (
+            <Route path="/modify-space" component={ModifySpaces}></Route>
+          )}
+          <Route path="/add-space/:id">
+            {(params) => <AddSpaces id={params.id} />}
+          </Route>
           <Route path="/add-space" component={AddSpaces}></Route>
           <Route path="/profile">
             <h1>Profile</h1>
@@ -95,7 +120,6 @@ function MainApp() {
           <Route path="/signout">
             <h1>Signout</h1>
           </Route>
-          {/* </Routes> */}
         </Layout>
       </Layout>
     </div>

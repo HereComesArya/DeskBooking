@@ -2,8 +2,9 @@ import React, { useRef, useState, useEffect } from "react";
 // import { Routes, Route, useNavigate } from "react-router-dom";
 import { useLocation, Link } from "wouter";
 import axios from "axios";
+import { getFormattedSpaceData } from "../../utils/services";
 
-import { Button, Input, Space, Table, Layout, Modal } from "antd";
+import { Button, Input, Space, Table, Layout, Modal, Affix } from "antd";
 const Header = Layout;
 import {
   SearchOutlined,
@@ -21,35 +22,43 @@ import "antd/dist/antd.css";
 
 const ManageSpaces = () => {
   const [location, setLocation] = useLocation();
-
   const [isLoading, setIsLoading] = useState(true);
   const [post, setPost] = useState([]);
+  const [dataSource, setDataSource] = useState([]);
   useEffect(() => {
     // axios.get("/api/booking/getall").then((res) => {
     //   setPost(res.data);
     // });
-    axios.get("https://randomuser.me/api/?results=20").then((res) => {
-      setPost(res.data);
-      setIsLoading(false);
-    });
+    // getFormattedSpaceData().then((data) => {
+    //   setIsLoading(false);
+    //   console.log(data);
+    //   setDataSource(data);
+    // });
+
+    const getData = async () => {
+      await getFormattedSpaceData().then((data) => {
+        setIsLoading(false);
+        setDataSource(data);
+      });
+    };
+    getData();
   }, []);
 
   //   const data = post;
 
   /*to be removed, add async get desks function in services.js*/
-  const [dataSource, setDataSource] = useState([]);
-  useEffect(() => {
-    const data = [];
+  // useEffect(() => {
+  //   const data = [];
 
-    for (let i = 0; i < 46; i++) {
-      data.push({
-        key: i,
-        SpaceId: i + 1,
-        SpaceName: `Example Space #${i + 1}`,
-      });
-    }
-    setDataSource(data);
-  }, []);
+  //   for (let i = 0; i < 46; i++) {
+  //     data.push({
+  //       key: i,
+  //       SpaceId: i + 1,
+  //       SpaceName: `Example Space #${i + 1}`,
+  //     });
+  //   }
+  //   setDataSource(data);
+  // }, []);
 
   //   const newData = [];
   //   {
@@ -107,6 +116,7 @@ const ManageSpaces = () => {
   };
 
   const onDelete = (SpaceId, e) => {
+    //add axios delete space
     const data = dataSource.filter((item) => item.SpaceId !== SpaceId);
     setDataSource(data);
   };
@@ -222,8 +232,9 @@ const ManageSpaces = () => {
             <EditOutlined
               onClick={() => {
                 // onEditStudent(record);
-                console.log(`edit ${record.SpaceName}`);
-                // setLocation("/add-space");
+                // console.log(`edit ${record}`);
+                // console.log(record);
+                setLocation(`/add-space/${record.SpaceId}`);
               }}
             />
             <DeleteOutlined

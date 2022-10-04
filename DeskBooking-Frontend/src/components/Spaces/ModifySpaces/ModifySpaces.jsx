@@ -4,7 +4,7 @@ import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfig
 import RoomImage from "../../../assets/images/empty-grid.jpg";
 import axios from "axios";
 
-const AddSpaces = (props) => {
+const AddSpaces = () => {
   useEffect(() => {
     //to fetch desk list in manage desks
   }, []);
@@ -25,8 +25,6 @@ const AddSpaces = (props) => {
 
   //Starting desk number
   const [initialDeskNumber, setInitialDeskNumber] = useState(1);
-  // const initialDeskNumberRef = useRef();
-  // initialDeskNumberRef.current = initialDeskNumber;
 
   //List of desks(id, name, x, y)
   const [deskList, setDeskList] = useState([
@@ -41,7 +39,7 @@ const AddSpaces = (props) => {
     //   y: 597.7564276048714,
     // },
     // {
-    //   id: 31,
+    //   id: 3,
     //   x: 1156.8092016238159,
     //   y: 838.5791610284167,
     // },
@@ -84,10 +82,7 @@ const AddSpaces = (props) => {
   return (
     <>
       <LayoutConfigContext.Provider value={values}>
-        <ConfigureLayoutSettings
-          name={props.id ? "Modify Space" : "Add Space"}
-          id={props.id}
-        ></ConfigureLayoutSettings>
+        <ConfigureLayoutSettings name="Modify Space"></ConfigureLayoutSettings>
       </LayoutConfigContext.Provider>
     </>
   );

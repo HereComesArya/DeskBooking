@@ -11,18 +11,17 @@ const ImagePanZoomFunction = () => {
   const {
     deskList,
     setDeskList,
-    id,
-    setId,
+    deskId,
+    setDeskId,
     image,
     setImage,
     initialDeskNumber,
     setInitialDeskNumber,
-    // imgRef,
     deskRef,
   } = useContext(LayoutConfigContext);
 
-  /* Ref for starting Desk Number */
-  const initialDeskNumberRef = useRef(1);
+  /* Ref for starting Desk Number */ //copied
+  const initialDeskNumberRef = useRef();
 
   /* Ref for new desk svg*/
   const imgRef = useRef();
@@ -30,6 +29,9 @@ const ImagePanZoomFunction = () => {
   useEffect(() => {
     initialDeskNumberRef.current = initialDeskNumber;
     changeTitles(imgRef.current.parentNode.lastChild, true);
+    console.log(`state: ${initialDeskNumber}`);
+    console.log("initialDeskNumber useeffect");
+    console.log(`ref: ${initialDeskNumberRef.current}`);
   }, [initialDeskNumber]);
 
   // useEffect(() => {
@@ -83,7 +85,11 @@ const ImagePanZoomFunction = () => {
 
   useEffect(() => {
     renderCircles(deskList);
-    // setDeskName(initialDeskNumber);
+    if (deskList.length > 0) {
+      setDeskId(deskList.slice(-1)[0].id + 1);
+    } else {
+      setDeskId(1);
+    }
   }, []);
 
   const updateWidthAndHeight = () => {
@@ -101,11 +107,11 @@ const ImagePanZoomFunction = () => {
 
   const addDesks = (x, y) => {
     const desk = {
-      id: id,
+      id: deskId,
       x: x,
       y: y,
     };
-    setId((id) => id + 1);
+    setDeskId((prev) => prev + 1);
 
     const newDeskList = [...deskList, desk];
     setDeskList(newDeskList);
@@ -122,8 +128,10 @@ const ImagePanZoomFunction = () => {
 
   const removeCircle = (e) => {
     console.log("in removeCircle");
-    const neDeskList = deskRef.current.filter((desk) => desk.id != e.target.id);
-    setDeskList(neDeskList);
+    const newDeskList = deskRef.current.filter(
+      (desk) => desk.id != e.target.id
+    );
+    setDeskList(newDeskList);
     // console.log(imgRef.current.parentNode.lastChild);
     // console.log(imgRef.current);
     changeTitles(e.target, false);
@@ -221,8 +229,9 @@ const ImagePanZoomFunction = () => {
 
   return (
     <>
-      {/* <p>initialDeskNumberRef: {initialDeskNumberRef.current}</p>
-      <p>initialDeskNumber: {initialDeskNumber}</p> */}
+      <p>initialDeskNumberRef: {initialDeskNumberRef.current}</p>
+      <p>initialDeskNumber: {initialDeskNumber}</p>
+      <p>deskId: {deskId}</p>
       <div className="container">
         <div className="item">
           <div>

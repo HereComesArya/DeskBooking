@@ -12,6 +12,8 @@ import {
 } from "@ant-design/icons";
 import ImagePanZoomFunction from "../../ImagePanZoom/ImagePanZoomFunction";
 import { Route, Redirect, useLocation } from "wouter";
+import getSpaceAndDeskData from "../../../utils/services";
+
 import axios from "axios";
 
 import {
@@ -30,48 +32,63 @@ const { Header } = Layout;
 import "./ConfigureLayoutSettings.css";
 import "antd/dist/antd.css";
 
-const ConfigureLayoutSettings = () => {
+const ConfigureLayoutSettings = (props) => {
   const {
-    spaceName,
-    setSpaceName,
     deskList,
     setDeskList,
-    id,
-    setId,
-    initialDeskNumber,
-    setInitialDeskNumber,
+    deskId,
+    setDeskId,
     image,
     setImage,
+    initialDeskNumber,
+    setInitialDeskNumber,
     isDefaultImage,
     setIsDefaultImage,
-    // imgRef,
     deskRef,
   } = useContext(LayoutConfigContext);
 
   const [post, setPost] = useState([]);
-  const [, setLocation] = useLocation();
+  // const [, setLocation] = useLocation();
   const [defaultName, setDefaultName] = useState("");
   const [imageFile, setImageFile] = useState([]);
+
   useEffect(() => {
-    //to fetch number of spaces to set defaullt name in add spaces
-    axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
-      // axios.get("/api/space/getall").then((res) => {
-      setPost(res.data);
-    });
+    if (props.id) {
+      //to fetch space and desk data and set state values
+      // getSpaceAndDeskData(id);
+      // const fetchData = async () => {
+      //   await getSpaceAndDeskData(props.id).then((data) => {
+      //     // setweather(data);
+      //   });
+      // };
+      // fetchData();
+    } else {
+      //set default state values, get list of spaces and set default name
+      // axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+      axios.get("/api/space/getall").then((res) => {
+        setPost(res.data);
+      });
+    }
   }, []);
 
   useEffect(() => {
-    setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
+    //FIX InitialDeskNumber for add desk ✅
+    setInitialDeskNumber(1);
+    // setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
     setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
-    // console.log(post);
-    // console.log(initialDeskNumber);
+    console.log("post");
+    console.log(post);
+    console.log(initialDeskNumber);
     // console.log(defaultName);
   }, [post]);
 
   const [form] = Form.useForm();
   useEffect(() => form.resetFields(), [defaultName]);
-  const init = Form.useWatch("initialDeskNumber", form);
-  useEffect(() => setInitialDeskNumber(init), [init]);
+  const form_initialDeskNumber = Form.useWatch("initialDeskNumber", form);
+  useEffect(() => {
+    setInitialDeskNumber(form_initialDeskNumber);
+    console.log(`form changed: ${form_initialDeskNumber}`);
+  }, [form_initialDeskNumber]);
 
   const dummyRequest = async ({ file, onSuccess }) => {
     setTimeout(() => {
@@ -177,19 +194,20 @@ const ConfigureLayoutSettings = () => {
           data.append("defaultImage", isDefaultImage);
           data.append("startingDesk", initialDeskNumber);
           !isDefaultImage && data.append("image", imageFile);
-
-          axios
-            .post("/api/space/addwithdesks", data)
-            .then((res) => console.log(res))
-            .catch((err) => {
-              console.log(err);
-            });
+          // console.log(data);
+          //post req for new space
+          // axios
+          //   .post("/api/space/addwithdesks", data)
+          //   .then((res) => console.log(res))
+          //   .catch((err) => {
+          //     console.log(err);
+          //   });
           // console.log(result);
         }}
       >
         <div>
           <Header className="header">
-            <h1 className="header-text">Add Space</h1>
+            <h1 className="header-text">{props.name}</h1>
             <Button
               className="add-bookings-button"
               type="primary"
