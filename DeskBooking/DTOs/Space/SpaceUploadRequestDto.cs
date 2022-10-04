@@ -1,4 +1,5 @@
-﻿using DeskBooking.Models;
+﻿using DeskBooking.DTOs.Desk;
+using DeskBooking.Models;
 
 namespace DeskBooking.DTOs.Space
 {
@@ -9,8 +10,8 @@ namespace DeskBooking.DTOs.Space
         //public string ImageData { get; set; } = String.Empty;
 
         public string Name { get; set; } = string.Empty;
-        public int InitialDeskNo { get; set; } = 0;
-        public IEnumerable<Models.Desk>? DeskList { get; set; }
+        public int StartingDesk { get; set; } = 0;
+        public IEnumerable<DeskRequestDto>? DeskList { get; set; }
         public IFormFile? Image { get; set; }
         public bool DefaultImage { get; set; } = true;
     }

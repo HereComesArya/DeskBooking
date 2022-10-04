@@ -24,7 +24,8 @@ namespace DeskBooking.Controllers
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
         public async Task<ActionResult<Space>> AddSpaceAsync(string name,int initialDeskNo, IFormFile? formFile)
         {
-            var file = new Space();
+            
+            var space = new Space();
             if (formFile != null)
             {
              
@@ -35,7 +36,7 @@ namespace DeskBooking.Controllers
                     // Upload the file if less than 5 MB
                     if (memoryStream.Length < 5242880)
                     {
-                        file = new Space()
+                        space = new Space()
                         {
                             Name = name,
                             InitialDeskNo = initialDeskNo,
@@ -51,31 +52,33 @@ namespace DeskBooking.Controllers
             }
             else
             {
-                file = new Space()
+                space = new Space()
                 {
                     Name = name,
                     InitialDeskNo = initialDeskNo,
                     DefaultImage = true 
                 };
             }
-            await _context.Spaces.AddAsync(file);
-
+            await _context.Spaces.AddAsync(space);
+            
             await _context.SaveChangesAsync();
             
-            var returnData = await _context.Spaces.FirstOrDefaultAsync(s => s.Name == name);
-            return returnData;
+            //var returnData = await _context.Spaces.FirstOrDefaultAsync(s => s.Name == name);
+            return space;
         }
        
         [Microsoft.AspNetCore.Mvc.HttpPost("addwithdesks")]
         public async Task<ActionResult> AddSpaceWithDesksAsync([FromForm] SpaceUploadRequestDto uploadRequestDto)
         {
             DeskController desk = new(_context);
-            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.Image);
+            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.StartingDesk, uploadRequestDto.Image);
             if (addedSpace.Value == null)
             {
                 return BadRequest(addedSpace.Result);
             }
-            await desk.AddDesksAsync(uploadRequestDto.DeskList);
+            var spaceId = addedSpace.Value.SpaceId;
+            var deskList = uploadRequestDto.DeskList.Select(d => new Desk() { DeskId = d.Id, SpaceId = spaceId, Xcoordinate = d.X, Ycoordinate = d.Y });
+            await desk.AddDesksAsync(deskList);
             return NoContent();
         }
 
@@ -86,7 +89,7 @@ namespace DeskBooking.Controllers
             {
                 SpaceId = s.SpaceId,
                 Name = s.Name
-            }).ToListAsync();
+            }).OrderBy(s => s.SpaceId).ToListAsync();
             return returnData;
         }
         [Microsoft.AspNetCore.Mvc.HttpGet("getspace")]
