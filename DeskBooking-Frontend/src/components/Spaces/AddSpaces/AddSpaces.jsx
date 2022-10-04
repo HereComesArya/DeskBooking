@@ -28,24 +28,24 @@ const AddSpaces = () => {
 
   //List of desks(id, name, x, y)
   const [deskList, setDeskList] = useState([
-    // {
-    //   id: 1,
-    //   name: "",
-    //   x: 700.9661705006765,
-    //   y: 976.1921515561569,
-    // },
-    // {
-    //   id: 2,
-    //   name: "",
-    //   x: 890.1840324763193,
-    //   y: 597.7564276048714,
-    // },
-    // {
-    //   id: 3,
-    //   name: "",
-    //   x: 1156.8092016238159,
-    //   y: 838.5791610284167,
-    // },
+    {
+      id: 1,
+      name: "",
+      x: 700.9661705006765,
+      y: 976.1921515561569,
+    },
+    {
+      id: 2,
+      name: "",
+      x: 890.1840324763193,
+      y: 597.7564276048714,
+    },
+    {
+      id: 3,
+      name: "",
+      x: 1156.8092016238159,
+      y: 838.5791610284167,
+    },
   ]);
 
   /* Ref for deskList*/
@@ -67,7 +67,7 @@ const AddSpaces = () => {
   // removedDesksRef.current = removedDesks;
 
   /* Ref for embedded image*/
-  const imgRef = useRef();
+  // const imgRef = useRef();
 
   // setDeskList([
   //   {

@@ -7,6 +7,8 @@ import {
   PlusOutlined,
   UploadOutlined,
   InfoCircleOutlined,
+  EditOutlined,
+  DeleteOutlined,
 } from "@ant-design/icons";
 import ImagePanZoomFunction from "../../ImagePanZoom/ImagePanZoomFunction";
 import { Route, Redirect, useLocation } from "wouter";
@@ -53,6 +55,7 @@ const ConfigureLayoutSettings = () => {
   useEffect(() => {
     //to fetch number of spaces to set defaullt name in add spaces
     axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+      // axios.get("/api/space/getall").then((res) => {
       setPost(res.data);
     });
   }, []);
@@ -191,7 +194,7 @@ const ConfigureLayoutSettings = () => {
               className="add-bookings-button"
               type="primary"
               shape="round"
-              icon={<PlusOutlined />}
+              // icon={<PlusOutlined />}
               // onClick={() => {
               //   const data = [];
               //   console.log("clicked");
@@ -200,7 +203,7 @@ const ConfigureLayoutSettings = () => {
               // }}
               htmlType="submit"
             >
-              Add New Space
+              Save Changes
             </Button>
           </Header>
           <div

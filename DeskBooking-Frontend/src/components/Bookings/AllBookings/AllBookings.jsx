@@ -7,7 +7,7 @@ import axios from "axios";
 import "./AllBookings.css";
 import "antd/dist/antd.css";
 
-const App = () => {
+const AllBookings = () => {
   const [post, setPost] = useState([]);
   useEffect(() => {
     axios.get("/api/booking/getall").then((res) => {
@@ -219,7 +219,7 @@ const App = () => {
     // },
     {
       //Checked
-      title: "User",
+      title: "Name",
       dataIndex: "name",
       key: "index",
       id: "index",
@@ -262,6 +262,22 @@ const App = () => {
       width: "20%",
       ...getColumnSearchProps("endTimeFormatted"),
       sorter: (a, b) => b.endTime - a.endTime,
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <a>Edit</a>
+          <a
+            onClick={() => {
+              console.log(record);
+            }}
+          >
+            Delete
+          </a>
+        </Space>
+      ),
     },
     // {
     //   title: "Address",
@@ -307,4 +323,4 @@ const App = () => {
 //   );
 // };
 
-export default App;
+export default AllBookings;

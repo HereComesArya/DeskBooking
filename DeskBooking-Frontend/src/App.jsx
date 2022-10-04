@@ -19,7 +19,7 @@ function App() {
         {/* <AuthGuard> */}
         <MainApp></MainApp>
         {/* </AuthGuard> */}
-
+        {/* <Login></Login> */}
         {/* <Route path="/login">{user ? <Redirect to="/" /> : <Login />}</Route> */}
       </UserContext.Provider>
     </>

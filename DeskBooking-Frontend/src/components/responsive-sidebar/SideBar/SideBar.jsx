@@ -1,6 +1,6 @@
 import React from "react";
 import { Layout } from "antd";
-import "./SideBar.css";
+// import "./SideBar.css";
 const SideBar = ({ menu }) => {
   return (
     <Layout.Sider
