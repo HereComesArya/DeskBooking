@@ -1,4 +1,5 @@
 ﻿using DeskBooking.Data;
+using DeskBooking.DTOs.Desk;
 using DeskBooking.DTOs.Space;
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.IO.Compression;
+using System.Text.Json;
 using static System.Net.WebRequestMethods;
+using FromBodyAttribute = Microsoft.AspNetCore.Mvc.FromBodyAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -77,7 +80,8 @@ namespace DeskBooking.Controllers
                 return BadRequest(addedSpace.Result);
             }
             var spaceId = addedSpace.Value.SpaceId;
-            var deskList = uploadRequestDto.DeskList.Select(d => new Desk() { DeskId = d.Id, SpaceId = spaceId, Xcoordinate = d.X, Ycoordinate = d.Y });
+            var jsonDeskList = JsonSerializer.Deserialize<IList<DeskRequestDto>>(uploadRequestDto.DeskList);
+            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y }); await desk.AddDesksAsync(deskList);
             await desk.AddDesksAsync(deskList);
             return NoContent();
         }
@@ -103,7 +107,7 @@ namespace DeskBooking.Controllers
             return new SpaceResponseDto()
             {
                 SpaceId = space.SpaceId,
-                InitialDeskNo = space.InitialDeskNo,
+                StartingDesk = space.InitialDeskNo,
                 Name = space.Name,
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage

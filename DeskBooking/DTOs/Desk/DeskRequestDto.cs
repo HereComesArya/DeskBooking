@@ -3,8 +3,8 @@ namespace DeskBooking.DTOs.Desk
 {
     public class DeskRequestDto
     {
-        public int Id { get; set; }
-        public float X { get; set; }
-        public float Y { get; set; }
+        public int id { get; set; }
+        public float x { get; set; }
+        public float y { get; set; }
     }
 }

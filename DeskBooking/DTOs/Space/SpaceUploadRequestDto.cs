@@ -11,7 +11,7 @@ namespace DeskBooking.DTOs.Space
 
         public string Name { get; set; } = string.Empty;
         public int StartingDesk { get; set; } = 0;
-        public IEnumerable<DeskRequestDto>? DeskList { get; set; }
+        public string DeskList { get; set; }
         public IFormFile? Image { get; set; }
         public bool DefaultImage { get; set; } = true;
     }

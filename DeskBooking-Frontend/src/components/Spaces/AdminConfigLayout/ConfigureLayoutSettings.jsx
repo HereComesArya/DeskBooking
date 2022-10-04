@@ -190,19 +190,30 @@ const ConfigureLayoutSettings = (props) => {
 
           let data = new FormData();
           data.append("name", e.spacename);
-          data.append("deskList", deskRef.current);
+          data.append("deskList", JSON.stringify(deskRef.current));
           data.append("defaultImage", isDefaultImage);
           data.append("startingDesk", initialDeskNumber);
           !isDefaultImage && data.append("image", imageFile);
-          // console.log(data);
+
+          // let data = {
+          //   name: e.spacename,
+          //   desklist: JSON.stringify(deskRef.current),
+          //   defaultImage: isDefaultImage,
+          //   startingDesk: initialDeskNumber,
+          //   ...(!isDefaultImage && { image: imageFile }),
+          // };
           //post req for new space
-          // axios
-          //   .post("/api/space/addwithdesks", data)
-          //   .then((res) => console.log(res))
-          //   .catch((err) => {
-          //     console.log(err);
-          //   });
-          // console.log(result);
+          axios
+            .post("/api/space/addwithdesks", data)
+            .then((res) => console.log(res))
+            .catch((err) => {
+              console.log(err);
+            });
+          console.log(result);
+        }}
+        initialValues={{
+          spacename: defaultName,
+          initialDeskNumber: initialDeskNumber,
         }}
       >
         <div>
@@ -240,7 +251,7 @@ const ConfigureLayoutSettings = (props) => {
               <Form.Item
                 label={<span></span>}
                 name="spacename"
-                initialValue={defaultName}
+                // initialValue={defaultName}
                 rules={[
                   {
                     required: true,
@@ -286,7 +297,7 @@ const ConfigureLayoutSettings = (props) => {
                 // onChange={(event) => console.log(event)}
                 label={<span></span>}
                 name="initialDeskNumber"
-                initialValue={initialDeskNumber}
+                // initialValue={initialDeskNumber}
                 rules={[
                   {
                     required: true,
