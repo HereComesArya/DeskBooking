@@ -32,7 +32,7 @@ namespace DeskBooking.Controllers
                 {
                     await formFile.CopyToAsync(memoryStream);
 
-                    // Upload the file if less than 2 MB
+                    // Upload the file if less than 5 MB
                     if (memoryStream.Length < 5242880)
                     {
                         file = new Space()
@@ -69,28 +69,40 @@ namespace DeskBooking.Controllers
         {
             DeskController desk = new(_context);
             var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.Image);
+            if (addedSpace.Value == null)
+            {
+                return BadRequest(addedSpace.Result);
+            }
             await desk.AddDesksAsync(uploadRequestDto.DeskList);
-            return Created("Successfully created", addedSpace);
+            return NoContent();
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("getall")]
-        public async Task<IEnumerable<SpaceResponseDto>> GetAll()
-        {
-            var returnData = await _context.Spaces.Select(s => s.DefaultImage ? new SpaceResponseDto()
+        public async Task<IEnumerable<SpacesResponseDto>> GetAll()
+        { 
+            var returnData = await _context.Spaces.Select(s => new SpacesResponseDto()
             {
                 SpaceId = s.SpaceId,
-                Name = s.Name,
-                Image = null,
-                DefaultImage = s.DefaultImage
-            } :
-                new SpaceResponseDto()
-                {
-                    SpaceId = s.SpaceId,
-                    Name = s.Name,
-                    Image = Convert.ToBase64String(s.FloorImage!),
-                    DefaultImage = s.DefaultImage
-                }).ToListAsync();
+                Name = s.Name
+            }).ToListAsync();
             return returnData;
+        }
+        [Microsoft.AspNetCore.Mvc.HttpGet("getspace")]
+        public async Task<ActionResult<SpaceResponseDto>> GetSpace(int spaceId)
+        {
+            var space = await _context.Spaces.FindAsync(spaceId);
+            if (space == null)
+            {
+                return NotFound();
+            }
+            return new SpaceResponseDto()
+            {
+                SpaceId = space.SpaceId,
+                InitialDeskNo = space.InitialDeskNo,
+                Name = space.Name,
+                Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
+                DefaultImage = space.DefaultImage
+            };
         }
     }
 }

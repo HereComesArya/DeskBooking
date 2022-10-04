@@ -16,7 +16,7 @@ using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
 
 namespace DeskBooking.Controllers
 {
-    [Route("api/[controller]/")]
+    [Route("api/[controller]")]
     public class BookingController : ControllerBase
     {
         private readonly DataContext _context;

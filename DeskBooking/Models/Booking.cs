@@ -5,6 +5,7 @@ namespace DeskBooking.Models
 {
     public class Booking
     {
+
         [Key]
         public int BookingId { get; set; }
         [Required]

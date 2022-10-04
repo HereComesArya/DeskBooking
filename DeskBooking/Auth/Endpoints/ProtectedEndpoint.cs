@@ -51,7 +51,6 @@ namespace DeskBooking.Auth.Endpoints
             var obj = new
             {
                 Name = User.GetFirstName(),
-                //LastName = User.GetLastName(),
                 PhotoUri = pictureUri.ToString(),
                 IsAdmin = User.IsAdmin()
             };
