@@ -29,9 +29,6 @@ const ImagePanZoomFunction = () => {
   useEffect(() => {
     initialDeskNumberRef.current = initialDeskNumber;
     changeTitles(imgRef.current.parentNode.lastChild, true);
-    console.log(`state: ${initialDeskNumber}`);
-    console.log("initialDeskNumber useeffect");
-    console.log(`ref: ${initialDeskNumberRef.current}`);
   }, [initialDeskNumber]);
 
   // useEffect(() => {

@@ -234,7 +234,7 @@ const ManageSpaces = () => {
                 // onEditStudent(record);
                 // console.log(`edit ${record}`);
                 // console.log(record);
-                setLocation(`/add-space/${record.SpaceId}`);
+                setLocation(`/customize-space/${record.SpaceId}`);
               }}
             />
             <DeleteOutlined
@@ -257,7 +257,7 @@ const ManageSpaces = () => {
       <Header className="manage-spaces-header">
         <h1 className="manage-spaces-header-text">Manage Spaces</h1>
         <Button
-          onClick={() => setLocation("/add-space")}
+          onClick={() => setLocation("/customize-space")}
           className="new-booking-button"
           type="primary"
           shape="round"

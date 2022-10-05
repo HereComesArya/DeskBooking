@@ -17,7 +17,6 @@ import NavBar from "../../components/responsive-sidebar/NavBar/NavBar";
 import SideBar from "../../components/responsive-sidebar/SideBar/SideBar";
 import Bookings from "../../components/Bookings/Bookings";
 import AddSpaces from "../../components/Spaces/AddSpaces/AddSpaces";
-import ModifySpaces from "../../components/Spaces/ModifySpaces/ModifySpaces";
 
 import "./MainApp.css";
 import "antd/dist/antd.css";
@@ -51,38 +50,21 @@ function MainApp() {
         },
         user.isAdmin && {
           label: "Manage Spaces",
-          // key: "/manage-spaces",
+          key: "/manage-spaces",
           icon: <BuildOutlined />,
-          children: [
-            {
-              label: "Add Space",
-              key: "/add-space",
-              icon: <PlusOutlined />,
-            },
-            {
-              label: "Modify Space",
-              key: "/manage-spaces",
-              icon: <EditOutlined />,
-            },
-          ],
+          // children: [
+          //   {
+          //     label: "Add Space",
+          //     key: "/customize-space",
+          //     icon: <PlusOutlined />,
+          //   },
+          //   {
+          //     label: "Modify Space",
+          //     key: "/manage-spaces",
+          //     icon: <EditOutlined />,
+          //   },
+          // ],
         },
-        // user.isAdmin && {
-        //   label: "Modify Space",
-        //   key: "/modify-space",
-        //   icon: <BuildOutlined />,
-        //   // children: [
-        //   //   {
-        //   //     label: "Add Space",
-        //   //     key: "/add-space",
-        //   //     icon: <PlusOutlined />,
-        //   //   },
-        //   //   {
-        //   //     label: "Modify Space",
-        //   //     key: "/manage-spaces",
-        //   //     icon: <EditOutlined />,
-        //   //   },
-        //   // ],
-        // },
         { label: "Profile", key: "/profile", icon: <UserAddOutlined /> },
         {
           label: "Signout",
@@ -108,12 +90,13 @@ function MainApp() {
             <Route path="/manage-spaces" component={ManageSpaces}></Route>
           )}
           {user.isAdmin && (
-            <Route path="/modify-space" component={ModifySpaces}></Route>
+            <Route path="/customize-space/:id">
+              {(params) => <AddSpaces id={params.id} />}
+            </Route>
           )}
-          <Route path="/add-space/:id">
-            {(params) => <AddSpaces id={params.id} />}
-          </Route>
-          <Route path="/add-space" component={AddSpaces}></Route>
+          {user.isAdmin && (
+            <Route path="/customize-space" component={AddSpaces}></Route>
+          )}
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>

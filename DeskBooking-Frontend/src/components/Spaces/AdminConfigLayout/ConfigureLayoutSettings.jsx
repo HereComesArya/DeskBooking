@@ -52,6 +52,8 @@ const ConfigureLayoutSettings = (props) => {
   const [defaultName, setDefaultName] = useState("");
   const [imageFile, setImageFile] = useState([]);
 
+  const [tempInitialDeskNumber, setTempInitialDeskNumber] = useState();
+
   useEffect(() => {
     if (props.id) {
       //to fetch space and desk data and set state values
@@ -72,22 +74,20 @@ const ConfigureLayoutSettings = (props) => {
   }, []);
 
   useEffect(() => {
-    //FIX InitialDeskNumber for add desk ✅
-    setInitialDeskNumber(1);
-    // setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
+    //FIX InitialDeskNumber for add desk
+    if (props.id) {
+      setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
+    } else setTempInitialDeskNumber(1);
     setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
-    console.log("post");
-    console.log(post);
-    console.log(initialDeskNumber);
     // console.log(defaultName);
   }, [post]);
 
   const [form] = Form.useForm();
-  useEffect(() => form.resetFields(), [defaultName]);
+  useEffect(() => form.resetFields(), [defaultName, tempInitialDeskNumber]);
+
   const form_initialDeskNumber = Form.useWatch("initialDeskNumber", form);
   useEffect(() => {
     setInitialDeskNumber(form_initialDeskNumber);
-    console.log(`form changed: ${form_initialDeskNumber}`);
   }, [form_initialDeskNumber]);
 
   const dummyRequest = async ({ file, onSuccess }) => {
@@ -95,6 +95,12 @@ const ConfigureLayoutSettings = (props) => {
       onSuccess("ok");
     }, 0);
   };
+
+  function nameExists(name) {
+    return post.some(function (el) {
+      return el.name === name;
+    });
+  }
 
   // function getBase64(file) {
   //   var reader = new FileReader();
@@ -182,7 +188,7 @@ const ConfigureLayoutSettings = (props) => {
           console.log("submit");
           console.log({
             desklist: deskRef.current,
-            name: e.spacename,
+            name: e.spacename.trim(),
             defaultImage: isDefaultImage,
             startingDesk: initialDeskNumber,
             ...(!isDefaultImage && { image: imageFile }),
@@ -213,7 +219,7 @@ const ConfigureLayoutSettings = (props) => {
         }}
         initialValues={{
           spacename: defaultName,
-          initialDeskNumber: initialDeskNumber,
+          initialDeskNumber: tempInitialDeskNumber,
         }}
       >
         <div>
@@ -260,7 +266,7 @@ const ConfigureLayoutSettings = (props) => {
                   {
                     message: "Name is already used.",
                     validator: (_, value) => {
-                      if (!post.includes(value)) {
+                      if (!nameExists(value.trim())) {
                         return Promise.resolve();
                       } else {
                         return Promise.reject();
