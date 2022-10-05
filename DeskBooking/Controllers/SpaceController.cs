@@ -81,7 +81,7 @@ namespace DeskBooking.Controllers
             }
             var spaceId = addedSpace.Value.SpaceId;
             var jsonDeskList = JsonSerializer.Deserialize<IList<DeskRequestDto>>(uploadRequestDto.DeskList);
-            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y }); await desk.AddDesksAsync(deskList);
+            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y });
             await desk.AddDesksAsync(deskList);
             return NoContent();
         }
@@ -111,7 +111,7 @@ namespace DeskBooking.Controllers
                 Name = space.Name,
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage
-            };
+            }; ;
         }
     }
 }
