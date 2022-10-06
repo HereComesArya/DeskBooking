@@ -3,12 +3,9 @@ import ConfigureLayoutSettings from "../AdminConfigLayout/ConfigureLayoutSetting
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
 import axios from "axios";
+import getSpaceAndDeskData from "../../../utils/services";
 
 const AddSpaces = (props) => {
-  useEffect(() => {
-    //to fetch desk list in manage desks
-  }, []);
-
   /*Name of the new space*/
   const [spaceName, setSpaceName] = useState("");
 
@@ -29,23 +26,10 @@ const AddSpaces = (props) => {
   // initialDeskNumberRef.current = initialDeskNumber;
 
   //List of desks(id, name, x, y)
-  const [deskList, setDeskList] = useState([
-    // {
-    //   id: 1,
-    //   x: 700.9661705006765,
-    //   y: 976.1921515561569,
-    // },
-    // {
-    //   id: 2,
-    //   x: 890.1840324763193,
-    //   y: 597.7564276048714,
-    // },
-    // {
-    //   id: 31,
-    //   x: 1156.8092016238159,
-    //   y: 838.5791610284167,
-    // },
-  ]);
+  const [deskList, setDeskList] = useState([]);
+
+  //used to set the desklist for editting spaces. There's probably a better way to do this.
+  const [initialDeskList, setInitialDeskList] = useState([]);
 
   /* Ref for deskList*/
   const deskRef = useRef([]);
@@ -68,9 +52,32 @@ const AddSpaces = (props) => {
   /* Ref for embedded image*/
   // const imgRef = useRef();
 
+  // useEffect(() => {
+  //   //to fetch desk list for edit desks
+  //   if (props.id) {
+  //     console.log("in edit");
+  //     const getData = async () => {
+  //       await getSpaceAndDeskData(props.id).then((data) => {
+  //         // setIsLoading(false);
+  //         // setDataSource(data);
+  //         console.log(data);
+  //         setSpaceName(data.name);
+  //         setInitialDeskNumber(data.startingDesk);
+  //         setDeskList(data.desks);
+  //         if (!data.defaultImage) setImage(data.image);
+  //       });
+  //     };
+  //     getData();
+  //   }
+  // }, []);
+
   const values = {
+    spaceName,
+    setSpaceName,
     deskList,
     setDeskList,
+    initialDeskList,
+    setInitialDeskList,
     deskId,
     setDeskId,
     initialDeskNumber,

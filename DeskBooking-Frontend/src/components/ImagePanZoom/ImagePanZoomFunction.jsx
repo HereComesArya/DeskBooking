@@ -11,6 +11,8 @@ const ImagePanZoomFunction = () => {
   const {
     deskList,
     setDeskList,
+    initialDeskList,
+    setInitialDeskList,
     deskId,
     setDeskId,
     image,
@@ -82,12 +84,23 @@ const ImagePanZoomFunction = () => {
 
   useEffect(() => {
     renderCircles(deskList);
+    console.log(deskRef.current);
     if (deskList.length > 0) {
       setDeskId(deskList.slice(-1)[0].id + 1);
     } else {
       setDeskId(1);
     }
   }, []);
+
+  useEffect(() => {
+    renderCircles(deskList);
+    console.log(deskRef.current);
+    if (deskList.length > 0) {
+      setDeskId(deskList.slice(-1)[0].id + 1);
+    } else {
+      setDeskId(1);
+    }
+  }, [initialDeskList]);
 
   const updateWidthAndHeight = () => {
     setWidth(window.innerWidth / 1);

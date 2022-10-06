@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE } from "react-svg-pan-zoom";
-import { BookingsConfigContext } from "../../helpers/contexts/AddBookingsLayoutConfig";
-import useClickPreventionOnDoubleClick from "../../helpers/hooks/UseClickPreventionOnDoubleClick";
+import { BookingsConfigContext } from "../../../helpers/contexts/AddBookingsLayoutConfig";
+import useClickPreventionOnDoubleClick from "../../../helpers/hooks/UseClickPreventionOnDoubleClick";
 
 import "./ImagePanZoomAddBookings.css";
 import "antd/dist/antd.css";
@@ -9,17 +9,31 @@ import { CaretLeftFilled } from "@ant-design/icons";
 
 const ImagePanZoomFunction = () => {
   const {
-    spaceName,
-    setSpaceName,
-    deskList,
-    setDeskList,
-    selectedDesk,
-    setSelectedDesk,
-    initialDeskNumber,
-    setInitialDeskNumber,
     image,
     setImage,
+    spaceName,
+    setSpaceName,
+    selectedSpaceId,
+    setSelectedSpaceId,
+    deskList,
+    setDeskList,
+    selectedDeskId,
+    setSelectedDeskId,
+    initialDeskNumber,
+    setInitialDeskNumber,
   } = useContext(BookingsConfigContext);
+
+  // deskList,
+  //   setDeskList,
+  //   deskId,
+  //   setDeskId,
+  //   initialDeskNumber,
+  //   setInitialDeskNumber,
+  //   image,
+  //   setImage,
+  //   isDefaultImage,
+  //   setIsDefaultImage,
+  //   deskRef,
 
   /* Ref for starting Desk Number */
   const initialDeskNumberRef = useRef(1);
@@ -29,7 +43,7 @@ const ImagePanZoomFunction = () => {
 
   useEffect(() => {
     initialDeskNumberRef.current = initialDeskNumber;
-    changeTitles(imgRef.current.parentNode.lastChild, true);
+    // changeTitles(imgRef.current.parentNode.lastChild, true);
   }, [initialDeskNumber]);
 
   /* For viewer */
@@ -37,8 +51,10 @@ const ImagePanZoomFunction = () => {
   const [value, setValue] = useState(INITIAL_VALUE);
 
   /* Set svg Width and Height. Triggers on window resize */
-  const [width, setWidth] = React.useState(window.innerWidth / 1.216);
-  const [height, setHeight] = React.useState(window.innerHeight / 1.2);
+  // const [width, setWidth] = React.useState(window.innerWidth / 1.216);
+  // const [height, setHeight] = React.useState(window.innerHeight / 1.2);
+  const [width, setWidth] = React.useState(400);
+  const [height, setHeight] = React.useState(400);
 
   // /*image inside viewer*/
   // const [image, setImage] = useState(RoomImage); //copied
@@ -114,6 +130,10 @@ const ImagePanZoomFunction = () => {
     initialDeskNumberRef.current--;
   };
 
+  //remove all circles
+  const EmptyViewer = () => {};
+
+  //change colours
   const changeTitles = (element, fromEffect) => {
     if (element.localName === "circle") {
       let newDeskName = fromEffect

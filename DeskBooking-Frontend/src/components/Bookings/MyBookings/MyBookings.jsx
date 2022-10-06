@@ -1,70 +1,87 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Space, Table, Modal } from "antd";
 import React, { useRef, useState, useEffect, useContext } from "react";
+import { Button, Input, Space, Table, Modal } from "antd";
+import {
+  SearchOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
+import { getFormattedMyBookingsData } from "../../../utils/services";
 import moment from "moment";
 import axios from "axios";
 
 import "./MyBookings.css";
 import "antd/dist/antd.css";
+import BookingsModal from "../Modal/BookingsModal";
 
 const MyBookings = () => {
-  const [post, setPost] = useState([]);
-  //   useEffect(() => {
-  //     axios.get(`/api/booking/mybookings`).then((res) => {
-  //       setPost(res.data);
-  //     });
-  //   }, []);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataSource, setDataSource] = useState([]);
 
-  const [data, setData] = useState([
-    {
-      bookingId: 0,
-      user: {
-        userId: 0,
-        email: "bobvance@vancerefrigiration.com",
-        firstName: "Bob",
-        lastName: "Vance",
-      },
-      userId: 0,
-      startTime: "2022-08-14T10:00:30Z",
-      endTime: "2022-08-14T11:30:00Z",
-      desk: null,
-      deskId: 0,
-      roomId: 0,
-    },
-    {
-      bookingId: 1,
-      user: {
-        userId: 0,
-        email: "nevan@nevan",
-        firstName: "Nevan",
-        lastName: "Nevan",
-      },
-      userId: 2,
-      startTime: "2022-09-09T10:30Z",
-      endTime: "2022-09-09T12:00Z",
-      desk: null,
-      deskId: 1,
-      roomId: 0,
-    },
-    {
-      bookingId: 99,
-      user: {
-        userId: 3,
-        email: "jam@jam.com",
-        firstName: "jam",
-        lastName: "jam",
-      },
-      userId: 3,
-      startTime: "2022-09-13T09:00:30Z",
-      endTime: "2022-09-13T10:00:00Z",
-      desk: null,
-      deskId: 2,
-      roomId: 0,
-    },
-  ]);
+  useEffect(() => {
+    const getData = async () => {
+      await getFormattedMyBookingsData().then((data) => {
+        setIsLoading(false);
+        setDataSource(data);
+      });
+    };
+    getData();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(dataSource);
+  // }, [dataSource]);
+
+  const [editBookingId, setEditBookingId] = useState("");
+  // const [data, setData] = useState([
+  //   {
+  //     bookingId: 0,
+  //     user: {
+  //       userId: 0,
+  //       email: "bobvance@vancerefrigiration.com",
+  //       firstName: "Bob",
+  //       lastName: "Vance",
+  //     },
+  //     userId: 0,
+  //     startTime: "2022-08-14T10:00:30Z",
+  //     endTime: "2022-08-14T11:30:00Z",
+  //     desk: null,
+  //     deskId: 0,
+  //     roomId: 0,
+  //   },
+  //   {
+  //     bookingId: 1,
+  //     user: {
+  //       userId: 0,
+  //       email: "nevan@nevan",
+  //       firstName: "Nevan",
+  //       lastName: "Nevan",
+  //     },
+  //     userId: 2,
+  //     startTime: "2022-09-09T10:30Z",
+  //     endTime: "2022-09-09T12:00Z",
+  //     desk: null,
+  //     deskId: 1,
+  //     roomId: 0,
+  //   },
+  //   {
+  //     bookingId: 99,
+  //     user: {
+  //       userId: 3,
+  //       email: "jam@jam.com",
+  //       firstName: "jam",
+  //       lastName: "jam",
+  //     },
+  //     userId: 3,
+  //     startTime: "2022-09-13T09:00:30Z",
+  //     endTime: "2022-09-13T10:00:00Z",
+  //     desk: null,
+  //     deskId: 2,
+  //     roomId: 0,
+  //   },
+  // ]);
   //   const data = post;
 
-  const onDeleteStudent = (record) => {
+  const onDelete = (record) => {
     Modal.confirm({
       title: "Are you sure, you want to delete this booking?",
       okText: "Yes",
@@ -81,54 +98,54 @@ const MyBookings = () => {
     });
   };
 
-  const [newData, setNewData] = useState([]);
+  // const [newData, setNewData] = useState([]);
 
-  useEffect(() => {
-    // console.log("in ue");
-    const modifiedData = [];
+  // useEffect(() => {
+  //   // console.log("in ue");
+  //   const modifiedData = [];
 
-    //   const [newData, setNewData] = useState([]);
-    // console.log(modifiedData);
-    // console.log(data);
-    // data &&
-    //   {
-    data.map((dataItem, index) => {
-      const {
-        userId,
-        bookingId,
-        roomId,
-        startTime,
-        endTime,
-        deskId,
-        user: { firstName },
-        user: { lastName },
-      } = dataItem;
+  //   //   const [newData, setNewData] = useState([]);
+  //   // console.log(modifiedData);
+  //   console.log(data);
+  //   // data &&
+  //   //   {
+  //   data.map((dataItem, index) => {
+  //     const {
+  //       userId,
+  //       bookingId,
+  //       roomId,
+  //       startTime,
+  //       endTime,
+  //       deskId,
+  //       user: { firstName },
+  //       user: { lastName },
+  //     } = dataItem;
 
-      const booking = new Object();
-      booking.key = index;
-      booking.deskId = deskId;
-      booking.name = firstName + " " + lastName;
-      booking.userId = userId;
-      booking.roomId = roomId;
-      booking.bookingId = bookingId;
-      booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
-      booking.date = moment(startTime);
-      booking.startTimeFormatted = moment(startTime).format("h: mm A");
-      booking.startTime = moment(startTime);
-      booking.endTimeFormatted = moment(endTime).format("h: mm A");
-      booking.endTime = moment(endTime);
+  //     const booking = new Object();
+  //     booking.key = index;
+  //     booking.deskId = deskId;
+  //     booking.name = firstName + " " + lastName;
+  //     booking.userId = userId;
+  //     booking.roomId = roomId;
+  //     booking.bookingId = bookingId;
+  //     booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
+  //     booking.date = moment(startTime);
+  //     booking.startTimeFormatted = moment(startTime).format("h: mm A");
+  //     booking.startTime = moment(startTime);
+  //     booking.endTimeFormatted = moment(endTime).format("h: mm A");
+  //     booking.endTime = moment(endTime);
 
-      modifiedData.push(booking);
-      // console.log(newData);
-      // console.log("start " + booking.startTimeFormatted);
-      // console.log("end " + booking.endTimeFormatted);
-      // console.log("date  " + booking.date);
-      // console.log("date  " + booking.dateFormatted);
-      //   console.log(modifiedData);
-    });
-    // }
-    // setNewData(modifiedData);
-  }, [data]);
+  //     modifiedData.push(booking);
+  //     // console.log(newData);
+  //     // console.log("start " + booking.startTimeFormatted);
+  //     // console.log("end " + booking.endTimeFormatted);
+  //     // console.log("date  " + booking.date);
+  //     // console.log("date  " + booking.dateFormatted);
+  //     //   console.log(modifiedData);
+  //   });
+  //   // }
+  //   // setNewData(modifiedData);
+  // }, [data]);
 
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -247,7 +264,8 @@ const MyBookings = () => {
     // },
     {
       //Checked
-      title: "Name",
+      align: "center",
+      title: "Space Name",
       dataIndex: "name",
       key: "index",
       id: "index",
@@ -256,13 +274,14 @@ const MyBookings = () => {
       ...getColumnSearchProps("name"),
     },
     {
-      title: "Date",
-      dataIndex: "dateFormatted",
+      // align: "center",
+      title: "Start Date",
+      dataIndex: "startDate",
       id: "index",
       key: "index",
       width: "15%",
-      showSorterTooltip: false, // change this
-      ...getColumnSearchProps("dateFormatted"),
+      showSorterTooltip: true, // change this
+      ...getColumnSearchProps("startDate"),
       sorter: (a, b) => {
         a.date - b.date;
         console.log(
@@ -271,41 +290,95 @@ const MyBookings = () => {
         );
         console.log(a.date);
       },
+      render: (text, record, index) => {
+        // console.log(moment(text).format("D MMM, YYYY"));
+        // console.log(text);
+        return moment(text).format("D MMM, YYYY");
+      },
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
+      // align: "center",
+      title: "End Date",
+      dataIndex: "endDate",
+      id: "index",
+      key: "index",
+      width: "15%",
+      showSorterTooltip: true, // change this
+      ...getColumnSearchProps("endDate"),
+      sorter: (a, b) => {
+        a.date - b.date;
+        console.log(
+          moment(a.date, "DD-MM-YYYY").unix() -
+            moment(b.date, "DD-MM-YYYY").unix()
+        );
+        console.log(a.date);
+      },
+      render: (text, record, index) => {
+        // console.log(moment(text).format("D MMM, YYYY"));
+        // console.log(text);
+        return moment(text).format("D MMM, YYYY");
+      },
+      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
+    },
+    {
+      // align: "center",
       title: "Start Time",
-      dataIndex: "startTimeFormatted",
+      dataIndex: "startTime",
       id: "index",
       key: "index",
-      width: "20%",
-      ...getColumnSearchProps("startTimeFormatted"),
+      width: "15%",
+      ...getColumnSearchProps("startTime"),
       sorter: (a, b) => a.startTime - b.startTime,
+      render: (text, record, index) => {
+        // console.log(moment(text).format("D MMM, YYYY"));
+        // console.log(text);
+        return moment(text).format("h:mm A");
+      },
     },
     {
+      // align: "center",
       title: "End Time",
-      dataIndex: "endTimeFormatted",
+      dataIndex: "endTime",
       key: "index",
       id: "index",
-      width: "20%",
-      ...getColumnSearchProps("endTimeFormatted"),
+      width: "15%",
+      ...getColumnSearchProps("endTime"),
       sorter: (a, b) => b.endTime - a.endTime,
+      render: (text, record, index) => {
+        // console.log(moment(text).format("D MMM, YYYY"));
+        // console.log(text);
+        return moment(text).format("h:mm a");
+      },
     },
     {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <a>Edit</a>
-          <a
-            onClick={() => {
-              onDeleteStudent(record);
-            }}
-          >
-            Delete
-          </a>
-        </Space>
-      ),
+      align: "center",
+      title: "Actions",
+      key: "actions",
+      render: (_, record) => {
+        return (
+          <>
+            <EditOutlined
+              onClick={() => {
+                // onEditStudent(record);
+                // console.log(`edit ${record}`);
+                console.log("edit ", record);
+                setOpen(true);
+                setEditBookingId(record.bookingId);
+              }}
+            />
+            <DeleteOutlined
+              onClick={(e) => {
+                // onDelete(record.spaceId, e);
+                // onDeleteStudent(record);
+                // this.onDelete(record.key, e);
+                console.log("delete ", record.key);
+              }}
+              style={{ color: "red", marginLeft: 12 }}
+            />
+          </>
+        );
+      },
     },
     // {
     //   title: "Address",
@@ -317,38 +390,34 @@ const MyBookings = () => {
     // },
   ];
 
+  const [open, setOpen] = useState(false);
+  const onCreate = (values) => {
+    console.log("Received values of form: ", values);
+    setOpen(false);
+  };
+
   return (
-    <Table
-      scroll={{
-        x: 900,
-      }}
-      pagination={{
-        position: ["topLeft", "bottomLeft"],
-      }}
-      columns={columns}
-      dataSource={newData}
-    />
+    <>
+      <Table
+        scroll={{
+          x: 900,
+        }}
+        pagination={{
+          position: ["bottomRight"],
+        }}
+        columns={columns}
+        dataSource={dataSource}
+      />
+      <BookingsModal
+        bookingId={editBookingId}
+        open={open}
+        onCreate={onCreate}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      />
+    </>
   );
 };
-
-// const App = () => {
-//   const baseURL = "https://jsonplaceholder.typicode.com/posts/1";
-//   const [post, setPost] = useState(null);
-
-//   useEffect(() => {
-//     axios.get(baseURL).then((response) => {
-//       setPost(response.data);
-//     });
-//   }, []);
-
-//   if (!post) return null;
-
-//   return (
-//     <div>
-//       <h1>{post.title}</h1>
-//       <p>{post.body}</p>
-//     </div>
-//   );
-// };
 
 export default MyBookings;

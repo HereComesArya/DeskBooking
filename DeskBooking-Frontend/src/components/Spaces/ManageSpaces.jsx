@@ -23,18 +23,9 @@ import "antd/dist/antd.css";
 const ManageSpaces = () => {
   const [location, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(true);
-  const [post, setPost] = useState([]);
   const [dataSource, setDataSource] = useState([]);
-  useEffect(() => {
-    // axios.get("/api/booking/getall").then((res) => {
-    //   setPost(res.data);
-    // });
-    // getFormattedSpaceData().then((data) => {
-    //   setIsLoading(false);
-    //   console.log(data);
-    //   setDataSource(data);
-    // });
 
+  useEffect(() => {
     const getData = async () => {
       await getFormattedSpaceData().then((data) => {
         setIsLoading(false);
@@ -43,60 +34,6 @@ const ManageSpaces = () => {
     };
     getData();
   }, []);
-
-  //   const data = post;
-
-  /*to be removed, add async get desks function in services.js*/
-  // useEffect(() => {
-  //   const data = [];
-
-  //   for (let i = 0; i < 46; i++) {
-  //     data.push({
-  //       key: i,
-  //       SpaceId: i + 1,
-  //       SpaceName: `Example Space #${i + 1}`,
-  //     });
-  //   }
-  //   setDataSource(data);
-  // }, []);
-
-  //   const newData = [];
-  //   {
-  //     data &&
-  //       data.map((dataItem, index) => {
-  //         const {
-  //           userId,
-  //           bookingId,
-  //           roomId,
-  //           startTime,
-  //           endTime,
-  //           deskId,
-  //           user: { firstName },
-  //           user: { lastName },
-  //         } = dataItem;
-
-  //         const booking = new Object();
-  //         booking.key = index;
-  //         booking.deskId = deskId;
-  //         booking.name = firstName + " " + lastName;
-  //         booking.userId = userId;
-  //         booking.roomId = roomId;
-  //         booking.bookingId = bookingId;
-  //         booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
-  //         booking.date = moment(startTime);
-  //         booking.startTimeFormatted = moment(startTime).format("h: mm A");
-  //         booking.startTime = moment(startTime);
-  //         booking.endTimeFormatted = moment(endTime).format("h: mm A");
-  //         booking.endTime = moment(endTime);
-
-  //         newData.push(booking);
-  //         // console.log(newData);
-  //         // console.log("start " + booking.startTimeFormatted);
-  //         // console.log("end " + booking.endTimeFormatted);
-  //         // console.log("date  " + booking.date);
-  //         // console.log("date  " + booking.dateFormatted);
-  //       });
-  //   }
 
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -116,9 +53,17 @@ const ManageSpaces = () => {
   };
 
   const onDelete = (SpaceId, e) => {
-    //add axios delete space
-    const data = dataSource.filter((item) => item.SpaceId !== SpaceId);
-    setDataSource(data);
+    Modal.confirm({
+      title: "Are you sure, you want to delete this space?",
+      okText: "Yes",
+      okType: "danger",
+      style: { marginTop: "100px" },
+      onOk: () => {
+        //add axios delete space
+        const data = dataSource.filter((item) => item.spaceId !== SpaceId);
+        setDataSource(data);
+      },
+    });
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -203,24 +148,24 @@ const ManageSpaces = () => {
     {
       //checked
       title: "ID",
-      dataIndex: "SpaceId",
+      dataIndex: "spaceId",
       key: "index",
       id: "index",
       align: "center",
       //   width: "20%",
       sorter: (a, b) => a.SpaceId - b.SpaceId,
-      ...getColumnSearchProps("SpaceId"),
+      ...getColumnSearchProps("spaceId"),
     },
     {
       //Checked
       title: "Name",
-      dataIndex: "SpaceName",
+      dataIndex: "spaceName",
       align: "center",
       key: "index",
       id: "index",
       //   width: "40%",
       sorter: (a, b) => a.SpaceName.localeCompare(b.SpaceName),
-      ...getColumnSearchProps("SpaceName"),
+      ...getColumnSearchProps("spaceName"),
     },
     {
       title: "Action",
@@ -234,12 +179,12 @@ const ManageSpaces = () => {
                 // onEditStudent(record);
                 // console.log(`edit ${record}`);
                 // console.log(record);
-                setLocation(`/customize-space/${record.SpaceId}`);
+                setLocation(`/customize-space/${record.spaceId}`);
               }}
             />
             <DeleteOutlined
               onClick={(e) => {
-                onDelete(record.SpaceId, e);
+                onDelete(record.spaceId, e);
                 // onDeleteStudent(record);
                 // this.onDelete(record.key, e);
                 // console.log(record.SpaceId);

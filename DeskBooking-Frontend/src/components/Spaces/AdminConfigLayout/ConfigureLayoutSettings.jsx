@@ -34,6 +34,10 @@ import "antd/dist/antd.css";
 
 const ConfigureLayoutSettings = (props) => {
   const {
+    spaceName,
+    setSpaceName,
+    initialDeskList,
+    setInitialDeskList,
     deskList,
     setDeskList,
     deskId,
@@ -53,6 +57,8 @@ const ConfigureLayoutSettings = (props) => {
   const [imageFile, setImageFile] = useState([]);
 
   const [tempInitialDeskNumber, setTempInitialDeskNumber] = useState();
+  const [isFetched, setIsFetched] = useState(false);
+  const [originalImage, setOriginalImage] = useState(RoomImage);
 
   useEffect(() => {
     if (props.id) {
@@ -64,11 +70,32 @@ const ConfigureLayoutSettings = (props) => {
       //   });
       // };
       // fetchData();
+      const getData = async () => {
+        await getSpaceAndDeskData(props.id).then((data) => {
+          // setIsLoading(false);
+          // setDataSource(data);
+          console.log(data);
+          //setid
+          // setSpaceName(data.name);
+          setDefaultName(data.name);
+          setInitialDeskNumber(data.startingDesk);
+          setDeskList(data.desks);
+          setInitialDeskList(data.desks);
+          if (!data.defaultImage) {
+            setImage(data.image);
+            setOriginalImage(data.image);
+            setIsDefaultImage(false);
+          }
+          setIsFetched(true);
+        });
+      };
+      getData();
     } else {
       //set default state values, get list of spaces and set default name
       // axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
       axios.get("/api/space/getall").then((res) => {
         setPost(res.data);
+        setIsFetched(true);
       });
     }
   }, []);
@@ -76,14 +103,21 @@ const ConfigureLayoutSettings = (props) => {
   useEffect(() => {
     //FIX InitialDeskNumber for add desk
     if (props.id) {
-      setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
-    } else setTempInitialDeskNumber(1);
-    setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+      setTempInitialDeskNumber(initialDeskNumber);
+      console.log("changing tempInitialDeskNumber");
+      // setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+    } else {
+      setTempInitialDeskNumber(1);
+      setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+    }
     // console.log(defaultName);
-  }, [post]);
+  }, [isFetched]);
 
   const [form] = Form.useForm();
-  useEffect(() => form.resetFields(), [defaultName, tempInitialDeskNumber]);
+  useEffect(() => {
+    form.resetFields();
+    console.log("changed form ", defaultName, tempInitialDeskNumber);
+  }, [defaultName, tempInitialDeskNumber]);
 
   const form_initialDeskNumber = Form.useWatch("initialDeskNumber", form);
   useEffect(() => {
@@ -141,10 +175,24 @@ const ConfigureLayoutSettings = (props) => {
     beforeUpload(file, fileList) {
       //check file type
       console.log("checking file");
+      const isJpgOrPng =
+        file.type === "image/jpeg" || file.type === "image/png";
+
+      if (!isJpgOrPng) {
+        message.error("You can only upload JPG/PNG file!");
+      }
+
+      const isLt5M = file.size / 1024 / 1024 < 5;
+
+      if (!isLt5M) {
+        message.error("Image must smaller than 5MB!");
+      }
+
+      return isJpgOrPng && isLt5M;
     },
 
     onRemove(file) {
-      setImage(RoomImage);
+      props.id ? setImage(originalImage) : setImage(RoomImage);
       setIsDefaultImage(true);
     },
 
@@ -209,13 +257,12 @@ const ConfigureLayoutSettings = (props) => {
           //   ...(!isDefaultImage && { image: imageFile }),
           // };
           //post req for new space
-          axios
-            .post("/api/space/addwithdesks", data)
-            .then((res) => console.log(res))
-            .catch((err) => {
-              console.log(err);
-            });
-          console.log(result);
+          // axios
+          //   .post("/api/space/addwithdesks", data)
+          //   .then((res) => console.log(res))
+          //   .catch((err) => {
+          //     console.log(err);
+          //   });
         }}
         initialValues={{
           spacename: defaultName,

@@ -1,16 +1,20 @@
 .header {
-    background-color: white !important;
-    padding: 0 !important;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: x-large !important;
+  background-color: white !important;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: x-large !important;
 }
-.header-text{
-    font-weight: 800 !important;
+.header-text {
+  font-weight: 800 !important;
 }
 
-.add-bookings-button{
-    background-color: #22D167 !important;
-    margin-right: 10px !important;
+.add-bookings-button {
+  background-color: #22d167 !important;
+  margin-right: 10px !important;
+}
+
+.bookings-content .ant-tabs-tabpane-active {
+  outline: none;
 }
