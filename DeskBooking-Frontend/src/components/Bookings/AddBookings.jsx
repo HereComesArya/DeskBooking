@@ -5,6 +5,7 @@ import {
   Tabs,
   Modal,
   Form,
+  Input,
   DatePicker,
   TimePicker,
   Select,
@@ -138,7 +139,7 @@ const AddBookings = () => {
             </Form.Item>
           </Form>
         </div>
-        {/* <div className="sub-div sub-div-2">anjks</div> */}
+        <div className="sub-div sub-div-2">anjks</div>
       </div>
     </>
   );

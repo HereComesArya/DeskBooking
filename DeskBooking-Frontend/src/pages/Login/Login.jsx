@@ -30,7 +30,7 @@ const Login = () => {
             <Button
               className="Login-button"
               block
-              href="/api/signin-google?returnUrl=/home"
+              href="/api/signin-google?returnUrl=/"
             >
               <span style={{ marginRight: 10 }}>
                 <img src={GoogleLogo}></img>
@@ -40,7 +40,7 @@ const Login = () => {
             <Button
               className="Login-button"
               block
-              href="/api/signin-ms?returnUrl=/home"
+              href="/api/signin-ms?returnUrl=/"
             >
               <span style={{ marginRight: 10 }}>
                 <img src={MicrosoftLogo}></img>

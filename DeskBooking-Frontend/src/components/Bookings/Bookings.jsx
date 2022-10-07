@@ -20,6 +20,7 @@ import { BookingsConfigContext } from "../../helpers/contexts/AddBookingsLayoutC
 
 import "./Bookings.css";
 import "antd/dist/antd.css";
+import BookingsModal from "./Modal/BookingsModal";
 
 function Bookings() {
   const onChange = (key) => {
@@ -35,10 +36,14 @@ function Bookings() {
   };
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
-
-  const showModal = () => {
-    setOpen(true);
+  const onCreate = (values) => {
+    console.log("Received values of form: ", values);
+    setOpen(false);
   };
+
+  // const showModal = () => {
+  //   setOpen(true);
+  // };
 
   const handleOk = () => {
     setLoading(true);
@@ -88,14 +93,24 @@ function Bookings() {
           type="primary"
           shape="round"
           icon={<PlusOutlined />}
-          onClick={showModal}
+          onClick={() => {
+            setOpen(true);
+          }}
           // size={"small"}
         >
           CREATE BOOKING
         </Button>
-        <BookingsConfigContext.Provider value={values}>
+        <BookingsModal
+          open={open}
+          onCreate={onCreate}
+          onCancel={() => {
+            setOpen(false);
+          }}
+        />
+        {/* <BookingsConfigContext.Provider value={values}>
           <Modal
             // style={{ Width: "420px" }}
+            destroyOnClose={true}
             width={1000}
             open={open}
             title="Enter Details..."
@@ -120,17 +135,19 @@ function Bookings() {
           >
             <AddBookings></AddBookings>
           </Modal>
-        </BookingsConfigContext.Provider>
+        </BookingsConfigContext.Provider> */}
       </Header>
       {/* <BookingsConfigContext.Provider
         value={values}
       ></BookingsConfigContext.Provider> */}
 
-      <Content>
+      <Content className="bookings-content">
         <Tabs
           defaultActiveKey="1"
           onChange={onChange}
           type="card"
+          tabBarStyle={{ outline: "none" }}
+          style={{ outline: "none" }}
           items={[
             {
               label: `MY BOOKINGS`,

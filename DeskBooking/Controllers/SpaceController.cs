@@ -1,4 +1,5 @@
 ﻿using DeskBooking.Data;
+using DeskBooking.DTOs.Desk;
 using DeskBooking.DTOs.Space;
 using DeskBooking.Models;
 using FastEndpoints;
@@ -7,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
+using System.Text.Json;
 using static System.Net.WebRequestMethods;
-using HttpPost = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -25,9 +26,10 @@ namespace DeskBooking.Controllers
             _context = context;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
-        public async Task<ActionResult<Space>> AddSpaceAsync(string name, IFormFile? formFile)
+        public async Task<ActionResult<Space>> AddSpaceAsync(string name,int initialDeskNo, IFormFile? formFile)
         {
-            var file = new Space();
+            
+            var space = new Space();
             if (formFile != null)
             {
              
@@ -38,9 +40,10 @@ namespace DeskBooking.Controllers
                     // Upload the file if less than 5 MB
                     if (memoryStream.Length < 5242880)
                     {
-                        file = new Space()
+                        space = new Space()
                         {
                             Name = name,
+                            InitialDeskNo = initialDeskNo,
                             FloorImage = memoryStream.ToArray(),
                             DefaultImage = false
                         };
@@ -53,30 +56,34 @@ namespace DeskBooking.Controllers
             }
             else
             {
-                file = new Space()
+                space = new Space()
                 {
                     Name = name,
+                    InitialDeskNo = initialDeskNo,
                     DefaultImage = true 
                 };
             }
-            await _context.Spaces.AddAsync(file);
-
+            await _context.Spaces.AddAsync(space);
+            
             await _context.SaveChangesAsync();
             
-            var returnData = await _context.Spaces.FirstOrDefaultAsync(s => s.Name == name);
-            return returnData;
+            //var returnData = await _context.Spaces.FirstOrDefaultAsync(s => s.Name == name);
+            return space;
         }
        
         [Microsoft.AspNetCore.Mvc.HttpPost("addwithdesks")]
         public async Task<ActionResult> AddSpaceWithDesksAsync([FromForm] SpaceUploadRequestDto uploadRequestDto)
         {
             DeskController desk = new(_context);
-            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.Image);
+            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.StartingDesk, uploadRequestDto.Image);
             if (addedSpace.Value == null)
             {
                 return BadRequest(addedSpace.Result);
             }
-            await desk.AddDesksAsync(uploadRequestDto.DeskList);
+            var spaceId = addedSpace.Value.SpaceId;
+            var jsonDeskList = JsonSerializer.Deserialize<IList<DeskRequestDto>>(uploadRequestDto.DeskList);
+            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y });
+            await desk.AddDesksAsync(deskList);
             return NoContent();
         }
 
@@ -87,7 +94,7 @@ namespace DeskBooking.Controllers
             {
                 SpaceId = s.SpaceId,
                 Name = s.Name
-            }).ToListAsync();
+            }).OrderBy(s => s.SpaceId).ToListAsync();
             return returnData;
         }
         [Microsoft.AspNetCore.Mvc.HttpGet("getspace")]
@@ -101,11 +108,11 @@ namespace DeskBooking.Controllers
             return new SpaceResponseDto()
             {
                 SpaceId = space.SpaceId,
-                InitialDeskNo = space.InitialDeskNo,
+                StartingDesk = space.InitialDeskNo,
                 Name = space.Name,
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage
-            };
+            }; ;
         }
 
         [HttpPost("modifyspace")]

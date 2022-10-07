@@ -3,12 +3,9 @@ import ConfigureLayoutSettings from "../AdminConfigLayout/ConfigureLayoutSetting
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
 import axios from "axios";
+import getSpaceAndDeskData from "../../../utils/services";
 
-const AddSpaces = () => {
-  useEffect(() => {
-    //to fetch desk list in manage desks
-  }, []);
-
+const AddSpaces = (props) => {
   /*Name of the new space*/
   const [spaceName, setSpaceName] = useState("");
 
@@ -21,32 +18,18 @@ const AddSpaces = () => {
   const [isDefaultImage, setIsDefaultImage] = useState(true);
 
   //holds the id of the last desk, equal to length of desklist
-  const [id, setId] = useState(1);
+  const [deskId, setDeskId] = useState(1);
 
   //Starting desk number
   const [initialDeskNumber, setInitialDeskNumber] = useState(1);
+  // const initialDeskNumberRef = useRef();
+  // initialDeskNumberRef.current = initialDeskNumber;
 
   //List of desks(id, name, x, y)
-  const [deskList, setDeskList] = useState([
-    {
-      id: 1,
-      name: "",
-      x: 700.9661705006765,
-      y: 976.1921515561569,
-    },
-    {
-      id: 2,
-      name: "",
-      x: 890.1840324763193,
-      y: 597.7564276048714,
-    },
-    {
-      id: 3,
-      name: "",
-      x: 1156.8092016238159,
-      y: 838.5791610284167,
-    },
-  ]);
+  const [deskList, setDeskList] = useState([]);
+
+  //used to set the desklist for editting spaces. There's probably a better way to do this.
+  const [initialDeskList, setInitialDeskList] = useState([]);
 
   /* Ref for deskList*/
   const deskRef = useRef([]);
@@ -69,47 +52,49 @@ const AddSpaces = () => {
   /* Ref for embedded image*/
   // const imgRef = useRef();
 
-  // setDeskList([
-  //   {
-  //     id: 1,
-  //     name: "",
-  //     x: 700.9661705006765,
-  //     y: 976.1921515561569,
-  //   },
-  //   {
-  //     id: 2,
-  //     name: "",
-  //     x: 890.1840324763193,
-  //     y: 597.7564276048714,
-  //   },
-  //   {
-  //     id: 3,
-  //     name: "",
-  //     x: 1156.8092016238159,
-  //     y: 838.5791610284167,
-  //   },
-  // ]);
+  // useEffect(() => {
+  //   //to fetch desk list for edit desks
+  //   if (props.id) {
+  //     console.log("in edit");
+  //     const getData = async () => {
+  //       await getSpaceAndDeskData(props.id).then((data) => {
+  //         // setIsLoading(false);
+  //         // setDataSource(data);
+  //         console.log(data);
+  //         setSpaceName(data.name);
+  //         setInitialDeskNumber(data.startingDesk);
+  //         setDeskList(data.desks);
+  //         if (!data.defaultImage) setImage(data.image);
+  //       });
+  //     };
+  //     getData();
+  //   }
+  // }, []);
 
   const values = {
     spaceName,
     setSpaceName,
     deskList,
     setDeskList,
-    id,
-    setId,
+    initialDeskList,
+    setInitialDeskList,
+    deskId,
+    setDeskId,
     initialDeskNumber,
     setInitialDeskNumber,
     image,
     setImage,
     isDefaultImage,
     setIsDefaultImage,
-    // imgRef,
     deskRef,
   };
   return (
     <>
       <LayoutConfigContext.Provider value={values}>
-        <ConfigureLayoutSettings></ConfigureLayoutSettings>
+        <ConfigureLayoutSettings
+          name={props.id ? "Modify Space" : "Add Space"}
+          id={props.id}
+        ></ConfigureLayoutSettings>
       </LayoutConfigContext.Provider>
     </>
   );

@@ -50,19 +50,20 @@ function MainApp() {
         },
         user.isAdmin && {
           label: "Manage Spaces",
+          key: "/manage-spaces",
           icon: <BuildOutlined />,
-          children: [
-            {
-              label: "Add Space",
-              key: "/add-space",
-              icon: <PlusOutlined />,
-            },
-            {
-              label: "Modify Space",
-              key: "/manage-spaces",
-              icon: <EditOutlined />,
-            },
-          ],
+          // children: [
+          //   {
+          //     label: "Add Space",
+          //     key: "/customize-space",
+          //     icon: <PlusOutlined />,
+          //   },
+          //   {
+          //     label: "Modify Space",
+          //     key: "/manage-spaces",
+          //     icon: <EditOutlined />,
+          //   },
+          // ],
         },
         { label: "Profile", key: "/profile", icon: <UserAddOutlined /> },
         {
@@ -88,14 +89,20 @@ function MainApp() {
           {user.isAdmin && (
             <Route path="/manage-spaces" component={ManageSpaces}></Route>
           )}
-          <Route path="/add-space" component={AddSpaces}></Route>
+          {user.isAdmin && (
+            <Route path="/customize-space/:id">
+              {(params) => <AddSpaces id={params.id} />}
+            </Route>
+          )}
+          {user.isAdmin && (
+            <Route path="/customize-space" component={AddSpaces}></Route>
+          )}
           <Route path="/profile">
             <h1>Profile</h1>
           </Route>
           <Route path="/signout">
             <h1>Signout</h1>
           </Route>
-          {/* </Routes> */}
         </Layout>
       </Layout>
     </div>

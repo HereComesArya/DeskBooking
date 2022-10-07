@@ -12,6 +12,8 @@ import {
 } from "@ant-design/icons";
 import ImagePanZoomFunction from "../../ImagePanZoom/ImagePanZoomFunction";
 import { Route, Redirect, useLocation } from "wouter";
+import getSpaceAndDeskData from "../../../utils/services";
+
 import axios from "axios";
 
 import {
@@ -30,54 +32,109 @@ const { Header } = Layout;
 import "./ConfigureLayoutSettings.css";
 import "antd/dist/antd.css";
 
-const ConfigureLayoutSettings = () => {
+const ConfigureLayoutSettings = (props) => {
   const {
     spaceName,
     setSpaceName,
+    initialDeskList,
+    setInitialDeskList,
     deskList,
     setDeskList,
-    id,
-    setId,
-    initialDeskNumber,
-    setInitialDeskNumber,
+    deskId,
+    setDeskId,
     image,
     setImage,
+    initialDeskNumber,
+    setInitialDeskNumber,
     isDefaultImage,
     setIsDefaultImage,
-    // imgRef,
     deskRef,
   } = useContext(LayoutConfigContext);
 
   const [post, setPost] = useState([]);
-  const [, setLocation] = useLocation();
+  // const [, setLocation] = useLocation();
   const [defaultName, setDefaultName] = useState("");
   const [imageFile, setImageFile] = useState([]);
+
+  const [tempInitialDeskNumber, setTempInitialDeskNumber] = useState();
+  const [isFetched, setIsFetched] = useState(false);
+  const [originalImage, setOriginalImage] = useState(RoomImage);
+
   useEffect(() => {
-    //to fetch number of spaces to set defaullt name in add spaces
-    axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
-      // axios.get("/api/space/getall").then((res) => {
-      setPost(res.data);
-    });
+    if (props.id) {
+      //to fetch space and desk data and set state values
+      // getSpaceAndDeskData(id);
+      // const fetchData = async () => {
+      //   await getSpaceAndDeskData(props.id).then((data) => {
+      //     // setweather(data);
+      //   });
+      // };
+      // fetchData();
+      const getData = async () => {
+        await getSpaceAndDeskData(props.id).then((data) => {
+          // setIsLoading(false);
+          // setDataSource(data);
+          console.log(data);
+          //setid
+          // setSpaceName(data.name);
+          setDefaultName(data.name);
+          setInitialDeskNumber(data.startingDesk);
+          setDeskList(data.desks);
+          setInitialDeskList(data.desks);
+          if (!data.defaultImage) {
+            setImage(data.image);
+            setOriginalImage(data.image);
+            setIsDefaultImage(false);
+          }
+          setIsFetched(true);
+        });
+      };
+      getData();
+    } else {
+      //set default state values, get list of spaces and set default name
+      // axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+      axios.get("/api/space/getall").then((res) => {
+        setPost(res.data);
+        setIsFetched(true);
+      });
+    }
   }, []);
 
   useEffect(() => {
-    setInitialDeskNumber(Math.max(...post.map((val) => val.id)));
-    setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
-    // console.log(post);
-    // console.log(initialDeskNumber);
+    //FIX InitialDeskNumber for add desk
+    if (props.id) {
+      setTempInitialDeskNumber(initialDeskNumber);
+      console.log("changing tempInitialDeskNumber");
+      // setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+    } else {
+      setTempInitialDeskNumber(1);
+      setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+    }
     // console.log(defaultName);
-  }, [post]);
+  }, [isFetched]);
 
   const [form] = Form.useForm();
-  useEffect(() => form.resetFields(), [defaultName]);
-  const init = Form.useWatch("initialDeskNumber", form);
-  useEffect(() => setInitialDeskNumber(init), [init]);
+  useEffect(() => {
+    form.resetFields();
+    console.log("changed form ", defaultName, tempInitialDeskNumber);
+  }, [defaultName, tempInitialDeskNumber]);
+
+  const form_initialDeskNumber = Form.useWatch("initialDeskNumber", form);
+  useEffect(() => {
+    setInitialDeskNumber(form_initialDeskNumber);
+  }, [form_initialDeskNumber]);
 
   const dummyRequest = async ({ file, onSuccess }) => {
     setTimeout(() => {
       onSuccess("ok");
     }, 0);
   };
+
+  function nameExists(name) {
+    return post.some(function (el) {
+      return el.name === name;
+    });
+  }
 
   // function getBase64(file) {
   //   var reader = new FileReader();
@@ -118,10 +175,24 @@ const ConfigureLayoutSettings = () => {
     beforeUpload(file, fileList) {
       //check file type
       console.log("checking file");
+      const isJpgOrPng =
+        file.type === "image/jpeg" || file.type === "image/png";
+
+      if (!isJpgOrPng) {
+        message.error("You can only upload JPG/PNG file!");
+      }
+
+      const isLt5M = file.size / 1024 / 1024 < 5;
+
+      if (!isLt5M) {
+        message.error("Image must smaller than 5MB!");
+      }
+
+      return isJpgOrPng && isLt5M;
     },
 
     onRemove(file) {
-      setImage(RoomImage);
+      props.id ? setImage(originalImage) : setImage(RoomImage);
       setIsDefaultImage(true);
     },
 
@@ -165,7 +236,7 @@ const ConfigureLayoutSettings = () => {
           console.log("submit");
           console.log({
             desklist: deskRef.current,
-            name: e.spacename,
+            name: e.spacename.trim(),
             defaultImage: isDefaultImage,
             startingDesk: initialDeskNumber,
             ...(!isDefaultImage && { image: imageFile }),
@@ -173,23 +244,34 @@ const ConfigureLayoutSettings = () => {
 
           let data = new FormData();
           data.append("name", e.spacename);
-          data.append("deskList", deskRef.current);
+          data.append("deskList", JSON.stringify(deskRef.current));
           data.append("defaultImage", isDefaultImage);
           data.append("startingDesk", initialDeskNumber);
           !isDefaultImage && data.append("image", imageFile);
 
-          axios
-            .post("/api/space/addwithdesks", data)
-            .then((res) => console.log(res))
-            .catch((err) => {
-              console.log(err);
-            });
-          // console.log(result);
+          // let data = {
+          //   name: e.spacename,
+          //   desklist: JSON.stringify(deskRef.current),
+          //   defaultImage: isDefaultImage,
+          //   startingDesk: initialDeskNumber,
+          //   ...(!isDefaultImage && { image: imageFile }),
+          // };
+          //post req for new space
+          // axios
+          //   .post("/api/space/addwithdesks", data)
+          //   .then((res) => console.log(res))
+          //   .catch((err) => {
+          //     console.log(err);
+          //   });
+        }}
+        initialValues={{
+          spacename: defaultName,
+          initialDeskNumber: tempInitialDeskNumber,
         }}
       >
         <div>
           <Header className="header">
-            <h1 className="header-text">Add Space</h1>
+            <h1 className="header-text">{props.name}</h1>
             <Button
               className="add-bookings-button"
               type="primary"
@@ -222,7 +304,7 @@ const ConfigureLayoutSettings = () => {
               <Form.Item
                 label={<span></span>}
                 name="spacename"
-                initialValue={defaultName}
+                // initialValue={defaultName}
                 rules={[
                   {
                     required: true,
@@ -231,7 +313,7 @@ const ConfigureLayoutSettings = () => {
                   {
                     message: "Name is already used.",
                     validator: (_, value) => {
-                      if (!post.includes(value)) {
+                      if (!nameExists(value.trim())) {
                         return Promise.resolve();
                       } else {
                         return Promise.reject();
@@ -268,7 +350,7 @@ const ConfigureLayoutSettings = () => {
                 // onChange={(event) => console.log(event)}
                 label={<span></span>}
                 name="initialDeskNumber"
-                initialValue={initialDeskNumber}
+                // initialValue={initialDeskNumber}
                 rules={[
                   {
                     required: true,
