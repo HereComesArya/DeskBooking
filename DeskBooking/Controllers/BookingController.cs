@@ -108,10 +108,18 @@ namespace DeskBooking.Controllers
             
         }
 
-        [HttpPut("meow")]
-        public async Task<string> Meow()
+        [HttpGet("meow")]
+        public async Task<string> Meow(bool cat)
         {
-            return ("Meow");
+            if (cat)
+            {
+                return ("Meow");
+            }
+            else
+            {
+                return ("Not a cat");
+            }
+
         }
     }
 }
