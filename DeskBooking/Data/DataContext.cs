@@ -19,6 +19,7 @@ namespace DeskBooking.Data
             
             modelBuilder.Entity<Desk>()
                 .HasKey(d => new { d.SpaceId, d.DeskId });
+                //.OnDelete(DeleteBehavior.ClientNoAction);
 
 
             //relationships

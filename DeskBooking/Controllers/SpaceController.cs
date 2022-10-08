@@ -2,6 +2,7 @@
 using DeskBooking.DTOs.Desk;
 using DeskBooking.DTOs.Space;
 using DeskBooking.Models;
+using FastEndpoints;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
-using FromBodyAttribute = Microsoft.AspNetCore.Mvc.FromBodyAttribute;
+using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 
 namespace DeskBooking.Controllers
 {
@@ -116,6 +117,28 @@ namespace DeskBooking.Controllers
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage
             }; ;
+        }
+
+        [HttpPost("modifyspace")]
+        public async Task<IActionResult> ModifySpace([FromForm] ModifySpacesDto spaces)
+        {
+            var spacetoedit = await _context.Spaces.FindAsync(spaces.SpaceId);
+
+            try
+            {
+                spacetoedit.Name = spaces.Name;
+                spacetoedit.InitialDeskNo = spaces.InitialDeskNo;
+
+                DeskController desk= new(_context);
+                var newdesklist = await desk.EditDesks(spaces.SpaceId, spaces.DeskList);
+                await _context.SaveChangesAsync();
+                return Ok();
+            }
+            catch (Exception)
+            {
+
+                return BadRequest("Cannot modify space");
+            }
         }
     }
 }
