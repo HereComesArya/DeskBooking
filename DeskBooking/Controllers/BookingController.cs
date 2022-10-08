@@ -13,6 +13,7 @@ using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using IMapper = AutoMapper.IMapper;
 using DeskBooking.DTOs.Booking;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
+using Newtonsoft.Json.Linq;
 
 namespace DeskBooking.Controllers
 {
@@ -51,37 +52,44 @@ namespace DeskBooking.Controllers
         [HttpGet("getbydeskid")]
         public async Task<IEnumerable<Booking>> GetBookingByDeskId(int spaceId,int deskId)
         {
-            var bookings = await _context.Bookings.Where(b =>b.SpaceId == spaceId && b.DeskId == deskId && b.StartTime > DateTime.Now).ToListAsync();
+            var bookings = await _context.Bookings.Where(b =>b.SpaceId == spaceId && b.DeskId == deskId && b.Cancelled == false && b.StartTime > DateTime.Now).ToListAsync();
             return bookings;
         }
 
         [NonAction]
         public async Task<bool> CheckAvailable(BookingRequestDto booking)
         {
-            var bookingsWithinDate = await _context.Bookings.Where(b => b.SpaceId == booking.SpaceId && b.DeskId == booking.DeskId &&
+            var bookingsWithinDate = await _context.Bookings.Where(b => b.SpaceId == booking.SpaceId && b.DeskId == booking.DeskId && b.Cancelled == false &&
                                 b.StartDate <= booking.EndDate && b.EndDate >= booking.StartDate).ToListAsync();
             var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime <= booking.EndTime && b.EndTime >= booking.StartTime);
             return !bookingsWithinTime;
         }
 
         [HttpPost("add")]
-        public async Task<ActionResult<Booking>> AddBooking([FromBody] BookingRequestDto bookingDto)
+        public async Task<ActionResult<Booking>> AddBooking(int? userId, [FromBody] BookingRequestDto bookingDto)
         {
             if (await CheckAvailable(bookingDto) == false)
             {
                 return BadRequest(new { Title = "Not available" });
             }
             var booking = _mapper.Map<Booking>(bookingDto);
-            booking.UserId = int.Parse(User.GetUserId()!);
+            booking.User = await _context.Users.FindAsync(userId ?? int.Parse(User.GetUserId()!));
             await _context.Bookings.AddAsync(booking);
             await _context.SaveChangesAsync();
-            return await _context.Bookings.FirstOrDefaultAsync();
+            return Ok();
+        }
+
+        [HttpGet("test")]
+        public IEnumerable<Booking> Test(int userId)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
+            return user.Bookings.ToList();
         }
 
         [Microsoft.AspNetCore.Mvc.HttpGet("getbyspace")]
         public async Task<IActionResult> GetBySpace(int spaceId)
         {
-            var bookings = await _context.Bookings.Where(d => d.SpaceId == spaceId).ToListAsync();
+            var bookings = await _context.Bookings.Where(d => d.SpaceId == spaceId && d.Cancelled == false).ToListAsync();
             if (bookings.Any())
             {
                 return Ok(bookings);

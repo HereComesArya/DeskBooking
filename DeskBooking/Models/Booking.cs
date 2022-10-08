@@ -17,10 +17,9 @@ namespace DeskBooking.Models
         public DateTime EndTime { get; set; }
 
 
-        [ForeignKey("SpaceId,DeskId")]
-        public Desk Desk { get; set; }
-        public int SpaceId { get; set; }
-        public int DeskId { get; set; }
+        public Desk? Desk { get; set; }
+        public int? SpaceId { get; set; }
+        public int? DeskId { get; set; }
 
         [Required]
         public bool IsRepeating { get; set; }
@@ -28,5 +27,7 @@ namespace DeskBooking.Models
         public DateTime StartDate { get; set; } 
         [Required]
         public DateTime EndDate { get; set; }
+
+        public bool Cancelled { get; set; } = false;
     }
 }

@@ -25,7 +25,7 @@ namespace DeskBooking.Controllers
             _context = context;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
-        public async Task<ActionResult<Space>> AddSpaceAsync(string name,int initialDeskNo, IFormFile? formFile)
+        public async Task<ActionResult<Space>> AddSpaceAsync(string name, string directions ,int initialDeskNo, IFormFile? formFile)
         {
             
             var space = new Space();
@@ -42,6 +42,7 @@ namespace DeskBooking.Controllers
                         space = new Space()
                         {
                             Name = name,
+                            Directions = directions,
                             InitialDeskNo = initialDeskNo,
                             FloorImage = memoryStream.ToArray(),
                             DefaultImage = false
@@ -58,6 +59,7 @@ namespace DeskBooking.Controllers
                 space = new Space()
                 {
                     Name = name,
+                    Directions = directions,
                     InitialDeskNo = initialDeskNo,
                     DefaultImage = true 
                 };
@@ -74,14 +76,14 @@ namespace DeskBooking.Controllers
         public async Task<ActionResult> AddSpaceWithDesksAsync([FromForm] SpaceUploadRequestDto uploadRequestDto)
         {
             DeskController desk = new(_context);
-            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name, uploadRequestDto.StartingDesk, uploadRequestDto.Image);
+            var addedSpace = await AddSpaceAsync(uploadRequestDto.Name,uploadRequestDto.Directions, uploadRequestDto.StartingDesk, uploadRequestDto.Image);
             if (addedSpace.Value == null)
             {
                 return BadRequest(addedSpace.Result);
             }
             var spaceId = addedSpace.Value.SpaceId;
             var jsonDeskList = JsonSerializer.Deserialize<IList<DeskRequestDto>>(uploadRequestDto.DeskList);
-            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y });
+            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y});
             await desk.AddDesksAsync(deskList);
             return NoContent();
         }
@@ -92,7 +94,8 @@ namespace DeskBooking.Controllers
             var returnData = await _context.Spaces.Select(s => new SpacesResponseDto()
             {
                 SpaceId = s.SpaceId,
-                Name = s.Name
+                Name = s.Name,
+                NumberOfDesks = s.Desks.Count
             }).OrderBy(s => s.SpaceId).ToListAsync();
             return returnData;
         }
@@ -109,6 +112,7 @@ namespace DeskBooking.Controllers
                 SpaceId = space.SpaceId,
                 StartingDesk = space.InitialDeskNo,
                 Name = space.Name,
+                Directions = space.Directions,
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage
             }; ;

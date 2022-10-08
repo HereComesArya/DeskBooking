@@ -1,7 +1,6 @@
 ﻿using DeskBooking.Data;
 using DeskBooking.DTOs.Desk;
 using DeskBooking.Extensions;
-using DeskBooking.Migrations;
 using DeskBooking.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -70,40 +69,12 @@ namespace DeskBooking.Controllers
                 var deletedDesks = deskList.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
                 var addedDesks = desks.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
 
+                var cancelledBookings = _context.Bookings.Where(b => deletedDesks.Contains(b.Desk));
+                await cancelledBookings.ForEachAsync(b => b.Cancelled = true);
+                _context.Bookings.UpdateRange(cancelledBookings);
+
                 await _context.Desks.AddRangeAsync(addedDesks);
-
-
-                List<Booking> bookingstoremove = new();
-                foreach (var ddesk in deletedDesks)
-                {
-                    //var x = ddesk.DeskId;
-                    bookingstoremove.AddRange(_context.Bookings.Where(b => b.SpaceId == ddesk.SpaceId && b.DeskId == ddesk.DeskId).ToList());
-                }
-                //_context.Bookings.RemoveRange(bookingstoremove);
-                //_context.DeletedBookings.AddRange(bookingstoremove);
-
-                List<DeletedBooking> bookingstoadd = new();
-                foreach (var d in bookingstoremove)
-                {
-                    var bookingtoadd = new DeletedBooking()
-                    {
-                        DBookingId = d.BookingId,
-                        DUserId = d.UserId,
-                        DStartTime = d.StartTime,
-                        DEndTime = d.EndTime,
-                        DSpaceId = d.SpaceId,
-                        DDeskId = d.DeskId,
-                        DIsRepeating = d.IsRepeating,
-                        DStartDate = d.StartDate,
-                        DEndDate = d.EndDate
-                    };
-                    //AddDeletedBookings(bookingtoadd);
-                    bookingstoadd.Add(bookingtoadd);
-                }
-                await _context.DeletedBookings.AddRangeAsync(bookingstoadd);
-                _context.Bookings.RemoveRange(bookingstoremove);
                 _context.Desks.RemoveRange(deletedDesks);
-                await _context.SaveChangesWithIdentityInsertAsync<DeletedBooking>();
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
@@ -144,15 +115,16 @@ namespace DeskBooking.Controllers
         }
 
         [HttpPost("del")]
-        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks(int spaceId, IEnumerable<Desk> desks)
+        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks([FromQuery]int spaceId,[FromQuery] int desks)
         {
             try
             {
-                _context.Desks.RemoveRange(desks);
+                var desk = await _context.Desks.Where(d => d.SpaceId == spaceId && d.DeskId == desks).ToListAsync();
+                _context.Desks.RemoveRange(desk);
                 await _context.SaveChangesAsync();
             }
             catch (Exception)
-            {
+            {   
 
                 return BadRequest();
             }

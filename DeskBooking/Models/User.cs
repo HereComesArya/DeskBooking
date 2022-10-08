@@ -13,5 +13,7 @@ namespace DeskBooking.Models
         public string Email { get; set; } = String.Empty;   
         public string FirstName { get; set; } = String.Empty;
         public string LastName { get; set; } = String.Empty;
+
+        public List<Booking> Bookings { get; set; }
     }
 }

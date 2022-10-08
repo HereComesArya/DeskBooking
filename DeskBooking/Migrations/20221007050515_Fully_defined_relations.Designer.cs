@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeskBooking.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221004045851_d")]
-    partial class d
+    [Migration("20221007050515_Fully_defined_relations")]
+    partial class Fully_defined_relations
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -41,6 +41,9 @@ namespace DeskBooking.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"), 1L, 1);
+
+                    b.Property<bool>("Cancelled")
+                        .HasColumnType("bit");
 
                     b.Property<int>("DeskId")
                         .HasColumnType("int");
@@ -75,43 +78,6 @@ namespace DeskBooking.Migrations
                     b.ToTable("Bookings");
                 });
 
-            modelBuilder.Entity("DeskBooking.Models.DeletedBooking", b =>
-                {
-                    b.Property<int>("DBookingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DBookingId"), 1L, 1);
-
-                    b.Property<int>("DDeskId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("DIsRepeating")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("DSpaceId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DStartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DBookingId");
-
-                    b.ToTable("DeletedBookings");
-                });
-
             modelBuilder.Entity("DeskBooking.Models.Desk", b =>
                 {
                     b.Property<int>("SpaceId")
@@ -144,6 +110,9 @@ namespace DeskBooking.Migrations
 
                     b.Property<byte[]>("FloorImage")
                         .HasColumnType("varbinary(max)");
+
+                    b.Property<int>("InitialDeskNo")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -188,20 +157,46 @@ namespace DeskBooking.Migrations
             modelBuilder.Entity("DeskBooking.Models.Booking", b =>
                 {
                     b.HasOne("DeskBooking.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DeskBooking.Models.Desk", "Desk")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("SpaceId", "DeskId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Desk");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Desk", b =>
+                {
+                    b.HasOne("DeskBooking.Models.Space", "Space")
+                        .WithMany("Desks")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Space");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Desk", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Space", b =>
+                {
+                    b.Navigation("Desks");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.User", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

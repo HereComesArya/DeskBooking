@@ -10,6 +10,7 @@ namespace DeskBooking.DTOs.Space
         //public string ImageData { get; set; } = String.Empty;
 
         public string Name { get; set; } = string.Empty;
+        public string Directions { get; set; } = string.Empty;
         public int StartingDesk { get; set; } = 0;
         public string DeskList { get; set; }
         public IFormFile? Image { get; set; }

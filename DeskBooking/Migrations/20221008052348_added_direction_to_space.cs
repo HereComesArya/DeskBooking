@@ -4,22 +4,22 @@
 
 namespace DeskBooking.Migrations
 {
-    public partial class change_space_table : Migration
+    public partial class added_direction_to_space : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "InitialDeskNo",
+            migrationBuilder.AddColumn<string>(
+                name: "Directions",
                 table: "Spaces",
-                type: "int",
+                type: "nvarchar(max)",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: "");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "InitialDeskNo",
+                name: "Directions",
                 table: "Spaces");
         }
     }

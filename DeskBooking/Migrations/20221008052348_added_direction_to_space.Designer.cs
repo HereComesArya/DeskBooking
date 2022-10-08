@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DeskBooking.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221004070553_change_space_table")]
-    partial class change_space_table
+    [Migration("20221008052348_added_direction_to_space")]
+    partial class added_direction_to_space
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -42,7 +42,10 @@ namespace DeskBooking.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BookingId"), 1L, 1);
 
-                    b.Property<int>("DeskId")
+                    b.Property<bool>("Cancelled")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("DeskId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
@@ -54,7 +57,7 @@ namespace DeskBooking.Migrations
                     b.Property<bool>("IsRepeating")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SpaceId")
+                    b.Property<int?>("SpaceId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("StartDate")
@@ -72,44 +75,11 @@ namespace DeskBooking.Migrations
 
                     b.HasIndex("SpaceId", "DeskId");
 
+                    b.HasIndex("StartDate", "EndDate");
+
+                    b.HasIndex("StartTime", "EndTime");
+
                     b.ToTable("Bookings");
-                });
-
-            modelBuilder.Entity("DeskBooking.Models.DeletedBooking", b =>
-                {
-                    b.Property<int>("DBookingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("DBookingId"), 1L, 1);
-
-                    b.Property<int>("DDeskId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DEndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("DIsRepeating")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("DSpaceId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("DStartTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DUserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("DBookingId");
-
-                    b.ToTable("DeletedBookings");
                 });
 
             modelBuilder.Entity("DeskBooking.Models.Desk", b =>
@@ -126,6 +96,9 @@ namespace DeskBooking.Migrations
                     b.Property<float>("Ycoordinate")
                         .HasColumnType("real");
 
+                    b.Property<bool>("isDeleted")
+                        .HasColumnType("bit");
+
                     b.HasKey("SpaceId", "DeskId");
 
                     b.ToTable("Desks");
@@ -141,6 +114,10 @@ namespace DeskBooking.Migrations
 
                     b.Property<bool>("DefaultImage")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Directions")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<byte[]>("FloorImage")
                         .HasColumnType("varbinary(max)");
@@ -191,20 +168,45 @@ namespace DeskBooking.Migrations
             modelBuilder.Entity("DeskBooking.Models.Booking", b =>
                 {
                     b.HasOne("DeskBooking.Models.User", "User")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DeskBooking.Models.Desk", "Desk")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("SpaceId", "DeskId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.ClientNoAction);
 
                     b.Navigation("Desk");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Desk", b =>
+                {
+                    b.HasOne("DeskBooking.Models.Space", "Space")
+                        .WithMany("Desks")
+                        .HasForeignKey("SpaceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Space");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Desk", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.Space", b =>
+                {
+                    b.Navigation("Desks");
+                });
+
+            modelBuilder.Entity("DeskBooking.Models.User", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

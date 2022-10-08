@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DeskBooking.Migrations
 {
-    public partial class initial_migration : Migration
+    public partial class Fully_defined_relations : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -21,25 +21,12 @@ namespace DeskBooking.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Desks",
-                columns: table => new
-                {
-                    DeskId = table.Column<int>(type: "int", nullable: false),
-                    SpaceId = table.Column<int>(type: "int", nullable: false),
-                    Xcoordinate = table.Column<float>(type: "real", nullable: false),
-                    Ycoordinate = table.Column<float>(type: "real", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Desks", x => new { x.SpaceId, x.DeskId });
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Spaces",
                 columns: table => new
                 {
                     SpaceId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    InitialDeskNo = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FloorImage = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     DefaultImage = table.Column<bool>(type: "bit", nullable: false)
@@ -65,6 +52,26 @@ namespace DeskBooking.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Desks",
+                columns: table => new
+                {
+                    DeskId = table.Column<int>(type: "int", nullable: false),
+                    SpaceId = table.Column<int>(type: "int", nullable: false),
+                    Xcoordinate = table.Column<float>(type: "real", nullable: false),
+                    Ycoordinate = table.Column<float>(type: "real", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Desks", x => new { x.SpaceId, x.DeskId });
+                    table.ForeignKey(
+                        name: "FK_Desks_Spaces_SpaceId",
+                        column: x => x.SpaceId,
+                        principalTable: "Spaces",
+                        principalColumn: "SpaceId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Bookings",
                 columns: table => new
                 {
@@ -77,7 +84,8 @@ namespace DeskBooking.Migrations
                     DeskId = table.Column<int>(type: "int", nullable: false),
                     IsRepeating = table.Column<bool>(type: "bit", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Cancelled = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,8 +94,7 @@ namespace DeskBooking.Migrations
                         name: "FK_Bookings_Desks_SpaceId_DeskId",
                         columns: x => new { x.SpaceId, x.DeskId },
                         principalTable: "Desks",
-                        principalColumns: new[] { "SpaceId", "DeskId" },
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumns: new[] { "SpaceId", "DeskId" });
                     table.ForeignKey(
                         name: "FK_Bookings_Users_UserId",
                         column: x => x.UserId,
@@ -128,13 +135,13 @@ namespace DeskBooking.Migrations
                 name: "Bookings");
 
             migrationBuilder.DropTable(
-                name: "Spaces");
-
-            migrationBuilder.DropTable(
                 name: "Desks");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Spaces");
         }
     }
 }
