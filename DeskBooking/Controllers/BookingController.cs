@@ -115,22 +115,5 @@ namespace DeskBooking.Controllers
             }       
             
         }
-<<<<<<< HEAD
-
-        [HttpGet("meow")]
-        public async Task<string> Meow(bool cat)
-        {
-            if (cat)
-            {
-                return ("Meow");
-            }
-            else
-            {
-                return ("Not a cat");
-            }
-
-        }
-=======
->>>>>>> 472b22998a6393005c1215cf92a841cc3a9300ed
     }
 }
