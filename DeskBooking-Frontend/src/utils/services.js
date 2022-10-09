@@ -101,11 +101,36 @@ const getFormattedMyBookingsData = async () => {
         endDate: booking.endDate,
       });
     });
-    console.log(res.data);
+    // console.log(res.data);
   });
   return finalData;
 };
 
+const getAvailableDesks = async (searchParams) => {
+  let deskList = [];
+  await axios
+    .get(
+      `/getavail?spaceId=${searchParams.spaceId}&startDate=${searchParams.startDate}&endDate=${searchParams.endDate}&startTime=${searchParams.startTime}&endTime=${searchParams.endTime}`
+    )
+    .then((res) => {
+      // res.data.forEach((booking, index) => {
+      //   finalData.push({
+      //     key: index,
+      //     bookingId: booking.bookingId,
+      //     // spaceName: booking.name,
+      //     deskId: booking.deskId,
+      //     spaceId: booking.spaceId,
+      //     startTime: booking.startTime,
+      //     endTime: booking.endTime,
+      //     startDate: booking.startDate,
+      //     endDate: booking.endDate,
+      //   });
+      // });
+      console.log(res.data);
+    });
+  return {};
+};
+
 export default getSpaceAndDeskData;
 
-export { getFormattedSpaceData, getFormattedMyBookingsData };
+export { getFormattedSpaceData, getFormattedMyBookingsData, getAvailableDesks };

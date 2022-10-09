@@ -27,59 +27,7 @@ const MyBookings = () => {
     getData();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(dataSource);
-  // }, [dataSource]);
-
   const [editBookingId, setEditBookingId] = useState("");
-  // const [data, setData] = useState([
-  //   {
-  //     bookingId: 0,
-  //     user: {
-  //       userId: 0,
-  //       email: "bobvance@vancerefrigiration.com",
-  //       firstName: "Bob",
-  //       lastName: "Vance",
-  //     },
-  //     userId: 0,
-  //     startTime: "2022-08-14T10:00:30Z",
-  //     endTime: "2022-08-14T11:30:00Z",
-  //     desk: null,
-  //     deskId: 0,
-  //     roomId: 0,
-  //   },
-  //   {
-  //     bookingId: 1,
-  //     user: {
-  //       userId: 0,
-  //       email: "nevan@nevan",
-  //       firstName: "Nevan",
-  //       lastName: "Nevan",
-  //     },
-  //     userId: 2,
-  //     startTime: "2022-09-09T10:30Z",
-  //     endTime: "2022-09-09T12:00Z",
-  //     desk: null,
-  //     deskId: 1,
-  //     roomId: 0,
-  //   },
-  //   {
-  //     bookingId: 99,
-  //     user: {
-  //       userId: 3,
-  //       email: "jam@jam.com",
-  //       firstName: "jam",
-  //       lastName: "jam",
-  //     },
-  //     userId: 3,
-  //     startTime: "2022-09-13T09:00:30Z",
-  //     endTime: "2022-09-13T10:00:00Z",
-  //     desk: null,
-  //     deskId: 2,
-  //     roomId: 0,
-  //   },
-  // ]);
-  //   const data = post;
 
   const onDelete = (record) => {
     Modal.confirm({

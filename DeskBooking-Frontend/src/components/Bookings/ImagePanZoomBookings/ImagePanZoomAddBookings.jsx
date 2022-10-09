@@ -89,14 +89,17 @@ const ImagePanZoomFunction = () => {
     // [window.innerWidth, window.innerHeight]
   );
 
+  /* 
+  todo check
   useEffect(() => {
     console.log(deskRef.current);
   }, [deskList]);
-
+  
   useEffect(() => {
     renderCircles(deskList);
     // setDeskName(initialDeskNumber);
   }, []);
+  */
 
   const updateWidthAndHeight = () => {
     setWidth(window.innerWidth / 1);
@@ -111,96 +114,100 @@ const ImagePanZoomFunction = () => {
     Viewer.fitToViewer();
   }, [Viewer]);
 
-  const executeAction = (e) => {
-    // e.target.style.fill = "black";
-    // console.log("delete node id", e.target.id); //gives id of node
-    // console.log(e);
-    setTimeout(removeCircle(e), 100);
-    // console.log("after rem circles");
-  };
+  // todo check
+  // const executeAction = (e) => {
+  //   // e.target.style.fill = "black";
+  //   // console.log("delete node id", e.target.id); //gives id of node
+  //   // console.log(e);
+  //   setTimeout(removeCircle(e), 100);
+  //   // console.log("after rem circles");
+  // };
 
-  const removeCircle = (e) => {
-    console.log("in removeCircle");
-    const neDeskList = deskRef.current.filter((desk) => desk.id != e.target.id);
-    setDeskList(neDeskList);
-    // console.log(imgRef.current.parentNode.lastChild);
-    // console.log(imgRef.current);
-    changeTitles(e.target, false);
-    e.target.remove();
-    initialDeskNumberRef.current--;
-  };
+  // const removeCircle = (e) => {
+  //   console.log("in removeCircle");
+  //   const neDeskList = deskRef.current.filter((desk) => desk.id != e.target.id);
+  //   setDeskList(neDeskList);
+  //   // console.log(imgRef.current.parentNode.lastChild);
+  //   // console.log(imgRef.current);
+  //   changeTitles(e.target, false);
+  //   e.target.remove();
+  //   initialDeskNumberRef.current--;
+  // };
 
-  //remove all circles
-  const EmptyViewer = () => {};
+  // todo check
+  // // ? what???
+  // //remove all circles
+  // const EmptyViewer = () => {};
 
-  //change colours
-  const changeTitles = (element, fromEffect) => {
-    if (element.localName === "circle") {
-      let newDeskName = fromEffect
-        ? initialDeskNumber
-        : parseInt(element.innerHTML.slice(8, -8));
-      let sibling = fromEffect ? element : element.previousSibling;
-      while (sibling.localName === "circle") {
-        sibling.innerHTML = `<title>D${newDeskName}</title>`;
-        sibling = sibling.previousSibling;
-        newDeskName++;
-        fromEffect && initialDeskNumberRef.current++;
-      }
-    }
-  };
+  // //change colours
+  // const changeTitles = (element, fromEffect) => {
+  //   if (element.localName === "circle") {
+  //     let newDeskName = fromEffect
+  //       ? initialDeskNumber
+  //       : parseInt(element.innerHTML.slice(8, -8));
+  //     let sibling = fromEffect ? element : element.previousSibling;
+  //     while (sibling.localName === "circle") {
+  //       sibling.innerHTML = `<title>D${newDeskName}</title>`;
+  //       sibling = sibling.previousSibling;
+  //       newDeskName++;
+  //       fromEffect && initialDeskNumberRef.current++;
+  //     }
+  //   }
+  // };
 
-  const renderCircles = (desks) => {
-    console.log("In render circles function");
+  // const renderCircles = (desks) => {
+  //   console.log("In render circles function");
 
-    let svgns = "http://www.w3.org/2000/svg";
-    const node = imgRef.current;
-    desks.forEach((desk, index) => {
-      // const svg = document.createElementNS(svgns, "svg");
-      // svg.setAttributeNS(null, "overflow", visible);
+  //   let svgns = "http://www.w3.org/2000/svg";
+  //   const node = imgRef.current;
+  //   desks.forEach((desk, index) => {
+  //     // const svg = document.createElementNS(svgns, "svg");
+  //     // svg.setAttributeNS(null, "overflow", visible);
 
-      /* Create an svg element for each node. 
-        Add a circle and text element.
-        
-      */
+  //     /* Create an svg element for each node.
+  //       Add a circle and text element.
 
-      const circle = document.createElementNS(svgns, "circle");
+  //     */
 
-      circle.setAttributeNS(null, "key", index);
-      circle.setAttributeNS(null, "id", desk.id);
-      circle.setAttributeNS(null, "cx", desk.x);
-      circle.setAttributeNS(null, "cy", desk.y);
-      circle.setAttributeNS(null, "r", 30);
-      circle.setAttributeNS(null, "fill", "red");
-      circle.setAttributeNS(null, "stroke", "black");
-      circle.addEventListener("dblclick", executeAction);
+  //     const circle = document.createElementNS(svgns, "circle");
 
-      const title = document.createElementNS(svgns, "title");
-      title.innerHTML = `D${initialDeskNumberRef.current}`;
+  //     circle.setAttributeNS(null, "key", index);
+  //     circle.setAttributeNS(null, "id", desk.id);
+  //     circle.setAttributeNS(null, "cx", desk.x);
+  //     circle.setAttributeNS(null, "cy", desk.y);
+  //     circle.setAttributeNS(null, "r", 30);
+  //     circle.setAttributeNS(null, "fill", "red");
+  //     circle.setAttributeNS(null, "stroke", "black");
+  //     circle.addEventListener("dblclick", executeAction);
 
-      // const text = document.createElementNS(svgns, "text");
-      // text.innerHTML = `D${deskName}`;
-      // text.setAttributeNS(null, "x", desk.x);
-      // text.setAttributeNS(null, "y", desk.y);
-      // text.setAttributeNS(null, "font-size", "100");
-      // // var textNode = document.createTextNode("val");
+  //     const title = document.createElementNS(svgns, "title");
+  //     title.innerHTML = `D${initialDeskNumberRef.current}`;
 
-      // setDeskName((prev) => prev + 1);
-      initialDeskNumberRef.current += 1;
+  //     // const text = document.createElementNS(svgns, "text");
+  //     // text.innerHTML = `D${deskName}`;
+  //     // text.setAttributeNS(null, "x", desk.x);
+  //     // text.setAttributeNS(null, "y", desk.y);
+  //     // text.setAttributeNS(null, "font-size", "100");
+  //     // // var textNode = document.createTextNode("val");
 
-      // console.log("deskname ", deskName);
-      // newElement.innerHTML = `Desk #${desk.name}`;
+  //     // setDeskName((prev) => prev + 1);
+  //     initialDeskNumberRef.current += 1;
 
-      circle.appendChild(title);
-      // text.appendChild(textNode);
-      // svg.appendChild(circle);
-      // svg.appendChild(text);
-      // node.after(svg);
+  //     // console.log("deskname ", deskName);
+  //     // newElement.innerHTML = `Desk #${desk.name}`;
 
-      node.after(circle);
+  //     circle.appendChild(title);
+  //     // text.appendChild(textNode);
+  //     // svg.appendChild(circle);
+  //     // svg.appendChild(text);
+  //     // node.after(svg);
 
-      console.log("Created a circle");
-    });
-  };
+  //     node.after(circle);
+
+  //     console.log("Created a circle");
+  //   });
+  // };
+  // todo check up
 
   /*Book Desk*/
   const singleClick = (event) => {

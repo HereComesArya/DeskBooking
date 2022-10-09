@@ -13,7 +13,10 @@ import {
   Radio,
 } from "antd";
 const { RangePicker } = DatePicker;
-import { getFormattedSpaceData } from "../../../utils/services";
+import {
+  getAvailableDesks,
+  getFormattedSpaceData,
+} from "../../../utils/services";
 import ImagePanZoomAddBookings from "../ImagePanZoomBookings/ImagePanZoomAddBookings";
 import { BookingsConfigContext } from "../../../helpers/contexts/AddBookingsLayoutConfig";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
@@ -41,7 +44,6 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
     };
     getData();
   }, []);
-
   // useEffect(() => {}, [dataSource]);
 
   /* Use Context */
@@ -57,6 +59,12 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
   const [selectedDeskId, setSelectedDeskId] = useState("");
   //
   const [initialDeskNumber, setInitialDeskNumber] = useState(1);
+
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
 
   const values = {
     image,
@@ -75,16 +83,55 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
 
   const form_spacename = Form.useWatch("spacename", form);
   const form_date = Form.useWatch("date", form);
-  const form_time = Form.useWatch("time", form);
+  const form_starttime = Form.useWatch("start-time", form);
+  const form_endtime = Form.useWatch("end-time", form);
+
   useEffect(() => {
     // trigger state updates
-    if ((form_spacename, form_time, form_date))
-      console.log(form_spacename, form_time, form_date);
-  }, [form_spacename, form_time, form_date]);
+    if ((form_spacename, form_starttime, form_endtime, form_date)) {
+      if (form_spacename && form_starttime && form_endtime && form_date) {
+        console.log(
+          form_spacename,
+          form_date[0].format(),
+          form_date[1].format(),
+          form_starttime.format(),
+          form_endtime.format()
+        );
+        // get desklist
+
+        //set states
+        setSelectedSpaceId(form_spacename);
+        setStartDate(form_date[0].format());
+        setEndDate(form_date[1].format());
+        setStartTime(form_starttime.format());
+        setEndTime(form_endtime.format());
+      } else {
+      }
+    }
+  }, [form_spacename, form_starttime, form_endtime, form_date]);
+
+  const formItemLayout = {
+    labelCol: {
+      xs: {
+        span: 24,
+      },
+      sm: {
+        span: 4,
+      },
+    },
+    wrapperCol: {
+      xs: {
+        span: 24,
+      },
+      sm: {
+        span: 15,
+      },
+    },
+  };
 
   return (
     <Modal
-      style={{ display: "flex" }}
+      style={{ display: "flex", top: 20 }}
       open={open}
       title={bookingId ? "Edit Booking" : "Add Booking"}
       okText="Create"
@@ -108,14 +155,22 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
         form={form}
         // layout="vertical"
         name="form_in_modal"
+        labelAlign="right"
         initialValues={{
           modifier: "public",
         }}
+        {...formItemLayout}
       >
         <>
           <Form.Item
             name="spacename"
-            label="Choose Space"
+            label="Space"
+            rules={[
+              {
+                required: true,
+                message: "Please select a space!",
+              },
+            ]}
             //   onValuesChange={validateSpace}
           >
             <Select
@@ -136,55 +191,156 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
             </Select>
           </Form.Item>
 
-          <Form.Item name="date" label="Choose Date">
-            <RangePicker
-              format="DD-MM-YYYY"
+          <Form.Item
+            name="date"
+            label="DateTime"
+            rules={[
+              {
+                required: true,
+                message: "Please select a date range!",
+              },
+            ]}
+          >
+            {/* <RangePicker
+              format="Do MMM"
               disabled={bookingId ? [true, false] : [false, false]}
               disabledDate={(currentDate) => {
                 // Can not select days before today and today
                 return currentDate < moment().startOf("day");
               }}
+            /> */}
+            <RangePicker
+              disabledDate={(currentDate) => {
+                // Can not select days before today and today
+                return currentDate < moment().startOf("day");
+              }}
+              // disabledTime={disabledRangeTime}
+              showTime={{
+                hideDisabledOptions: true,
+                defaultValue: [
+                  moment("00:00:00", "HH:mm:ss"),
+                  moment("11:59:59", "HH:mm:ss"),
+                ],
+              }}
+              format="YYYY-MM-DD HH:mm:ss"
             />
           </Form.Item>
+          {/*
+          // ! old remove 
+          // <Form.Item name="start date" label="Start Date">
+          //   <DatePicker
+          //     className="date-range-picker"
+          //     style={{
+          //       width: "100%",
+          //     }}
+          //   />
+          // </Form.Item>
 
-          {/* <Form.Item name="start date" label="Start Date">
-            <DatePicker
-              className="date-range-picker"
-              style={{
-                width: "100%",
-              }}
-            />
-          </Form.Item>
+          // <Form.Item name="end date" label="End Date">
+          //   <DatePicker
+          //     className="date-range-picker"
+          //     style={{
+          //       width: "100%",
+          //     }}
+          //   />
+          // </Form.Item> 
 
-          <Form.Item name="end date" label="End Date">
-            <DatePicker
-              className="date-range-picker"
-              style={{
-                width: "100%",
-              }}
-            />
-          </Form.Item> */}
-
+          //! New remove
           <Form.Item
-            name="time"
-            label="Choose Time"
+            name="start-time"
+            label="Start Time"
+            rules={[
+              {
+                required: true,
+                message: "Please select a start time!",
+              },
+            ]}
             // labelWarp={true}
             // labelAlign={"left"}
           >
-            <TimePicker.RangePicker
+            <TimePicker
+              // defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
               format="h:mm:ss A"
               use12Hours
+              showNow={false}
               minuteStep={30}
             />
           </Form.Item>
 
-          <Form.Item name="deskId" label="Choose Desk">
+          <Form.Item
+            name="end-time"
+            label="End Time"
+            rules={[
+              {
+                required: true,
+                message: "Please select a start time!",
+              },
+            ]}
+
+            // labelWarp={true}
+            // labelAlign={"left"}
+          >
+            <TimePicker
+              // defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
+              format="h:mm:ss A"
+              showNow={false}
+              use12Hours
+              minuteStep={30}
+            />
+          </Form.Item> 
+          <Form.Item
+            name="start-datetime"
+            label="Start DateTime"
+            rules={[
+              {
+                required: true,
+                message: "Please select a start time!",
+              },
+            ]}
+          >
+            <TimePicker
+              // defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
+              format="h:mm:ss A"
+              showNow={false}
+              use12Hours
+              minuteStep={30}
+            />
+          </Form.Item>
+          <Form.Item
+            name="end-datetime"
+            label="End DateTime"
+            rules={[
+              {
+                required: true,
+                message: "Please select a start time!",
+              },
+            ]}
+          >
+            <TimePicker
+              // defaultOpenValue={moment("00:00:00", "HH:mm:ss")}
+              format="h:mm:ss A"
+              showNow={false}
+              use12Hours
+              minuteStep={30}
+            />
+          </Form.Item>
+          <Form.Item
+            name="deskId"
+            label="Your Desk"
+            rules={[
+              {
+                required: true,
+                message: "Please select a desk!",
+              },
+            ]}
+          >
             <Input disabled style={{ maxWidth: 100 }}></Input>
           </Form.Item>
+          */}
         </>
         <>
           <BookingsConfigContext.Provider value={values}>
-            {/* <ImagePanZoomAddBookings></ImagePanZoomAddBookings> */}
+            <ImagePanZoomAddBookings></ImagePanZoomAddBookings>
           </BookingsConfigContext.Provider>
         </>
       </Form>
