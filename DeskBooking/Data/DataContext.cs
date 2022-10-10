@@ -34,7 +34,8 @@ namespace DeskBooking.Data
             modelBuilder.Entity<Desk>()
                 .HasMany(d => d.Bookings)
                 .WithOne(b => b.Desk)
-                .HasForeignKey(b => new { b.SpaceId, b.DeskId });
+                .HasForeignKey(b => new { b.SpaceId, b.DeskId })
+                .OnDelete(DeleteBehavior.ClientNoAction);
 
             //Query Filters
 
