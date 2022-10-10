@@ -73,10 +73,6 @@ namespace DeskBooking.Controllers
                 var intersect = deskList.IntersectBy(desks.Select(t => t.DeskId), d => d.DeskId);
                 var deletedDesks = deskList.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
                 var addedDesks = desks.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
-
-                //var cancelledBookings = _context.Bookings.Where(b => deletedDesks.Contains(b.Desk));
-                //await cancelledBookings.ForEachAsync(b => b.Cancelled = true);
-                //_context.Bookings.UpdateRange(cancelledBookings);
                 
                 deletedDesks.ForEach(desk => desk.Bookings.ForEach(b => b.Cancelled = true));
 

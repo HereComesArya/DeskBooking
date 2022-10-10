@@ -13,7 +13,6 @@ using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using IMapper = AutoMapper.IMapper;
 using DeskBooking.DTOs.Booking;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
-using Newtonsoft.Json.Linq;
 
 namespace DeskBooking.Controllers
 {
@@ -28,7 +27,7 @@ namespace DeskBooking.Controllers
             _context = context;
             _mapper = mapper;
         }
-     
+
         [HttpGet("getall")]
         public async Task<List<BookingResponseDto>> GetAllBookings()
         {
@@ -41,7 +40,8 @@ namespace DeskBooking.Controllers
                 deskNames.Add(d.SpaceId.ToString() + d.DeskId.ToString(), deskName++.ToString());
                 space = d.SpaceId;
             });
-            var returnData = await _context.Bookings.Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
+            var returnData = await _context.Bookings.Where(b => b.EndTime >= DateTime.Now).Include(b => b.User)
+                .Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
             returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
             return returnData;
         }
@@ -61,9 +61,9 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("getbydeskid")]
-        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int spaceId,int deskId)
+        public async Task<IEnumerable<Booking>> GetBookingByDeskId(int spaceId, int deskId)
         {
-            var bookings = await _context.Bookings.Where(b =>b.SpaceId == spaceId && b.DeskId == deskId && b.Cancelled == false && b.StartTime > DateTime.Now).ToListAsync();
+            var bookings = await _context.Bookings.Where(b => b.SpaceId == spaceId && b.DeskId == deskId && b.Cancelled == false && b.StartTime > DateTime.Now).ToListAsync();
             return bookings;
         }
 
@@ -75,6 +75,7 @@ namespace DeskBooking.Controllers
             var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime <= booking.EndTime && b.EndTime >= booking.StartTime);
             return !bookingsWithinTime;
         }
+
 
         [HttpPost("add")]
         public async Task<ActionResult<Booking>> AddBooking(int? userId, [FromBody] BookingRequestDto bookingDto)
@@ -89,14 +90,6 @@ namespace DeskBooking.Controllers
             await _context.SaveChangesAsync();
             return Ok();
         }
-
-        [HttpGet("test")]
-        public IEnumerable<Booking> Test(int userId)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.UserId == userId);
-            return user.Bookings.ToList();
-        }
-
         [Microsoft.AspNetCore.Mvc.HttpGet("getbyspace")]
         public async Task<IActionResult> GetBySpace(int spaceId)
         {
@@ -123,8 +116,8 @@ namespace DeskBooking.Controllers
             catch (Exception)
             {
                 return BadRequest();
-            }       
-            
+            }
+
         }
     }
 }

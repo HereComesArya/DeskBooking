@@ -125,7 +125,7 @@ namespace DeskBooking.Controllers
         }
 
         [HttpPost("modifyspace")]
-        public async Task<IActionResult> ModifySpace([FromForm] ModifySpacesDto spaces)
+        public async Task<IActionResult> ModifySpace([FromBody] ModifySpacesDto spaces)
         {
             var space = await _context.Spaces.FindAsync(spaces.SpaceId);
             if (space == null)
@@ -134,7 +134,7 @@ namespace DeskBooking.Controllers
             {
                 space.Name = spaces.Name;
                 space.InitialDeskNo = spaces.InitialDeskNo;
-                space.Name = spaces.Name;
+                space.Directions = spaces.Directions;
                 DeskController desk= new(_context, _mapper);
                 var newdesklist = await desk.EditDesks(spaces.SpaceId, spaces.DeskList);
                 await _context.SaveChangesAsync();
