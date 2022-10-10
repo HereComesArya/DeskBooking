@@ -59,7 +59,7 @@ const ManageSpaces = () => {
       okType: "danger",
       style: { marginTop: "100px" },
       onOk: () => {
-        //add axios delete space
+        //! add axios delete space
         const data = dataSource.filter((item) => item.spaceId !== SpaceId);
         setDataSource(data);
       },
@@ -153,20 +153,32 @@ const ManageSpaces = () => {
       id: "index",
       align: "center",
       //   width: "20%",
-      sorter: (a, b) => a.SpaceId - b.SpaceId,
+      sorter: (a, b) => a.spaceId - b.spaceId,
       ...getColumnSearchProps("spaceId"),
     },
     {
-      //Checked
-      title: "Name",
+      //! not Checked
+      title: "Space Name",
       dataIndex: "spaceName",
       align: "center",
       key: "index",
       id: "index",
       //   width: "40%",
-      sorter: (a, b) => a.SpaceName.localeCompare(b.SpaceName),
+      sorter: (a, b) => a.spaceName.localeCompare(b.spaceName),
       ...getColumnSearchProps("spaceName"),
     },
+    {
+      // checked
+      title: "Total Desks",
+      dataIndex: "numberOfDesks",
+      key: "index",
+      id: "index",
+      align: "center",
+      //   width: "20%",
+      sorter: (a, b) => a.numberOfDesks - b.numberOfDesks,
+      ...getColumnSearchProps("numberOfDesks"),
+    },
+
     {
       title: "Action",
       key: "action",
@@ -176,18 +188,12 @@ const ManageSpaces = () => {
           <>
             <EditOutlined
               onClick={() => {
-                // onEditStudent(record);
-                // console.log(`edit ${record}`);
-                // console.log(record);
                 setLocation(`/customize-space/${record.spaceId}`);
               }}
             />
             <DeleteOutlined
               onClick={(e) => {
                 onDelete(record.spaceId, e);
-                // onDeleteStudent(record);
-                // this.onDelete(record.key, e);
-                // console.log(record.SpaceId);
               }}
               style={{ color: "red", marginLeft: 12 }}
             />

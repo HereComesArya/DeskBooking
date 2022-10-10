@@ -111,22 +111,24 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
   }, [form_spacename, form_starttime, form_endtime, form_date]);
 
   const formItemLayout = {
-    labelCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 4,
-      },
-    },
-    wrapperCol: {
-      xs: {
-        span: 24,
-      },
-      sm: {
-        span: 15,
-      },
-    },
+    // labelCol: { span: 10 },
+    // labelCol: {
+    //   xs: {
+    //     span: 0,
+    //   },
+    //   sm: {
+    //     span: 0,
+    //   },
+    // },
+    // wrapperCol: { span: 17 },
+    // wrapperCol: {
+    // xs: {
+    //   span: 0,
+    // },
+    //   sm: {
+    //     span: 0,
+    //   },
+    // },
   };
 
   return (
@@ -163,6 +165,7 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
       >
         <>
           <Form.Item
+            // labelCol={{ span: 5 }}
             name="spacename"
             label="Space"
             rules={[
@@ -176,9 +179,6 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
             <Select
               placeholder="Select space"
               showSearch
-              style={{
-                width: 200,
-              }}
               optionFilterProp="children"
               filterOption={(input, option) => option.children.includes(input)}
               filterSort={(optionA, optionB) =>
@@ -222,7 +222,7 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
                   moment("11:59:59", "HH:mm:ss"),
                 ],
               }}
-              format="YYYY-MM-DD HH:mm:ss"
+              format="h:mm A D-MM-YY"
             />
           </Form.Item>
           {/*
@@ -340,7 +340,7 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
         </>
         <>
           <BookingsConfigContext.Provider value={values}>
-            <ImagePanZoomAddBookings></ImagePanZoomAddBookings>
+            {/* <ImagePanZoomAddBookings></ImagePanZoomAddBookings> */}
           </BookingsConfigContext.Provider>
         </>
       </Form>
