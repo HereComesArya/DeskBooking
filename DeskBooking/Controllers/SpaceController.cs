@@ -119,10 +119,13 @@ namespace DeskBooking.Controllers
             }; ;
         }
 
-        [HttpPost("modifyspace")]
-        public async Task<IActionResult> ModifySpace([FromForm] ModifySpacesDto spaces)
+        [Microsoft.AspNetCore.Mvc.HttpPost("modifyspace")]
+        public async Task<ActionResult> ModifySpace( ModifySpacesDto spaces)
         {
             var spacetoedit = await _context.Spaces.FindAsync(spaces.SpaceId);
+            var spaceId = spacetoedit.SpaceId;
+            var jsonDeskList = JsonSerializer.Deserialize<IList<DeskRequestDto>>(spaces.DeskList);
+            var deskList = jsonDeskList.Select(d => new Desk() { DeskId = d.id, SpaceId = spaceId, Xcoordinate = d.x, Ycoordinate = d.y });
 
             try
             {
@@ -130,7 +133,7 @@ namespace DeskBooking.Controllers
                 spacetoedit.InitialDeskNo = spaces.InitialDeskNo;
 
                 DeskController desk= new(_context);
-                var newdesklist = await desk.EditDesks(spaces.SpaceId, spaces.DeskList);
+                var newdesklist = await desk.EditDesks(spaces.SpaceId, deskList);
                 await _context.SaveChangesAsync();
                 return Ok();
             }
