@@ -1,4 +1,5 @@
-﻿using DeskBooking.Data;
+﻿using AutoMapper;
+using DeskBooking.Data;
 using DeskBooking.DTOs.Desk;
 using DeskBooking.DTOs.Space;
 using DeskBooking.Models;
@@ -10,7 +11,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
+using FromBodyAttribute = Microsoft.AspNetCore.Mvc.FromBodyAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
+using IMapper = AutoMapper.IMapper;
 
 namespace DeskBooking.Controllers
 {
@@ -20,10 +23,12 @@ namespace DeskBooking.Controllers
     //TODO: add starting desk number
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public SpaceController(DataContext context)
+        public SpaceController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [Microsoft.AspNetCore.Mvc.HttpPost("add")]
         public async Task<ActionResult<Space>> AddSpaceAsync(string name, string directions ,int initialDeskNo, IFormFile? formFile)
@@ -76,7 +81,7 @@ namespace DeskBooking.Controllers
         [Microsoft.AspNetCore.Mvc.HttpPost("addwithdesks")]
         public async Task<ActionResult> AddSpaceWithDesksAsync([FromForm] SpaceUploadRequestDto uploadRequestDto)
         {
-            DeskController desk = new(_context);
+            DeskController desk = new(_context,_mapper);
             var addedSpace = await AddSpaceAsync(uploadRequestDto.Name,uploadRequestDto.Directions, uploadRequestDto.StartingDesk, uploadRequestDto.Image);
             if (addedSpace.Value == null)
             {
@@ -116,20 +121,21 @@ namespace DeskBooking.Controllers
                 Directions = space.Directions,
                 Image = space.DefaultImage ? null : "data:image/jpeg;base64," + Convert.ToBase64String(space.FloorImage!),
                 DefaultImage = space.DefaultImage
-            }; ;
+            }; 
         }
 
         [HttpPost("modifyspace")]
-        public async Task<IActionResult> ModifySpace([FromForm] ModifySpacesDto spaces)
+        public async Task<IActionResult> ModifySpace([FromBody] ModifySpacesDto spaces)
         {
-            var spacetoedit = await _context.Spaces.FindAsync(spaces.SpaceId);
-
+            var space = await _context.Spaces.FindAsync(spaces.SpaceId);
+            if (space == null)
+                return BadRequest("No space found");
             try
             {
-                spacetoedit.Name = spaces.Name;
-                spacetoedit.InitialDeskNo = spaces.InitialDeskNo;
-
-                DeskController desk= new(_context);
+                space.Name = spaces.Name;
+                space.InitialDeskNo = spaces.InitialDeskNo;
+                space.Name = spaces.Name;
+                DeskController desk= new(_context, _mapper);
                 var newdesklist = await desk.EditDesks(spaces.SpaceId, spaces.DeskList);
                 await _context.SaveChangesAsync();
                 return Ok();

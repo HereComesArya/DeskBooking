@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using HttpGetAttribute = Microsoft.AspNetCore.Mvc.HttpGetAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
+using IMapper = AutoMapper.IMapper;
 
 namespace DeskBooking.Controllers
 {
@@ -18,17 +19,19 @@ namespace DeskBooking.Controllers
     public class DeskController : ControllerBase
     {
         private readonly DataContext _context;
+        private readonly IMapper _mapper;
 
-        public DeskController(DataContext context)
+        public DeskController(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         [HttpGet("getall")]
         public async Task<IEnumerable<Desk>> GetDesks(int? spaceId)
         {
             if (spaceId != null)
             {
-                return await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
+                return await _context.Desks.Where(d => d.SpaceId == spaceId).Include(d => d.Bookings).ToListAsync();
             }
             return await _context.Desks.ToListAsync();
         }
@@ -60,18 +63,22 @@ namespace DeskBooking.Controllers
         }
 
         [HttpPost("edit")]
-        public async Task<ActionResult<IEnumerable<Desk>>> EditDesks(int spaceId, IEnumerable<Desk> desks)
+        public async Task<ActionResult<IEnumerable<Desk>>> EditDesks(int spaceId, IList<DeskRequestDto> reqDesksDto)
         {
             try
             {
-                var deskList = await _context.Desks.Where(d => d.SpaceId == spaceId).ToListAsync();
+                var desks = _mapper.Map<List<Desk>>(reqDesksDto);
+                desks.ForEach(d => d.SpaceId = spaceId);
+                var deskList = await _context.Desks.Where(d => d.SpaceId == spaceId).Include(d => d.Bookings).ToListAsync();
                 var intersect = deskList.IntersectBy(desks.Select(t => t.DeskId), d => d.DeskId);
                 var deletedDesks = deskList.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
                 var addedDesks = desks.ExceptBy(intersect.Select(t => t.DeskId), d => d.DeskId).ToList();
 
-                var cancelledBookings = _context.Bookings.Where(b => deletedDesks.Contains(b.Desk));
-                await cancelledBookings.ForEachAsync(b => b.Cancelled = true);
-                _context.Bookings.UpdateRange(cancelledBookings);
+                //var cancelledBookings = _context.Bookings.Where(b => deletedDesks.Contains(b.Desk));
+                //await cancelledBookings.ForEachAsync(b => b.Cancelled = true);
+                //_context.Bookings.UpdateRange(cancelledBookings);
+                
+                deletedDesks.ForEach(desk => desk.Bookings.ForEach(b => b.Cancelled = true));
 
                 await _context.Desks.AddRangeAsync(addedDesks);
                 _context.Desks.RemoveRange(deletedDesks);
