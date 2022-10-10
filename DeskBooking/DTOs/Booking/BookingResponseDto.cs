@@ -7,6 +7,8 @@ namespace DeskBooking.DTOs.Booking
         public int SpaceId { get; set; }
         public int DeskId { get; set; }
         public string? DeskName { get; set; }
+        public string? SpaceName { get; set; }
+        public string? SpaceDirections { get; set; }
         public bool IsRepeating { get; set; }
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
