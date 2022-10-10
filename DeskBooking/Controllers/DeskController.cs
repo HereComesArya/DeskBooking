@@ -122,11 +122,11 @@ namespace DeskBooking.Controllers
         }
 
         [HttpPost("del")]
-        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks([FromQuery]int spaceId,[FromQuery] int desks)
+        public async Task<ActionResult<IEnumerable<Desk>>> DeleteDesks([FromQuery]int spaceId,[FromQuery] int deskId)
         {
             try
             {
-                var desk = await _context.Desks.Where(d => d.SpaceId == spaceId && d.DeskId == desks).ToListAsync();
+                var desk = await _context.Desks.Where(d => d.SpaceId == spaceId && d.DeskId == deskId).ToListAsync();
                 _context.Desks.RemoveRange(desk);
                 await _context.SaveChangesAsync();
             }

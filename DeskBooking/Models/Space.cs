@@ -13,7 +13,8 @@ namespace DeskBooking.Models
         public string Directions { get; set; } = string.Empty;
         public byte[]? FloorImage { get; set; }
         public bool DefaultImage { get; set; } = true;
-       
+        public bool isDeleted { get; set; }
+
         public List<Desk> Desks { get; set; }
     }
 }

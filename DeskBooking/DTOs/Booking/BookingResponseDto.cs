@@ -13,5 +13,6 @@ namespace DeskBooking.DTOs.Booking
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public bool Cancelled { get; set; } = false;
+
     }
 }

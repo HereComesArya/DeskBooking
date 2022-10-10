@@ -43,6 +43,10 @@ namespace DeskBooking.Data
                 .Property<bool>("isDeleted");
             modelBuilder.Entity<Desk>().HasQueryFilter(m => EF.Property<bool>(m, "isDeleted") == false);
 
+            modelBuilder.Entity<Space>()
+                .Property<bool>("isDeleted");
+            modelBuilder.Entity<Space>().HasQueryFilter(m => EF.Property<bool>(m, "isDeleted") == false);
+
 
             //Indexing the DateTime
             modelBuilder.Entity<Booking>()
@@ -69,14 +73,14 @@ namespace DeskBooking.Data
             foreach (var entry in ChangeTracker.Entries())
             {
                 //TODO: test
-                if (entry.Entity.GetType() == typeof(Desk))
+                if (entry.Entity.GetType() == typeof(Desk) || entry.Entity.GetType() == typeof(Space))
                 {
                     switch (entry.State)
                     {
                         case EntityState.Added:
-                            entry.CurrentValues["isDeleted"] = false;
-                           
+                            entry.CurrentValues["isDeleted"] = false;                         
                             break;
+
                         case EntityState.Deleted:
                             entry.State = EntityState.Modified;
                             entry.CurrentValues["isDeleted"] = true;

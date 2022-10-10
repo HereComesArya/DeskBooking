@@ -12,6 +12,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using static System.Net.WebRequestMethods;
 using FromBodyAttribute = Microsoft.AspNetCore.Mvc.FromBodyAttribute;
+using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using HttpPostAttribute = Microsoft.AspNetCore.Mvc.HttpPostAttribute;
 using IMapper = AutoMapper.IMapper;
 
@@ -145,6 +146,27 @@ namespace DeskBooking.Controllers
 
                 return BadRequest("Cannot modify space");
             }
+        }
+
+        [HttpDelete("deletespace")]
+        public async Task<IActionResult> DeleteSpace(int spaceId)
+        {
+            var spacetodelete = await _context.Spaces.FindAsync(spaceId);
+            var deskstodelete = _context.Desks.Where(d => d.SpaceId == spaceId);
+
+            try
+            {
+                _context.Desks.RemoveRange(deskstodelete);
+                _context.Spaces.Remove(spacetodelete);
+                return Ok();
+
+            }
+            catch (Exception)
+            {
+
+                return BadRequest("cannot remove space");
+            }
+
         }
     }
 }

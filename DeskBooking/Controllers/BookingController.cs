@@ -45,10 +45,26 @@ namespace DeskBooking.Controllers
             returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
             return returnData;
         }
+
         [HttpGet("mybookings")]
-        public async Task<IEnumerable<Booking>> UserBookings()
+        public async Task<List<BookingResponseDto>> UserBookings()
         {
-            return await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).ToListAsync();
+            //var mybookings = _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).ToListAsync();
+            
+            Dictionary<string, string> deskNames = new();
+            int deskName = 1, space = -1;
+            await _context.Desks.ForEachAsync(d =>
+            {
+                if (space != d.SpaceId)
+                { 
+                    deskName = 1;
+                }
+                deskNames.Add(d.SpaceId.ToString() + d.DeskId.ToString(), deskName++.ToString());
+                space = d.SpaceId;
+            });
+            var returnData = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
+            returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
+            return returnData;
         }
         [HttpGet("getbydatetime")]
         public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
@@ -72,7 +88,8 @@ namespace DeskBooking.Controllers
         {
             var bookingsWithinDate = await _context.Bookings.Where(b => b.SpaceId == booking.SpaceId && b.DeskId == booking.DeskId && b.Cancelled == false &&
                                 b.StartDate <= booking.EndDate && b.EndDate >= booking.StartDate).ToListAsync();
-            var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime <= booking.EndTime && b.EndTime >= booking.StartTime);
+            
+            var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime.TimeOfDay <= booking.EndTime.TimeOfDay && b.EndTime.TimeOfDay >= booking.StartTime.TimeOfDay);
             return !bookingsWithinTime;
         }
 
@@ -110,6 +127,7 @@ namespace DeskBooking.Controllers
                 return BadRequest("No data");
             }
         }
+
         [HttpDelete("delete")]
         public async Task<IActionResult> DeleteBooking(int bookingId)
         {
@@ -123,8 +141,10 @@ namespace DeskBooking.Controllers
             catch (Exception)
             {
                 return BadRequest();
-            }       
-            
+            }      
         }
+
+        //[NonAction]
+        //public async Task<bool> CheckUserBookingAvail(DateTime)
     }
 }
