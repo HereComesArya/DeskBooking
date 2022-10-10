@@ -42,7 +42,10 @@ namespace DeskBooking.Controllers
             });
             var returnData = await _context.Bookings.Where(b => b.EndTime >= DateTime.Now).Include(b => b.User)
                 .Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
-            returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
+            returnData.ForEach(b => {
+                b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
+                b.SpaceName = _context.Spaces.Find(b.SpaceId).Name ?? "";
+            } );
             return returnData;
         }
         [HttpGet("mybookings")]
