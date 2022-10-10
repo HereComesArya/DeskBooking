@@ -68,7 +68,12 @@ namespace DeskBooking.Controllers
                 space = d.SpaceId;
             });
             var returnData = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
-            returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
+            returnData.ForEach(async b => {
+                b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
+                var space = await _context.Spaces.FindAsync(b.SpaceId);
+                b.SpaceName = space?.Name ?? "";
+                b.SpaceDirections = space?.Directions ?? "";
+            });
             return returnData;
         }
         [HttpGet("getbydatetime")]
