@@ -85,30 +85,6 @@ const ConfigureLayoutSettings = (props) => {
     "color",
     "background",
   ];
-  const readOnly = true;
-
-  // const value =
-  // ReactQuill.value = "asdadasda";
-
-  // const { quill, quillRef } = useQuill({
-  //   theme,
-  //   modules,
-  //   formats,
-  //   placeholder,
-  // });
-
-  // useEffect(() => {
-  //   if (quill) {
-  //     quill.on("text-change", (delta, oldDelta, source) => {
-  //       setIsRichText(!checkIfRichTextIsEmpty());
-  //       // console.log("Text change!");
-  //       console.log(quill.getText()); // Get text only
-  //       // console.log(quill.getContents()); // Get delta contents
-  //       // console.log(quill.root.innerHTML); // Get innerHTML using quill
-  //       // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
-  //     });
-  //   }
-  // }, [quill]);
 
   const [post, setPost] = useState([]);
   // const [, setLocation] = useLocation();
@@ -120,13 +96,6 @@ const ConfigureLayoutSettings = (props) => {
   const [originalImage, setOriginalImage] = useState(RoomImage);
   useEffect(() => {
     if (props.id) {
-      //to fetch space and desk data and set state values
-      // getSpaceAndDeskData(id);
-      // const fetchData = async () => {
-      //   await getSpaceAndDeskData(props.id).then((data) => {
-      //   });
-      // };
-      // fetchData();
       const getData = async () => {
         await getSpaceAndDeskData(props.id).then((data) => {
           // setIsLoading(false);
@@ -138,6 +107,7 @@ const ConfigureLayoutSettings = (props) => {
           setInitialDeskNumber(data.startingDesk);
           setDeskList(data.desks);
           setInitialDeskList(data.desks);
+          setRichText(data.directions);
           if (!data.defaultImage) {
             setImage(data.image);
             setOriginalImage(data.image);
@@ -148,9 +118,6 @@ const ConfigureLayoutSettings = (props) => {
       };
       getData();
     } else {
-      // if (props.id == undefined);
-      //set default state values, get list of spaces and set default name
-      // axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
       axios.get("/api/space/getall").then((res) => {
         setPost(res.data);
         setIsFetched(true);
@@ -166,7 +133,7 @@ const ConfigureLayoutSettings = (props) => {
       // setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
     } else {
       setTempInitialDeskNumber(1);
-      setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
+      // setDefaultName(`Example Space ${post.map((val) => val.name).length + 1}`);
     }
     // console.log(defaultName);
   }, [isFetched]);
@@ -298,17 +265,9 @@ const ConfigureLayoutSettings = (props) => {
         onFinish={(e) => {
           //on successful submit
           console.log("submit success");
-          console.log({
-            desklist: deskRef.current,
-            name: e.spacename.trim(),
-            defaultImage: isDefaultImage,
-            startingDesk: initialDeskNumber,
-            richText: richText,
-            ...(!isDefaultImage && { image: imageFile }),
-          });
 
-          if (props.id == undefined) {
-            // add new space
+          if (!props.id) {
+            //* add new space
             let data = new FormData();
             data.append("name", e.spacename);
             data.append("directions", richText);
@@ -316,7 +275,7 @@ const ConfigureLayoutSettings = (props) => {
             data.append("defaultImage", isDefaultImage);
             data.append("startingDesk", initialDeskNumber);
             !isDefaultImage && data.append("image", imageFile);
-
+            console.log("wrong");
             // let data = {
             //   name: e.spacename,
             //   desklist: JSON.stringify(deskRef.current),
@@ -325,40 +284,47 @@ const ConfigureLayoutSettings = (props) => {
             //   ...(!isDefaultImage && { image: imageFile }),
             // };
             //post to add new space
-            axios.post("/api/space/addwithdesks", data).catch((err) => {
-              console.log(err);
-            });
-
-            setLocation(`/manage-spaces`);
-          } else {
-            //modify space
-            let data = new FormData();
-            data.append("id", props.id);
-            data.append("name", e.spacename);
-            data.append("deskList", JSON.stringify(deskRef.current));
-            data.append("startingDesk", initialDeskNumber);
-
-            // let data = {
-            //   name: e.spacename,
-            //   desklist: JSON.stringify(deskRef.current),
-            //   defaultImage: isDefaultImage,
-            //   startingDesk: initialDeskNumber,
-            //   ...(!isDefaultImage && { image: imageFile }),
-            // };
-            //post req for new space
             axios
               .post("/api/space/addwithdesks", data)
               .then((res) => console.log(res))
               .catch((err) => {
                 console.log(err);
               });
+            setLocation(`/manage-spaces`);
+          } else {
+            //* modify space
+
+            let modifiedData = {
+              spaceId: props.id,
+              name: e.spacename,
+              directions: richText,
+              initialDeskNo: initialDeskNumber,
+              deskList: deskRef.current,
+            };
+
+            console.log(modifiedData);
+            axios
+              .post("/api/space/modifyspace", modifiedData)
+              .then((res) => console.log(res))
+              .catch((err) => {
+                console.log(err);
+              });
+            setLocation(`/manage-spaces`);
           }
         }}
-        initialValues={{
-          // spacename: defaultName,
-          richtext: richText,
-          initialDeskNumber: tempInitialDeskNumber,
-        }}
+        initialValues={
+          props.id
+            ? {
+                spacename: defaultName,
+                richtext: richText,
+                initialDeskNumber: tempInitialDeskNumber,
+              }
+            : {
+                // spacename: defaultName,
+                richtext: richText,
+                initialDeskNumber: tempInitialDeskNumber,
+              }
+        }
       >
         <div>
           <Header className="header">
@@ -368,12 +334,6 @@ const ConfigureLayoutSettings = (props) => {
               type="primary"
               shape="round"
               // icon={<PlusOutlined />}
-              // onClick={() => {
-              //   const data = [];
-              //   console.log("clicked");
-              //   console.log(post);
-              //   // window.location.reload(false);
-              // }}
               htmlType="submit"
             >
               {props.id ? "Save Changes" : "Create"}
@@ -394,7 +354,6 @@ const ConfigureLayoutSettings = (props) => {
               <Form.Item
                 label={"Space Name"}
                 name="spacename"
-                // initialValue={defaultName}
                 rules={[
                   {
                     required: true,
@@ -403,10 +362,10 @@ const ConfigureLayoutSettings = (props) => {
                   {
                     message: "Name is already in use!",
                     validator: async (_, value) => {
-                      // if (typeof value == "undefined")
-                      //   console.log("typeof value");
                       value = value ?? "";
-                      if (
+                      if (props.id && value.trim() == defaultName) {
+                        return Promise.resolve();
+                      } else if (
                         value.trim() == "" ||
                         !(await nameExists(value.trim()))
                       ) {
@@ -422,14 +381,7 @@ const ConfigureLayoutSettings = (props) => {
               </Form.Item>
             </div>
             <div>
-              {/* <h3>Starting Desk Number:{" "}</h3> */}
               <Form.Item
-                // getValueFromEvent={(value) => {
-                //   console.log(value);
-                //   setInitialDeskNumber(value);
-                // }}
-                // onChange={(event) => setInitialDeskNumber(event.target.value)}
-                // onChange={(event) => console.log(event)}
                 label={
                   <>
                     <span>Starting Desk Number </span>
@@ -449,12 +401,10 @@ const ConfigureLayoutSettings = (props) => {
                   </>
                 }
                 name="initialDeskNumber"
-                // initialValue={initialDeskNumber}
                 rules={[
                   {
                     required: true,
                     message: "A value must be entered",
-                    // pattern: new RegExp(/^[0-9]+$/),
                   },
                 ]}
               >
@@ -468,19 +418,16 @@ const ConfigureLayoutSettings = (props) => {
             </div>
             {props.id == undefined && (
               <Form.Item label={<span>Add Image</span>}>
-                {/* <h3>Add Image:</h3> */}
                 <Upload {...imageUploadProps}>
                   <Button icon={<UploadOutlined />}>Click to Upload</Button>
                 </Upload>
               </Form.Item>
             )}
-            {/* <img src={image} /> */}
           </div>
           <div className="rich-text-form">
-            {/*Rich text component*/}
+            {/* //* Rich text component */}
             <Form.Item
               required
-              // initialValue={"richText"}
               label={
                 <>
                   <span></span>
@@ -490,10 +437,6 @@ const ConfigureLayoutSettings = (props) => {
               validateTrigger="onChange"
               name="richtext"
               rules={[
-                // {
-                //   required: true,
-                //   message: "Please enter body of post",
-                // },
                 () => ({
                   validator(_, value) {
                     value = value ?? "";
@@ -518,8 +461,6 @@ const ConfigureLayoutSettings = (props) => {
                 formats={formats}
                 onChange={setRichText}
                 placeholder={placeholder}
-                // value={"riAchText"}
-                // defaultValue={"<p>asaasdsa</p>"}
                 style={{
                   width: "100%",
                   height: 100,

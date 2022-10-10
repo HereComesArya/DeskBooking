@@ -79,6 +79,7 @@ const getFormattedSpaceData = async () => {
         key: index,
         spaceId: space.spaceId,
         spaceName: space.name,
+        numberOfDesks: space.numberOfDesks,
       });
     });
   });
@@ -88,17 +89,23 @@ const getFormattedSpaceData = async () => {
 const getFormattedMyBookingsData = async () => {
   let finalData = [];
   await axios.get(`/api/booking/mybookings`).then((res) => {
+    console.log(res.data);
     res.data.forEach((booking, index) => {
       finalData.push({
         key: index,
         bookingId: booking.bookingId,
-        // spaceName: booking.name,
+        cancelled: booking.cancelled,
+        //! Waiting for API update
+        //! spaceName: booking.name,
         deskId: booking.deskId,
+        deskNo: booking.deskName,
         spaceId: booking.spaceId,
+        spaceName: booking.spaceName,
         startTime: booking.startTime,
         endTime: booking.endTime,
         startDate: booking.startDate,
         endDate: booking.endDate,
+        directions: booking.spaceDirections,
       });
     });
     // console.log(res.data);

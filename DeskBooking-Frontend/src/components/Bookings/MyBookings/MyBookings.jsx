@@ -1,9 +1,14 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
-import { Button, Input, Space, Table, Modal } from "antd";
+import { Button, Input, Space, Table, Modal, Tooltip, Tag } from "antd";
 import {
   SearchOutlined,
   DeleteOutlined,
   EditOutlined,
+  EnvironmentOutlined,
+  EnvironmentTwoTone,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+  SyncOutlined,
 } from "@ant-design/icons";
 import { getFormattedMyBookingsData } from "../../../utils/services";
 import moment from "moment";
@@ -190,15 +195,18 @@ const MyBookings = () => {
 
   const columns = [
     {
-      //checked
+      //! not checked
       align: "center",
-      title: "Desk ID",
-      dataIndex: "deskId",
+      title: "Desk No.",
+      dataIndex: "deskNo",
       key: "index",
       id: "index",
       width: "10%",
-      sorter: (a, b) => a.deskId - b.deskId,
-      ...getColumnSearchProps("deskId"),
+      sorter: (a, b) => parseInt(a).deskName - parseInt(b).deskName,
+      ...getColumnSearchProps("deskName"),
+      render: (text, record, index) => {
+        return `D${record.deskNo}`;
+      },
     },
     // {
     //   //checked
@@ -214,20 +222,21 @@ const MyBookings = () => {
       //Checked
       align: "center",
       title: "Space Name",
-      dataIndex: "name",
+      dataIndex: "spaceName",
       key: "index",
       id: "index",
       width: "20%",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      ...getColumnSearchProps("name"),
+      sorter: (a, b) => a.spaceName.localeCompare(b.spaceName),
+      ...getColumnSearchProps("spaceName"),
     },
     {
+      //! not checked
       // align: "center",
-      title: "Start Date",
-      dataIndex: "startDate",
+      title: "Start",
+      dataIndex: "start",
       id: "index",
       key: "index",
-      width: "15%",
+      width: "20%",
       showSorterTooltip: true, // change this
       ...getColumnSearchProps("startDate"),
       sorter: (a, b) => {
@@ -239,19 +248,21 @@ const MyBookings = () => {
         console.log(a.date);
       },
       render: (text, record, index) => {
-        // console.log(moment(text).format("D MMM, YYYY"));
-        // console.log(text);
-        return moment(text).format("D MMM, YYYY");
+        return (
+          moment(record.startTime).format("h:mm A, ") +
+          moment(record.startDate).format("D MMM, YYYY")
+        );
       },
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
+      //! not checked
       // align: "center",
-      title: "End Date",
+      title: "End",
       dataIndex: "endDate",
       id: "index",
       key: "index",
-      width: "15%",
+      width: "20%",
       showSorterTooltip: true, // change this
       ...getColumnSearchProps("endDate"),
       sorter: (a, b) => {
@@ -263,42 +274,55 @@ const MyBookings = () => {
         console.log(a.date);
       },
       render: (text, record, index) => {
-        // console.log(moment(text).format("D MMM, YYYY"));
-        // console.log(text);
-        return moment(text).format("D MMM, YYYY");
+        return (
+          moment(record.endTime).format("h:mm A, ") +
+          moment(record.endDate).format("D MMM, YYYY")
+        );
       },
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
-      // align: "center",
-      title: "Start Time",
-      dataIndex: "startTime",
+      //! not checked
+      align: "center",
+      title: "Status",
+      dataIndex: "status",
       id: "index",
       key: "index",
       width: "15%",
-      ...getColumnSearchProps("startTime"),
-      sorter: (a, b) => a.startTime - b.startTime,
       render: (text, record, index) => {
-        // console.log(moment(text).format("D MMM, YYYY"));
-        // console.log(text);
-        return moment(text).format("h:mm A");
+        // console.log(record);
+        //* cancelled, upcomming, ongoing   ( and expired )
+        if (record.cancelled) {
+          //* cancelled by admin
+          return (
+            <Tag icon={<CloseCircleOutlined />} color="error">
+              cancelled
+            </Tag>
+          );
+        } else if (moment().isBefore(`${record.startTime}`)) {
+          //! NEEDS FIX, date and time are split. Join and compare
+          //* upcoming
+          console.log(moment().format());
+          console.log(record.startTime);
+          return (
+            <Tag icon={<ClockCircleOutlined spin />} color="geekblue">
+              upcoming
+            </Tag>
+          );
+        } else {
+          //! NEEDS FIX, Filter out expired bookings
+          //? FIltered on frontend for now.
+          //* ongoing
+          return (
+            <Tag icon={<SyncOutlined spin />} color="success">
+              ongoing
+            </Tag>
+          );
+        }
       },
+      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
-    {
-      // align: "center",
-      title: "End Time",
-      dataIndex: "endTime",
-      key: "index",
-      id: "index",
-      width: "15%",
-      ...getColumnSearchProps("endTime"),
-      sorter: (a, b) => b.endTime - a.endTime,
-      render: (text, record, index) => {
-        // console.log(moment(text).format("D MMM, YYYY"));
-        // console.log(text);
-        return moment(text).format("h:mm a");
-      },
-    },
+
     {
       align: "center",
       title: "Actions",
@@ -306,7 +330,31 @@ const MyBookings = () => {
       render: (_, record) => {
         return (
           <>
-            <EditOutlined
+            <Tooltip
+              placement="left"
+              title={
+                <div
+                  className="content"
+                  style={{
+                    whiteSpace: "nowrap",
+                    overflow: "auto",
+                    // border: "1px solid red",
+                    width: "220px",
+                    color: "black",
+                    // float: "left",
+                    height: "100px",
+                    // position: "relative",
+                  }}
+                  dangerouslySetInnerHTML={{
+                    __html: record.directions,
+                  }}
+                ></div>
+              }
+              color="#ebf0f5"
+            >
+              <EnvironmentTwoTone style={{ color: "green" }} />
+            </Tooltip>
+            {/* <EditOutlined
               onClick={() => {
                 // onEditStudent(record);
                 // console.log(`edit ${record}`);
@@ -314,7 +362,8 @@ const MyBookings = () => {
                 setOpen(true);
                 setEditBookingId(record.bookingId);
               }}
-            />
+              style={{ marginLeft: 12 }}
+            /> */}
             <DeleteOutlined
               onClick={(e) => {
                 // onDelete(record.spaceId, e);
