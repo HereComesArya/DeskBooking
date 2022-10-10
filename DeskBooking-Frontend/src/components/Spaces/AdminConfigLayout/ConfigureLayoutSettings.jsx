@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { LayoutConfigContext } from "../../../helpers/contexts/AdminLayoutConfigContext";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
 import {
@@ -15,6 +15,9 @@ import { Route, Redirect, useLocation } from "wouter";
 import getSpaceAndDeskData from "../../../utils/services";
 
 import axios from "axios";
+import ReactQuill, { Value } from "react-quill";
+import "quill/dist/quill.snow.css";
+import "quill/dist/quill.bubble.css";
 
 import {
   Switch,
@@ -33,6 +36,8 @@ import "./ConfigureLayoutSettings.css";
 import "antd/dist/antd.css";
 
 const ConfigureLayoutSettings = (props) => {
+  const [location, setLocation] = useLocation();
+
   const {
     spaceName,
     setSpaceName,
@@ -49,7 +54,61 @@ const ConfigureLayoutSettings = (props) => {
     isDefaultImage,
     setIsDefaultImage,
     deskRef,
+    richText,
+    setRichText,
+    rtcRef,
   } = useContext(LayoutConfigContext);
+
+  const theme = props.id ? "bubble" : "snow";
+  const modules = {
+    toolbar: [
+      ["bold", "italic", "underline", "strike"],
+      [{ header: [1, 2, 3, 4] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["link"],
+      [{ color: [] }, { background: [] }],
+    ],
+
+    clipboard: {
+      matchVisual: false,
+    },
+  };
+  const placeholder = "Add directions...";
+  const formats = [
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "list",
+    "header",
+    "link",
+    "color",
+    "background",
+  ];
+  const readOnly = true;
+
+  // const value =
+  // ReactQuill.value = "asdadasda";
+
+  // const { quill, quillRef } = useQuill({
+  //   theme,
+  //   modules,
+  //   formats,
+  //   placeholder,
+  // });
+
+  // useEffect(() => {
+  //   if (quill) {
+  //     quill.on("text-change", (delta, oldDelta, source) => {
+  //       setIsRichText(!checkIfRichTextIsEmpty());
+  //       // console.log("Text change!");
+  //       console.log(quill.getText()); // Get text only
+  //       // console.log(quill.getContents()); // Get delta contents
+  //       // console.log(quill.root.innerHTML); // Get innerHTML using quill
+  //       // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
+  //     });
+  //   }
+  // }, [quill]);
 
   const [post, setPost] = useState([]);
   // const [, setLocation] = useLocation();
@@ -59,14 +118,12 @@ const ConfigureLayoutSettings = (props) => {
   const [tempInitialDeskNumber, setTempInitialDeskNumber] = useState();
   const [isFetched, setIsFetched] = useState(false);
   const [originalImage, setOriginalImage] = useState(RoomImage);
-
   useEffect(() => {
     if (props.id) {
       //to fetch space and desk data and set state values
       // getSpaceAndDeskData(id);
       // const fetchData = async () => {
       //   await getSpaceAndDeskData(props.id).then((data) => {
-      //     // setweather(data);
       //   });
       // };
       // fetchData();
@@ -91,6 +148,7 @@ const ConfigureLayoutSettings = (props) => {
       };
       getData();
     } else {
+      // if (props.id == undefined);
       //set default state values, get list of spaces and set default name
       // axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
       axios.get("/api/space/getall").then((res) => {
@@ -116,7 +174,7 @@ const ConfigureLayoutSettings = (props) => {
   const [form] = Form.useForm();
   useEffect(() => {
     form.resetFields();
-    console.log("changed form ", defaultName, tempInitialDeskNumber);
+    // console.log("changed form ", defaultName, tempInitialDeskNumber);
   }, [defaultName, tempInitialDeskNumber]);
 
   const form_initialDeskNumber = Form.useWatch("initialDeskNumber", form);
@@ -130,10 +188,13 @@ const ConfigureLayoutSettings = (props) => {
     }, 0);
   };
 
-  function nameExists(name) {
-    return post.some(function (el) {
-      return el.name === name;
-    });
+  async function nameExists(name) {
+    try {
+      const res = await axios.get("/api/space/getall");
+      return res.data.some((e) => e.name == name);
+    } catch (error) {
+      return false;
+    }
   }
 
   // function getBase64(file) {
@@ -172,7 +233,7 @@ const ConfigureLayoutSettings = (props) => {
     maxCount: 1,
     customRequest: dummyRequest,
 
-    beforeUpload(file, fileList) {
+    beforeUpload(file) {
       //check file type
       console.log("checking file");
       const isJpgOrPng =
@@ -188,7 +249,7 @@ const ConfigureLayoutSettings = (props) => {
         message.error("Image must smaller than 5MB!");
       }
 
-      return isJpgOrPng && isLt5M;
+      return (isJpgOrPng && isLt5M) || Upload.LIST_IGNORE;
     },
 
     onRemove(file) {
@@ -231,41 +292,71 @@ const ConfigureLayoutSettings = (props) => {
     <>
       <Form
         form={form}
+        layout={"vertical"}
+        validateTrigger={["onFinish", "onChange"]}
+        // onFinishFailed={(e) => console.log(e)}
         onFinish={(e) => {
           //on successful submit
-          console.log("submit");
+          console.log("submit success");
           console.log({
             desklist: deskRef.current,
             name: e.spacename.trim(),
             defaultImage: isDefaultImage,
             startingDesk: initialDeskNumber,
+            richText: richText,
             ...(!isDefaultImage && { image: imageFile }),
           });
 
-          let data = new FormData();
-          data.append("name", e.spacename);
-          data.append("deskList", JSON.stringify(deskRef.current));
-          data.append("defaultImage", isDefaultImage);
-          data.append("startingDesk", initialDeskNumber);
-          !isDefaultImage && data.append("image", imageFile);
+          if (props.id == undefined) {
+            // add new space
+            let data = new FormData();
+            data.append("name", e.spacename);
+            data.append("directions", richText);
+            data.append("deskList", JSON.stringify(deskRef.current));
+            data.append("defaultImage", isDefaultImage);
+            data.append("startingDesk", initialDeskNumber);
+            !isDefaultImage && data.append("image", imageFile);
 
-          // let data = {
-          //   name: e.spacename,
-          //   desklist: JSON.stringify(deskRef.current),
-          //   defaultImage: isDefaultImage,
-          //   startingDesk: initialDeskNumber,
-          //   ...(!isDefaultImage && { image: imageFile }),
-          // };
-          //post req for new space
-          // axios
-          //   .post("/api/space/addwithdesks", data)
-          //   .then((res) => console.log(res))
-          //   .catch((err) => {
-          //     console.log(err);
-          //   });
+            // let data = {
+            //   name: e.spacename,
+            //   desklist: JSON.stringify(deskRef.current),
+            //   defaultImage: isDefaultImage,
+            //   startingDesk: initialDeskNumber,
+            //   ...(!isDefaultImage && { image: imageFile }),
+            // };
+            //post to add new space
+            axios.post("/api/space/addwithdesks", data).catch((err) => {
+              console.log(err);
+            });
+
+            setLocation(`/manage-spaces`);
+          } else {
+            //modify space
+            let data = new FormData();
+            data.append("id", props.id);
+            data.append("name", e.spacename);
+            data.append("deskList", JSON.stringify(deskRef.current));
+            data.append("startingDesk", initialDeskNumber);
+
+            // let data = {
+            //   name: e.spacename,
+            //   desklist: JSON.stringify(deskRef.current),
+            //   defaultImage: isDefaultImage,
+            //   startingDesk: initialDeskNumber,
+            //   ...(!isDefaultImage && { image: imageFile }),
+            // };
+            //post req for new space
+            axios
+              .post("/api/space/addwithdesks", data)
+              .then((res) => console.log(res))
+              .catch((err) => {
+                console.log(err);
+              });
+          }
         }}
         initialValues={{
-          spacename: defaultName,
+          // spacename: defaultName,
+          richtext: richText,
           initialDeskNumber: tempInitialDeskNumber,
         }}
       >
@@ -285,7 +376,7 @@ const ConfigureLayoutSettings = (props) => {
               // }}
               htmlType="submit"
             >
-              Save Changes
+              {props.id ? "Save Changes" : "Create"}
             </Button>
           </Header>
           <div
@@ -293,16 +384,15 @@ const ConfigureLayoutSettings = (props) => {
             style={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "space-around",
+              justifyContent: "space-between",
               // coloumGap: "10px",
               // gridTemplateColumns: "auto auto auto",
-              backgroundColor: "azure",
+              // backgroundColor: "azure",
             }}
           >
             <div>
-              <h3>Space Name:</h3>
               <Form.Item
-                label={<span></span>}
+                label={"Space Name"}
                 name="spacename"
                 // initialValue={defaultName}
                 rules={[
@@ -311,9 +401,15 @@ const ConfigureLayoutSettings = (props) => {
                     message: "Please input the Space Name!",
                   },
                   {
-                    message: "Name is already used.",
-                    validator: (_, value) => {
-                      if (!nameExists(value.trim())) {
+                    message: "Name is already in use!",
+                    validator: async (_, value) => {
+                      // if (typeof value == "undefined")
+                      //   console.log("typeof value");
+                      value = value ?? "";
+                      if (
+                        value.trim() == "" ||
+                        !(await nameExists(value.trim()))
+                      ) {
                         return Promise.resolve();
                       } else {
                         return Promise.reject();
@@ -326,21 +422,7 @@ const ConfigureLayoutSettings = (props) => {
               </Form.Item>
             </div>
             <div>
-              <h3>
-                Starting Desk Number:{" "}
-                <span>
-                  <Tooltip
-                    placement="topLeft"
-                    title={
-                      "Naming of desks will begin from this number. Default value is 1."
-                    }
-                    color={"#1890FF"}
-                    arrowPointAtCenter
-                  >
-                    <InfoCircleOutlined style={{ color: "#1890FF" }} />
-                  </Tooltip>
-                </span>
-              </h3>
+              {/* <h3>Starting Desk Number:{" "}</h3> */}
               <Form.Item
                 // getValueFromEvent={(value) => {
                 //   console.log(value);
@@ -348,7 +430,24 @@ const ConfigureLayoutSettings = (props) => {
                 // }}
                 // onChange={(event) => setInitialDeskNumber(event.target.value)}
                 // onChange={(event) => console.log(event)}
-                label={<span></span>}
+                label={
+                  <>
+                    <span>Starting Desk Number </span>
+                    <span>
+                      <Tooltip
+                        placement="topLeft"
+                        title={
+                          "Naming of desks will begin from this number. Default value is 1."
+                        }
+                        color={"#1890FF"}
+                        arrowPointAtCenter
+                        style={{ paddingLeft: 10 }}
+                      >
+                        <InfoCircleOutlined style={{ color: "#1890FF" }} />
+                      </Tooltip>
+                    </span>
+                  </>
+                }
                 name="initialDeskNumber"
                 // initialValue={initialDeskNumber}
                 rules={[
@@ -367,15 +466,68 @@ const ConfigureLayoutSettings = (props) => {
                 />
               </Form.Item>
             </div>
-            <div>
-              <h3>Add Image:</h3>
-              <Upload {...imageUploadProps}>
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
-              </Upload>
-            </div>
+            {props.id == undefined && (
+              <Form.Item label={<span>Add Image</span>}>
+                {/* <h3>Add Image:</h3> */}
+                <Upload {...imageUploadProps}>
+                  <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
+              </Form.Item>
+            )}
             {/* <img src={image} /> */}
           </div>
-          <div>
+          <div className="rich-text-form">
+            {/*Rich text component*/}
+            <Form.Item
+              required
+              // initialValue={"richText"}
+              label={
+                <>
+                  <span></span>
+                  <span>Directions to the Space</span>
+                </>
+              }
+              validateTrigger="onChange"
+              name="richtext"
+              rules={[
+                // {
+                //   required: true,
+                //   message: "Please enter body of post",
+                // },
+                () => ({
+                  validator(_, value) {
+                    value = value ?? "";
+
+                    const sanitizedValue = value
+                      .replace(/<\/?[\w]+>/gi, "")
+                      .replace(/\s+/, "");
+
+                    const isBlank = sanitizedValue === "";
+                    if (isBlank) {
+                      return Promise.reject(new Error("Cannot be blank!"));
+                    } else {
+                      return Promise.resolve();
+                    }
+                  },
+                }),
+              ]}
+            >
+              <ReactQuill
+                theme={"snow"}
+                modules={modules}
+                formats={formats}
+                onChange={setRichText}
+                placeholder={placeholder}
+                // value={"riAchText"}
+                // defaultValue={"<p>asaasdsa</p>"}
+                style={{
+                  width: "100%",
+                  height: 100,
+                  marginBottom: 70,
+                }}
+                ref={rtcRef}
+              />
+            </Form.Item>
             <ImagePanZoomFunction></ImagePanZoomFunction>
           </div>
         </div>

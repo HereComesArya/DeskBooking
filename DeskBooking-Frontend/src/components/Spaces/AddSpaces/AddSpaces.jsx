@@ -35,6 +35,10 @@ const AddSpaces = (props) => {
   const deskRef = useRef([]);
   deskRef.current = deskList;
 
+  //Rich text
+  const [richText, setRichText] = useState("");
+  const rtcRef = useRef();
+
   // /* List of added desks*/
   // const [addedDesks, setAddedDesks] = useState([]);
 
@@ -87,6 +91,8 @@ const AddSpaces = (props) => {
     isDefaultImage,
     setIsDefaultImage,
     deskRef,
+    richText,
+    setRichText,
   };
   return (
     <>

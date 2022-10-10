@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useContext } from "react";
+import { useWindowSize } from "@react-hook/window-size";
 import { INITIAL_VALUE, ReactSVGPanZoom, TOOL_NONE } from "react-svg-pan-zoom";
 import { LayoutConfigContext } from "../../helpers/contexts/AdminLayoutConfigContext";
 import useClickPreventionOnDoubleClick from "../../helpers/hooks/UseClickPreventionOnDoubleClick";
@@ -42,8 +43,9 @@ const ImagePanZoomFunction = () => {
   const [value, setValue] = useState(INITIAL_VALUE);
 
   /* Set svg Width and Height. Triggers on window resize */
-  const [width, setWidth] = React.useState(window.innerWidth / 1.216);
-  const [height, setHeight] = React.useState(window.innerHeight / 1.2);
+  const [width, setWidth] = useState(window.innerWidth / 1.5);
+  // const [height, setHeight] = useState(window.innerHeight / 2);
+  const [height, setHeight] = useState(window.innerWidth / 1.8);
 
   // /*image inside viewer*/
   // const [image, setImage] = useState(RoomImage); //copied
@@ -66,17 +68,18 @@ const ImagePanZoomFunction = () => {
   // deskRef.current = deskList;
   // //copied
 
-  useEffect(
-    () => {
-      window.addEventListener("resize", updateWidthAndHeight);
-      // Viewer.fitToViewer();
-      // console.log(window.innerWidth, window.innerHeight);
-      // console.log(deskRef);
-      return () => window.removeEventListener("resize", updateWidthAndHeight);
-    }
-    // [Viewer]
-    // [window.innerWidth, window.innerHeight]
-  );
+  // useEffect(
+  //   () => {
+  //     window.addEventListener("resize", updateWidthAndHeight);
+  //     // Viewer.fitToViewer();
+  //     // console.log(window.innerWidth, window.innerHeight);
+  //     // console.log(deskRef);
+  //     return () => window.removeEventListener("resize", updateWidthAndHeight);
+  //   }
+  //   // [Viewer]
+  //   // [window.innerWidth, window.innerHeight]
+  // ),
+  //   [];
 
   useEffect(() => {
     console.log(deskRef.current);
@@ -239,11 +242,14 @@ const ImagePanZoomFunction = () => {
 
   return (
     <>
-      <p>initialDeskNumberRef: {initialDeskNumberRef.current}</p>
+      {/* <p>initialDeskNumberRef: {initialDeskNumberRef.current}</p>
       <p>initialDeskNumber: {initialDeskNumber}</p>
-      <p>deskId: {deskId}</p>
+      <p>deskId: {deskId}</p> */}
       <div className="container">
-        <div className="item">
+        <div
+          className="item"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
           <div>
             {/* <div style={{ width: width, height: height }}> */}
             {/* <AutoSizer>
@@ -290,33 +296,6 @@ const ImagePanZoomFunction = () => {
           </AutoSizer> */}
           </div>
         </div>
-        {/* <List
-          className="scroll"
-          size="small"
-          column={7}
-          dataSource={deskList}
-          renderItem={(desk, index) => (
-            <List.Item
-              key={index}
-              actions={[
-                <a
-                  key={index}
-                  onClick={() => {
-                    // console.log(desk.id);
-                    executeAction(desk);
-                  }}
-                >
-                  Delete
-                </a>,
-              ]}
-            >
-              <List.Item.Meta
-                title={<a href="https://ant.design">{desk.id}</a>}
-              />
-              <div>Content</div>
-            </List.Item>
-          )}
-        /> */}
       </div>
     </>
   );
