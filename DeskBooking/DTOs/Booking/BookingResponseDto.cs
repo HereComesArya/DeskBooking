@@ -3,6 +3,7 @@ namespace DeskBooking.DTOs.Booking
 {
     public class BookingResponseDto
     {
+        public int BookingId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public int SpaceId { get; set; }
         public int DeskId { get; set; }
