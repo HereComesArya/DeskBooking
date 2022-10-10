@@ -34,8 +34,8 @@ namespace DeskBooking.Data
             modelBuilder.Entity<Desk>()
                 .HasMany(d => d.Bookings)
                 .WithOne(b => b.Desk)
-                .HasForeignKey(b => new {b.SpaceId, b.DeskId})
-                .OnDelete(DeleteBehavior.ClientNoAction);
+                .HasForeignKey(b => new { b.SpaceId, b.DeskId })
+                .OnDelete(DeleteBehavior.Cascade);
 
             //Query Filters
 
@@ -68,7 +68,8 @@ namespace DeskBooking.Data
         {
             foreach (var entry in ChangeTracker.Entries())
             {
-                if (entry.Entity.ToString() == "DeskBooking.Models.Desk")
+                //TODO: test
+                if (entry.Entity.GetType() == typeof(Desk))
                 {
                     switch (entry.State)
                     {

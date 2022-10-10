@@ -30,9 +30,20 @@ namespace DeskBooking.Controllers
         }
      
         [HttpGet("getall")]
-        public async Task<IEnumerable<Booking>> GetAllBookings()
+        public async Task<List<BookingResponseDto>> GetAllBookings()
         {
-            return await _context.Bookings.ToListAsync();
+            Dictionary<string, string> deskNames = new();
+            int deskName = 1, space = -1;
+            await _context.Desks.ForEachAsync(d =>
+            {
+                if (space != d.SpaceId)
+                    deskName = 1;
+                deskNames.Add(d.SpaceId.ToString() + d.DeskId.ToString(), deskName++.ToString());
+                space = d.SpaceId;
+            });
+            var returnData = await _context.Bookings.Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
+            returnData.ForEach(b => b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString()));
+            return returnData;
         }
         [HttpGet("mybookings")]
         public async Task<IEnumerable<Booking>> UserBookings()
