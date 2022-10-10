@@ -145,14 +145,14 @@ namespace DeskBooking.Controllers
             {
 
                 return BadRequest("Cannot modify space");
-            }
+            }   
         }
 
         [HttpDelete("deletespace")]
         public async Task<IActionResult> DeleteSpace(int spaceId)
         {
             var spacetodelete = await _context.Spaces.FindAsync(spaceId);
-            var deskstodelete = _context.Desks.Where(d => d.SpaceId == spaceId).ToList();
+            var deskstodelete = _context.Desks.Include(d => d.Bookings).Where(d => d.SpaceId == spaceId).ToList();
 
             try
             {

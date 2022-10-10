@@ -35,7 +35,6 @@ namespace DeskBooking.Data
                 .HasMany(d => d.Bookings)
                 .WithOne(b => b.Desk)
                 .HasForeignKey(b => new { b.SpaceId, b.DeskId })
-                .OnDelete(DeleteBehavior.Cascade);
 
             //Query Filters
 
