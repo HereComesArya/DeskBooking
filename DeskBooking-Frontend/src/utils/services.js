@@ -93,10 +93,32 @@ const getFormattedMyBookingsData = async () => {
     res.data.forEach((booking, index) => {
       finalData.push({
         key: index,
-        bookingId: booking.bookingId,
+        // bookingId: booking.bookingId,
         cancelled: booking.cancelled,
-        //! Waiting for API update
-        //! spaceName: booking.name,
+        deskId: booking.deskId,
+        deskNo: booking.deskName,
+        spaceId: booking.spaceId,
+        spaceName: booking.spaceName,
+        startTime: booking.startTime,
+        endTime: booking.endTime,
+        startDate: booking.startDate,
+        endDate: booking.endDate,
+        directions: booking.spaceDirections,
+      });
+    });
+  });
+  return finalData;
+};
+const getFormattedAllBookingsData = async () => {
+  let finalData = [];
+  await axios.get(`/api/booking/getall`).then((res) => {
+    console.log(res.data);
+    res.data.forEach((booking, index) => {
+      finalData.push({
+        key: index,
+        // bookingId: booking.bookingId,
+        cancelled: booking.cancelled,
+        userName: booking.userName,
         deskId: booking.deskId,
         deskNo: booking.deskName,
         spaceId: booking.spaceId,
@@ -140,4 +162,9 @@ const getAvailableDesks = async (searchParams) => {
 
 export default getSpaceAndDeskData;
 
-export { getFormattedSpaceData, getFormattedMyBookingsData, getAvailableDesks };
+export {
+  getFormattedSpaceData,
+  getFormattedMyBookingsData,
+  getFormattedAllBookingsData,
+  getAvailableDesks,
+};

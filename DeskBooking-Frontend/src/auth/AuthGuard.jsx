@@ -35,7 +35,7 @@ const AuthGuard = ({ children }) => {
   if (user === false) {
     return <></>;
   }
-  // console.log(user)
+  console.log(user);
   return children;
 };
 
