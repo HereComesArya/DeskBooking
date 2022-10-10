@@ -205,7 +205,7 @@ const MyBookings = () => {
       sorter: (a, b) => parseInt(a).deskName - parseInt(b).deskName,
       ...getColumnSearchProps("deskName"),
       render: (text, record, index) => {
-        return `D${record.deskNo}`;
+        return record.cancelled ? `-` : `D${record.deskNo}`;
       },
     },
     // {
@@ -302,8 +302,7 @@ const MyBookings = () => {
         } else if (moment().isBefore(`${record.startTime}`)) {
           //! NEEDS FIX, date and time are split. Join and compare
           //* upcoming
-          console.log(moment().format());
-          console.log(record.startTime);
+          // console.log(moment().format());
           return (
             <Tag icon={<ClockCircleOutlined spin />} color="geekblue">
               upcoming
@@ -396,6 +395,7 @@ const MyBookings = () => {
   return (
     <>
       <Table
+        loading={isLoading}
         scroll={{
           x: 900,
         }}
@@ -405,14 +405,14 @@ const MyBookings = () => {
         columns={columns}
         dataSource={dataSource}
       />
-      <BookingsModal
+      {/* <BookingsModal
         bookingId={editBookingId}
         open={open}
         onCreate={onCreate}
         onCancel={() => {
           setOpen(false);
         }}
-      />
+      /> */}
     </>
   );
 };

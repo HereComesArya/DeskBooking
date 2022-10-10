@@ -59,7 +59,10 @@ const ManageSpaces = () => {
       okType: "danger",
       style: { marginTop: "100px" },
       onOk: () => {
-        //! add axios delete space
+        axios
+          .delete(`/api/Space/deletespace?spaceId=${SpaceId}`)
+          .then((res) => console.log(res))
+          .catch((error) => console.log(error));
         const data = dataSource.filter((item) => item.spaceId !== SpaceId);
         setDataSource(data);
       },

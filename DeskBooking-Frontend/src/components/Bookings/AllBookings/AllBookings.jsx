@@ -1,6 +1,17 @@
-import { SearchOutlined } from "@ant-design/icons";
-import { Button, Input, Space, Table } from "antd";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useContext } from "react";
+import { Button, Input, Space, Table, Modal, Tooltip, Tag } from "antd";
+import {
+  SearchOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  EnvironmentOutlined,
+  EnvironmentTwoTone,
+  CloseCircleOutlined,
+  ClockCircleOutlined,
+  SyncOutlined,
+} from "@ant-design/icons";
+import { getFormattedAllBookingsData } from "../../../utils/services";
+import { UserContext } from "../../../App";
 import moment from "moment";
 import axios from "axios";
 
@@ -8,99 +19,39 @@ import "./AllBookings.css";
 import "antd/dist/antd.css";
 
 const AllBookings = () => {
-  const [post, setPost] = useState([]);
+  const { user, setUser } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dataSource, setDataSource] = useState([]);
+
   useEffect(() => {
-    axios.get("/api/booking/getall").then((res) => {
-      setPost(res.data);
-    });
+    const getData = async () => {
+      await getFormattedAllBookingsData().then((data) => {
+        setIsLoading(false);
+        setDataSource(data);
+      });
+    };
+    getData();
   }, []);
 
-  const data = post;
-  // const data = [
-  //   {
-  //     bookingId: 0,
-  //     user: {
-  //       userId: 0,
-  //       email: "bobvance@vancerefrigiration.com",
-  //       firstName: "Bob",
-  //       lastName: "Vance",
-  //     },
-  //     userId: 0,
-  //     startTime: "2022-08-14T10:00:30Z",
-  //     endTime: "2022-08-14T11:30:00Z",
-  //     desk: null,
-  //     deskId: 0,
-  //     roomId: 0,
-  //   },
-  //   {
-  //     bookingId: 1,
-  //     user: {
-  //       userId: 0,
-  //       email: "nevan@nevan",
-  //       firstName: "Nevan",
-  //       lastName: "Nevan",
-  //     },
-  //     userId: 2,
-  //     startTime: "2022-09-09T10:30Z",
-  //     endTime: "2022-09-09T12:00Z",
-  //     desk: null,
-  //     deskId: 1,
-  //     roomId: 0,
-  //   },
-  //   {
-  //     bookingId: 2,
-  //     user: {
-  //       userId: 3,
-  //       email: "jam@jam.com",
-  //       firstName: "jam",
-  //       lastName: "jam",
-  //     },
-  //     userId: 3,
-  //     startTime: "2022-09-13T09:00:30Z",
-  //     endTime: "2022-09-13T10:00:00Z",
-  //     desk: null,
-  //     deskId: 2,
-  //     roomId: 0,
-  //   },
-  // ];
+  const [editBookingId, setEditBookingId] = useState("");
 
-  const newData = [];
-  {
-    data &&
-      data.map((dataItem, index) => {
-        const {
-          userId,
-          bookingId,
-          roomId,
-          startTime,
-          endTime,
-          deskId,
-          user: { firstName },
-          user: { lastName },
-        } = dataItem;
-
-        const booking = new Object();
-        booking.key = index;
-        booking.deskId = deskId;
-        booking.name = firstName + " " + lastName;
-        booking.userId = userId;
-        booking.roomId = roomId;
-        booking.bookingId = bookingId;
-        booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
-        booking.date = moment(startTime);
-        booking.startTimeFormatted = moment(startTime).format("h: mm A");
-        booking.startTime = moment(startTime);
-        booking.endTimeFormatted = moment(endTime).format("h: mm A");
-        booking.endTime = moment(endTime);
-
-        newData.push(booking);
-        // console.log(newData);
-        // console.log("start " + booking.startTimeFormatted);
-        // console.log("end " + booking.endTimeFormatted);
-        // console.log("date  " + booking.date);
-        // console.log("date  " + booking.dateFormatted);
-      });
-  }
+  const onDelete = (record) => {
+    Modal.confirm({
+      title: "Are you sure, you want to delete this booking?",
+      okText: "Yes",
+      okType: "danger",
+      onOk: () => {
+        //! add delete booking
+        console.log(data);
+        setData((prev) => {
+          const art = data.filter(
+            (booking) => booking.bookingId !== record.bookingId
+          );
+          console.log(art);
+        });
+      },
+    });
+  };
 
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
@@ -197,88 +148,238 @@ const AllBookings = () => {
 
   const columns = [
     {
-      //checked
+      //! not checked
       align: "center",
-      title: "Desk ID",
-      dataIndex: "deskId",
-      key: "index",
-      id: "index",
+      title: "Desk No.",
+      dataIndex: "deskNo",
+      // key: "index",
+      // id: "index",
       width: "10%",
-      sorter: (a, b) => a.deskId - b.deskId,
-      ...getColumnSearchProps("deskId"),
+      sorter: {
+        compare: (a, b) => {
+          const a1 = a.deskNo ?? "";
+          const b1 = b.deskNo ?? "";
+          return a1.localeCompare(b1);
+        },
+        multiple: 3,
+      },
+      ...getColumnSearchProps("deskName"),
+      render: (text, record, index) => {
+        return record.cancelled ? `-` : `D${record.deskNo}`;
+      },
     },
-    // {
-    //   //checked
-    //   title: "Room ID",
-    //   dataIndex: "roomId",
-    //   key: "index",
-    //   id: "index",
-    //   width: "10%",
-    //   sorter: (a, b) => a.roomId - b.roomId,
-    //   ...getColumnSearchProps("roomId"),
-    // },
     {
       //Checked
-      title: "Name",
-      dataIndex: "name",
-      key: "index",
-      id: "index",
+      align: "center",
+      title: "Space Name",
+      dataIndex: "spaceName",
+      // key: "index",
+      // id: "index",
       width: "20%",
-      sorter: (a, b) => a.name.localeCompare(b.name),
-      ...getColumnSearchProps("name"),
+      sorter: {
+        compare: (a, b) => a.spaceName.localeCompare(b.spaceName),
+        multiple: 1,
+      },
+      ...getColumnSearchProps("spaceName"),
     },
     {
-      title: "Date",
-      dataIndex: "dateFormatted",
-      id: "index",
-      key: "index",
-      width: "15%",
-      showSorterTooltip: false, // change this
-      ...getColumnSearchProps("dateFormatted"),
-      sorter: (a, b) => {
-        a.date - b.date;
-        console.log(
-          moment(a.date, "DD-MM-YYYY").unix() -
-            moment(b.date, "DD-MM-YYYY").unix()
+      //Checked
+      align: "center",
+      title: "Name",
+      dataIndex: "userName",
+      // key: "index",
+      // id: "index",
+      width: "20%",
+      sorter: {
+        compare: (a, b) => a.userName.localeCompare(b.userName),
+        multiple: 1,
+      },
+      ...getColumnSearchProps("userName"),
+    },
+    {
+      //! not checked
+      // align: "center",
+      title: "Start",
+      dataIndex: "startDate",
+      // id: "index",
+      // key: "index",
+      width: "20%",
+      ...getColumnSearchProps("startDate"),
+      sorter: {
+        compare: (a, b) => {
+          console.log(a.startDate, a.startTime);
+          console.log(b.startDate, b.startTime);
+
+          let sd1 = a.startDate.substr(0, 10);
+          let sd2 = b.startDate.substr(0, 10);
+
+          let st1 = a.startTime.substr(10);
+          let st2 = b.startTime.substr(10);
+
+          let x = `${sd1}${st1}`;
+          let y = `${sd2}${st2}`;
+          console.log(x, y);
+          return moment(x).diff(moment(y));
+        },
+        multiple: 2,
+      },
+      // sorter: (a, b) => {
+      //   a.date - b.date;
+      //   console.log(
+      //     moment(a.date, "DD-MM-YYYY").unix() -
+      //       moment(b.date, "DD-MM-YYYY").unix()
+      //   );
+      // },
+      render: (text, record, index) => {
+        return (
+          moment(record.startTime).format("h:mm A, ") +
+          moment(record.startDate).format("D MMM, YYYY")
         );
-        console.log(a.date);
       },
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
-      title: "Start Time",
-      dataIndex: "startTimeFormatted",
-      id: "index",
-      key: "index",
+      //! not checked
+      // align: "center",
+      title: "End",
+      dataIndex: "endDate",
+      // id: "index",
+      // key: "index",
       width: "20%",
-      ...getColumnSearchProps("startTimeFormatted"),
-      sorter: (a, b) => a.startTime - b.startTime,
+      showSorterTooltip: true, // change this
+      ...getColumnSearchProps("endDate"),
+      sorter: {
+        compare: (a, b) => {
+          console.log(a.endDate, a.endTime);
+          console.log(b.endDate, b.endTime);
+
+          let sd1 = a.endDate.substr(0, 10);
+          let sd2 = b.endDate.substr(0, 10);
+
+          let st1 = a.endTime.substr(10);
+          let st2 = b.endTime.substr(10);
+
+          let x = `${sd1}${st1}`;
+          let y = `${sd2}${st2}`;
+          console.log(x, y);
+          return moment(x).diff(moment(y));
+        },
+        multiple: 2,
+      },
+      // sorter: (a, b) => {
+      //   a.date - b.date;
+      //   console.log(
+      //     moment(a.date, "DD-MM-YYYY").unix() -
+      //       moment(b.date, "DD-MM-YYYY").unix()
+      //   );
+      //   console.log(a.date);
+      // },
+      render: (text, record, index) => {
+        return (
+          moment(record.endTime).format("h:mm A, ") +
+          moment(record.endDate).format("D MMM, YYYY")
+        );
+      },
+      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
-      title: "End Time",
-      dataIndex: "endTimeFormatted",
-      key: "index",
+      //! not checked
+      align: "center",
+      title: "Status",
+      dataIndex: "status",
       id: "index",
-      width: "20%",
-      ...getColumnSearchProps("endTimeFormatted"),
-      sorter: (a, b) => b.endTime - a.endTime,
+      key: "index",
+      width: "15%",
+      render: (text, record, index) => {
+        // console.log(record);
+        //* cancelled, upcomming, ongoing   ( and expired )
+        if (record.cancelled) {
+          //* cancelled by admin
+          return (
+            <Tag icon={<CloseCircleOutlined />} color="error">
+              cancelled
+            </Tag>
+          );
+        } else if (moment().isBefore(`${record.startTime}`)) {
+          //! NEEDS FIX, date and time are split. Join and compare
+          //* upcoming
+          console.log(moment().format());
+          console.log(record.startTime);
+          return (
+            <Tag icon={<ClockCircleOutlined spin />} color="geekblue">
+              upcoming
+            </Tag>
+          );
+        } else {
+          //! NEEDS FIX, Filter out expired bookings
+          //? FIltered on frontend for now.
+          //* ongoing
+          return (
+            <Tag icon={<SyncOutlined spin />} color="success">
+              ongoing
+            </Tag>
+          );
+        }
+      },
+      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
-    {
-      title: "Action",
-      key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <a>Edit</a>
-          <a
-            onClick={() => {
-              console.log(record);
-            }}
-          >
-            Delete
-          </a>
-        </Space>
-      ),
-    },
+    !user.isAdmin
+      ? null
+      : {
+          // {
+          align: "center",
+          title: "Actions",
+          key: "actions",
+          render: (_, record) => {
+            return (
+              <>
+                <Tooltip
+                  placement="left"
+                  title={
+                    <div
+                      className="content"
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "auto",
+                        // border: "1px solid red",
+                        width: "220px",
+                        color: "black",
+                        // float: "left",
+                        height: "100px",
+                        // position: "relative",
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: record.directions,
+                      }}
+                    ></div>
+                  }
+                  color="#ebf0f5"
+                >
+                  <EnvironmentTwoTone style={{ color: "green" }} />
+                </Tooltip>
+                {/* <EditOutlined
+              onClick={() => {
+                // onEditStudent(record);
+                // console.log(`edit ${record}`);
+                console.log("edit ", record);
+                setOpen(true);
+                setEditBookingId(record.bookingId);
+              }}
+              style={{ marginLeft: 12 }}
+            /> */}
+                <DeleteOutlined
+                  onClick={(e) => {
+                    // onDelete(record.spaceId, e);
+                    // onDeleteStudent(record);
+                    // this.onDelete(record.key, e);
+                    console.log("delete ", record.key);
+                  }}
+                  style={{ color: "red", marginLeft: 12 }}
+                />
+              </>
+            );
+          },
+        },
     // {
     //   title: "Address",
     //   dataIndex: "address",
@@ -287,40 +388,37 @@ const AllBookings = () => {
     //     sorter: (a, b) => a.address.length - b.address.length,
     //     sortDirections: ["descend", "ascend"],
     // },
-  ];
+  ].filter((x) => x !== null);
+
+  const [open, setOpen] = useState(false);
+  const onCreate = (values) => {
+    console.log("Received values of form: ", values);
+    setOpen(false);
+  };
 
   return (
-    <Table
-      scroll={{
-        x: 900,
-      }}
-      pagination={{
-        position: ["topLeft", "bottomLeft"],
-      }}
-      columns={columns}
-      dataSource={newData}
-    />
+    <>
+      <Table
+        loading={isLoading}
+        scroll={{
+          x: 900,
+        }}
+        pagination={{
+          position: ["bottomRight"],
+        }}
+        columns={columns}
+        dataSource={dataSource}
+      />
+      {/* <BookingsModal
+        bookingId={editBookingId}
+        open={open}
+        onCreate={onCreate}
+        onCancel={() => {
+          setOpen(false);
+        }}
+      /> */}
+    </>
   );
 };
-
-// const App = () => {
-//   const baseURL = "https://jsonplaceholder.typicode.com/posts/1";
-//   const [post, setPost] = useState(null);
-
-//   useEffect(() => {
-//     axios.get(baseURL).then((response) => {
-//       setPost(response.data);
-//     });
-//   }, []);
-
-//   if (!post) return null;
-
-//   return (
-//     <div>
-//       <h1>{post.title}</h1>
-//       <p>{post.body}</p>
-//     </div>
-//   );
-// };
 
 export default AllBookings;

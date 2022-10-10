@@ -37,7 +37,9 @@ function Bookings() {
   const [loading, setLoading] = useState(false);
   const [open, setOpen] = useState(false);
   const onCreate = (values) => {
-    console.log("Received values of form: ", values);
+    console.log(`spacename: ${values.spacename}`);
+    console.log(`start: ${values.date[0].format()}`);
+    console.log(`end: ${values.date[1].format()}`);
     setOpen(false);
   };
 
