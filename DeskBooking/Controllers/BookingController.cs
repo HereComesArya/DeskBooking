@@ -164,5 +164,19 @@ namespace DeskBooking.Controllers
             return bookingsWithinTime;
 
         }
+
+        [HttpGet("mybookinghistory")]
+        public async Task<ActionResult<IEnumerable<Booking>>> MyBookingHistory()
+        {
+            var bookings = _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToList();
+            return bookings;
+        }
+
+        [HttpGet("allbookinghistory")]
+        public async Task<ActionResult<IEnumerable<Booking>>> AllBookingHistory()
+        {
+            var bookings = _context.Bookings.Where(b => b.EndTime <= DateTime.Now && b.StartDate >= DateTime.Now.AddDays(-7)).ToList();
+            return bookings;
+        }
     }
 }
