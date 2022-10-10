@@ -58,7 +58,7 @@ namespace DeskBooking.Controllers
             
             Dictionary<string, string> deskNames = new();
             int deskName = 1, space = -1;
-            await _context.Desks.ForEachAsync(d =>
+            await _context.Desks.IgnoreQueryFilters().ForEachAsync(d =>
             {
                 if (space != d.SpaceId)
                 { 
@@ -67,10 +67,11 @@ namespace DeskBooking.Controllers
                 deskNames.Add(d.SpaceId.ToString() + d.DeskId.ToString(), deskName++.ToString());
                 space = d.SpaceId;
             });
-            var returnData = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
+            var returnData = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).Include(b => b.User)
+                .Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
             returnData.ForEach( b => {
                 b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
-                var space = _context.Spaces.Find(b.SpaceId);
+                var space = _context.Spaces.IgnoreQueryFilters().FirstOrDefault(S => S.SpaceId == b.SpaceId);
                 b.SpaceName = space?.Name ?? "";
                 b.SpaceDirections = space?.Directions ?? "";
             });
