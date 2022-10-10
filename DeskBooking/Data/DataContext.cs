@@ -72,7 +72,6 @@ namespace DeskBooking.Data
         {
             foreach (var entry in ChangeTracker.Entries())
             {
-                //TODO: test
                 if (entry.Entity.GetType() == typeof(Desk) || entry.Entity.GetType() == typeof(Space))
                 {
                     switch (entry.State)

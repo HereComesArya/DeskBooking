@@ -42,9 +42,9 @@ namespace DeskBooking.Controllers
             });
             var returnData = await _context.Bookings.Where(b => b.EndTime >= DateTime.Now).Include(b => b.User)
                 .Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
-            returnData.ForEach(async b => {
+            returnData.ForEach( b => {
                 b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
-                var space = await _context.Spaces.FindAsync(b.SpaceId);
+                var space = _context.Spaces.Find(b.SpaceId);
                 b.SpaceName = space?.Name ?? "";
                 b.SpaceDirections = space?.Directions ?? "";
             } );
@@ -68,9 +68,9 @@ namespace DeskBooking.Controllers
                 space = d.SpaceId;
             });
             var returnData = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).Include(b => b.User).Select(b => _mapper.Map<BookingResponseDto>(b)).ToListAsync();
-            returnData.ForEach(async b => {
+            returnData.ForEach( b => {
                 b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
-                var space = await _context.Spaces.FindAsync(b.SpaceId);
+                var space = _context.Spaces.Find(b.SpaceId);
                 b.SpaceName = space?.Name ?? "";
                 b.SpaceDirections = space?.Directions ?? "";
             });
