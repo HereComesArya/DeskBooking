@@ -147,5 +147,22 @@ namespace DeskBooking.Controllers
             }
 
         }
+
+        [HttpGet("userbookingsconflict")]
+        public async Task<bool> UserBookingsConflict(string start, string end)
+        {
+            //DateTime startDate = DateTime.Parse(start).Date;
+            //DateTime endDate = DateTime.Parse(end).Date;
+            DateTime startDate = DateTime.Parse(start);
+            DateTime endDate = DateTime.Parse(end);
+            //var x = User.GetUserId();
+
+            var bookingsWithinDate = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false &&
+                                b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
+
+            var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime.TimeOfDay <= endDate.TimeOfDay && b.EndTime.TimeOfDay >= startDate.TimeOfDay);
+            return bookingsWithinTime;
+
+        }
     }
 }

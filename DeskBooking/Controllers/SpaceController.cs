@@ -152,12 +152,14 @@ namespace DeskBooking.Controllers
         public async Task<IActionResult> DeleteSpace(int spaceId)
         {
             var spacetodelete = await _context.Spaces.FindAsync(spaceId);
-            var deskstodelete = _context.Desks.Where(d => d.SpaceId == spaceId);
+            var deskstodelete = _context.Desks.Where(d => d.SpaceId == spaceId).ToList();
 
             try
             {
+                deskstodelete.ForEach(desk => desk.Bookings.ForEach(b => b.Cancelled = true));
                 _context.Desks.RemoveRange(deskstodelete);
                 _context.Spaces.Remove(spacetodelete);
+                await _context.SaveChangesAsync();
                 return Ok();
 
             }
