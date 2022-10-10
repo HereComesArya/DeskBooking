@@ -187,20 +187,38 @@ namespace DeskBooking.Controllers
         [HttpGet("mybookinghistory")]
         public async Task<ActionResult<List<BookingResponseDto>>> MyBookingHistory()
         {
-            var deskNames = await GetDeskNamesAsync();
-            var bookings = await _context.Bookings.IgnoreQueryFilters().Where(b => b.UserId.ToString() == User.GetUserId() &&
-                b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToListAsync();
-            var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
-            returnData.ForEach(b =>
+            var bookings = _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToList();
+            List<BookingResponseDto> final = new();
+            foreach (var booking in bookings)
             {
-                b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
-                var space = _context.Spaces.IgnoreQueryFilters().FirstOrDefault(S => S.SpaceId == b.SpaceId);
-                b.SpaceName = space?.Name ?? "";
-                b.SpaceDirections = space?.Directions ?? "";
-            });
-            return returnData;
+                var spaceofbooking = _context.Spaces.Where(s => s.SpaceId == booking.SpaceId).FirstOrDefault();
+                if (spaceofbooking != null)
+                {
+                    var result = _mapper.Map<BookingResponseDto>(booking);
+                    result.SpaceName = spaceofbooking.Name;
+                    final.Add(result);
+                }
+            }
+            return final;
         }
+        
 
+        [HttpGet("allbookinghistory")]
+        public async Task<ActionResult<IEnumerable<BookingResponseDto>>> AllBookingHistory()
+        {
+            var bookings = _context.Bookings.Where(b => b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToList();
+            List<BookingResponseDto> final = new();
+            foreach(var booking in bookings)
+            {
+                var spaceofbooking = _context.Spaces.Where(s => s.SpaceId == booking.SpaceId).FirstOrDefault();
+                if (spaceofbooking != null)
+                {
+                    var result = _mapper.Map<BookingResponseDto>(booking);
+                    result.SpaceName = spaceofbooking.Name;
+                    final.Add(result);
+                }
+            } 
+            return final;
+        }
     }
 }
-
