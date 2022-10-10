@@ -167,17 +167,62 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("mybookinghistory")]
-        public async Task<ActionResult<IEnumerable<Booking>>> MyBookingHistory()
+        public async Task<ActionResult<List<BookingHistoryDto>>> MyBookingHistory()
         {
             var bookings = _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToList();
-            return bookings;
+            List<BookingHistoryDto> final = new();
+            foreach (var booking in bookings)
+            {
+                var spaceofbooking = _context.Spaces.Where(s => s.SpaceId == booking.SpaceId).FirstOrDefault();
+                var spacename = spaceofbooking.Name;
+                var result = new BookingHistoryDto()
+                {
+                    BookingId = booking.BookingId,
+                    UserId = booking.UserId.ToString(),
+                    SpaceId = booking.SpaceId.Value,
+                    DeskId = booking.DeskId.Value,
+                    SpaceName = spacename,
+                    IsRepeating = booking.IsRepeating,
+                    StartTime = booking.StartTime,
+                    EndTime = booking.EndTime,
+                    StartDate = booking.StartDate,
+                    EndDate = booking.EndDate,
+                    Cancelled = booking.Cancelled
+                };
+                final.Add(result);
+            }
+
+            return final;
         }
+        
 
         [HttpGet("allbookinghistory")]
-        public async Task<ActionResult<IEnumerable<Booking>>> AllBookingHistory()
+        public async Task<ActionResult<List<BookingHistoryDto>>> AllBookingHistory()
         {
-            var bookings = _context.Bookings.Where(b => b.EndTime <= DateTime.Now && b.StartDate >= DateTime.Now.AddDays(-7)).ToList();
-            return bookings;
+            var bookings = _context.Bookings.Where(b => b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7) && b.Cancelled == false).ToList();
+            List<BookingHistoryDto> final = new();
+            foreach(var booking in bookings)
+            {
+                var spaceofbooking = _context.Spaces.Where(s => s.SpaceId == booking.SpaceId).FirstOrDefault();
+                var spacename = spaceofbooking.Name;
+                var result = new BookingHistoryDto()
+                {
+                    BookingId = booking.BookingId,
+                    UserId = booking.UserId.ToString(),
+                    SpaceId = booking.SpaceId.Value,
+                    DeskId = booking.DeskId.Value,
+                    SpaceName = spacename,
+                    IsRepeating = booking.IsRepeating,
+                    StartTime = booking.StartTime,
+                    EndTime = booking.EndTime,
+                    StartDate = booking.StartDate,
+                    EndDate = booking.EndDate,
+                    Cancelled = booking.Cancelled
+                };
+                final.Add(result);
+            }
+  
+            return final;
         }
     }
 }
