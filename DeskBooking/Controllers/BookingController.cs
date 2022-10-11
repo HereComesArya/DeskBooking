@@ -97,11 +97,10 @@ namespace DeskBooking.Controllers
             return returnData;
         }
         [HttpGet("getbydatetime")]
-        public async Task<IEnumerable<Booking>> GetBookingsByDate(string start, string end)
+        public async Task<IEnumerable<Booking>> GetBookingsByDate(DateTime startDate, DateTime endDate)
         {
-            DateTime startDate = DateTime.Parse(start);
-            DateTime endDate = DateTime.Parse(end);
-
+            //DateTime startDate = DateTime.Parse(start);
+            //DateTime endDate = DateTime.Parse(end);
             var bookings = await _context.Bookings.Where(b => b.EndTime >= startDate && b.StartTime <= endDate).ToListAsync();
             return bookings;
         }
@@ -182,10 +181,10 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("userbookingsconflict")]
-        public async Task<bool> UserBookingsConflict( [FromBody]string start,string end)
+        public async Task<bool> UserBookingsConflict( DateTime startDate, DateTime endDate)
         {
-            DateTime startDate = DateTime.Parse(start);
-            DateTime endDate = DateTime.Parse(end);
+            //DateTime startDate = DateTime.Parse(start);
+            //DateTime endDate = DateTime.Parse(end);
             //var x = User.GetUserId();
             var bookingsWithinDate = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false &&
                                 b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
