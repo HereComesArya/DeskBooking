@@ -76,7 +76,7 @@ namespace DeskBooking.Controllers
             //var mybookings = _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId()).ToListAsync();
             var deskNames = await GetDeskNamesAsync();
             var bookings = new List<Booking>();
-            if(type.Equals("history"))
+            if(type != null && type.Equals("history"))
             {
                  bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() &&
                     b.EndDate <= DateTime.Now.AddDays(-7).Date && b.EndTime.TimeOfDay <= DateTime.Now.TimeOfDay).ToListAsync();
@@ -166,6 +166,19 @@ namespace DeskBooking.Controllers
                 return BadRequest();
             }
 
+        }
+
+        [HttpPut("cancel")]
+        public async Task<IActionResult> CancelBookingsAsync(int bookingId)
+        {
+            var booking = await _context.Bookings.FindAsync(bookingId);
+            if(booking == null)
+            {
+                return NotFound();
+            }
+            booking.Cancelled = true;
+            await _context.SaveChangesAsync();
+            return Ok();
         }
 
         [HttpGet("userbookingsconflict")]
