@@ -52,11 +52,12 @@ namespace DeskBooking.Controllers
             if (type != null && type.Equals("history"))
             {
                 bookings = await _context.Bookings.Include(b => b.User)
-                    .Where(b => b.EndTime <= DateTime.Now && b.StartDate >= DateTime.Now.AddDays(-7)).ToListAsync();
+                    .Where(b => b.EndDate <= DateTime.Now.AddDays(-7).Date && b.EndTime.TimeOfDay <= DateTime.Now.TimeOfDay).ToListAsync();
             }
             else
             {
-                bookings = await _context.Bookings.Include(b => b.User).Where(b => b.EndTime >= DateTime.Now && b.Cancelled == false).ToListAsync();
+                bookings = await _context.Bookings.Include(b => b.User).Where(b => b.EndDate >= DateTime.Now.Date && b.EndTime.TimeOfDay >=
+                        DateTime.Now.TimeOfDay && b.Cancelled == false).ToListAsync();
             }
             var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
             returnData.ForEach(b =>
@@ -77,13 +78,13 @@ namespace DeskBooking.Controllers
             var bookings = new List<Booking>();
             if(type.Equals("history"))
             {
-                 bookings = await _context.Bookings.IgnoreQueryFilters().Where(b => b.UserId.ToString() == User.GetUserId() &&
-                    b.EndTime <= DateTime.Now && b.StartTime >= DateTime.Now.AddDays(-7)).ToListAsync();
+                 bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() &&
+                    b.EndDate <= DateTime.Now.AddDays(-7).Date && b.EndTime.TimeOfDay <= DateTime.Now.TimeOfDay).ToListAsync();
             }            
             else
             {
-                 bookings = await _context.Bookings.IgnoreQueryFilters().Where(b => b.UserId.ToString() == User.GetUserId() &&
-                    b.EndTime <= DateTime.Now).ToListAsync();
+                 bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() &&
+                    b.EndDate >= DateTime.Now.Date && b.EndTime.TimeOfDay >= DateTime.Now.TimeOfDay).ToListAsync();
             }
             var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
             returnData.ForEach(b =>
@@ -168,14 +169,11 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("userbookingsconflict")]
-        public async Task<bool> UserBookingsConflict(string start, string end)
+        public async Task<bool> UserBookingsConflict( [FromBody]string start,string end)
         {
-            //DateTime startDate = DateTime.Parse(start).Date;
-            //DateTime endDate = DateTime.Parse(end).Date;
             DateTime startDate = DateTime.Parse(start);
             DateTime endDate = DateTime.Parse(end);
             //var x = User.GetUserId();
-
             var bookingsWithinDate = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false &&
                                 b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
 
