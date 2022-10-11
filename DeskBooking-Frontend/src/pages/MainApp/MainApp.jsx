@@ -23,6 +23,7 @@ import "antd/dist/antd.css";
 import { signOut } from "../../utils/signOut";
 import { UserContext } from "../../App";
 import ManageSpaces from "../../components/Spaces/ManageSpaces";
+import Profile from "../../components/Profile/Profile";
 
 function MainApp() {
   const [, setLocation] = useLocation();
@@ -97,9 +98,7 @@ function MainApp() {
           {user.isAdmin && (
             <Route path="/customize-space" component={AddSpaces}></Route>
           )}
-          <Route path="/profile">
-            <h1>Profile</h1>
-          </Route>
+          <Route path="/profile" component={Profile}></Route>
           <Route path="/signout">
             <h1>Signout</h1>
           </Route>

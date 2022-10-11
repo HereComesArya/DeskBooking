@@ -21,22 +21,14 @@ const ImagePanZoomFunction = () => {
     setSelectedDeskId,
     initialDeskNumber,
     setInitialDeskNumber,
+    updateViewer,
+    setUpdateViewer,
   } = useContext(BookingsConfigContext);
-
-  // deskList,
-  //   setDeskList,
-  //   deskId,
-  //   setDeskId,
-  //   initialDeskNumber,
-  //   setInitialDeskNumber,
-  //   image,
-  //   setImage,
-  //   isDefaultImage,
-  //   setIsDefaultImage,
-  //   deskRef,
 
   /* Ref for starting Desk Number */
   const initialDeskNumberRef = useRef(1);
+
+  const [previousSelectedNode, setPreviousSelectedNode] = useState(null);
 
   /* Ref for new desk svg*/
   const imgRef = useRef();
@@ -56,20 +48,14 @@ const ImagePanZoomFunction = () => {
   const [width, setWidth] = React.useState(400);
   const [height, setHeight] = React.useState(400);
 
+  const [reload, reloadNow] = useState("");
+
   // /*image inside viewer*/
   // const [image, setImage] = useState(RoomImage); //copied
 
   // const [deskList, setDeskList] = useState([]);
   // const [id, setId] = useState(1);
   // //copied
-
-  // /* Set toggles for adding and deleting desks*/
-  // const [isAdding, setIsAdding] = useState(true); //change to false later
-  // const [isDeleting, setIsDeleting] = useState(false);
-  // const addRef = useRef(true); //change to false later
-  // const deleteRef = useRef(true);
-  // deleteRef.current = isDeleting;
-  // addRef.current = isAdding;
   // //copied
 
   // /* Ref for deskList*/
@@ -89,17 +75,18 @@ const ImagePanZoomFunction = () => {
     // [window.innerWidth, window.innerHeight]
   );
 
-  /* 
-  todo check
+  //todo check
   useEffect(() => {
-    console.log(deskRef.current);
+    console.log(deskList);
   }, [deskList]);
-  
+
   useEffect(() => {
+    console.log(imgRef.current.parentNode.lastChild);
+    // EmptyViewer(imgRef.current.parentNode.lastChild, true);
     renderCircles(deskList);
     // setDeskName(initialDeskNumber);
-  }, []);
-  */
+    // reloadNow((prev) => !prev);
+  }, [updateViewer]);
 
   const updateWidthAndHeight = () => {
     setWidth(window.innerWidth / 1);
@@ -115,13 +102,18 @@ const ImagePanZoomFunction = () => {
   }, [Viewer]);
 
   // todo check
-  // const executeAction = (e) => {
-  //   // e.target.style.fill = "black";
-  //   // console.log("delete node id", e.target.id); //gives id of node
-  //   // console.log(e);
-  //   setTimeout(removeCircle(e), 100);
-  //   // console.log("after rem circles");
-  // };
+  const executeAction = async (e) => {
+    if (previousSelectedNode) {
+      previousSelectedNode.target.style.fill = "green";
+    }
+    e.target.style.fill = "pink";
+    setPreviousSelectedNode(e);
+    // console.log("delete node id", e.target.id); //gives id of node
+    console.log(e);
+
+    // setTimeout(removeCircle(e), 100);
+    // console.log("after rem circles");
+  };
 
   // const removeCircle = (e) => {
   //   console.log("in removeCircle");
@@ -136,10 +128,18 @@ const ImagePanZoomFunction = () => {
 
   // todo check
   // // ? what???
-  // //remove all circles
-  // const EmptyViewer = () => {};
+  //!!remove all circles
+  const EmptyViewer = (element, fromEffect) => {
+    if (element.localName === "circle") {
+      let sibling = fromEffect ? element : element.previousSibling;
+      while (sibling.localName === "circle") {
+        sibling.remove();
+        sibling = sibling.previousSibling;
+      }
+    }
+  };
 
-  // //change colours
+  //change colours
   // const changeTitles = (element, fromEffect) => {
   //   if (element.localName === "circle") {
   //     let newDeskName = fromEffect
@@ -155,82 +155,63 @@ const ImagePanZoomFunction = () => {
   //   }
   // };
 
-  // const renderCircles = (desks) => {
-  //   console.log("In render circles function");
+  const renderCircles = (desks) => {
+    console.log("In render circles function");
+    console.log(desks);
+    let svgns = "http://www.w3.org/2000/svg";
+    const node = imgRef.current;
+    desks.forEach((desk, index) => {
+      // const svg = document.createElementNS(svgns, "svg");
+      // svg.setAttributeNS(null, "overflow", visible);
 
-  //   let svgns = "http://www.w3.org/2000/svg";
-  //   const node = imgRef.current;
-  //   desks.forEach((desk, index) => {
-  //     // const svg = document.createElementNS(svgns, "svg");
-  //     // svg.setAttributeNS(null, "overflow", visible);
+      /* Create an svg element for each node.
+        Add a circle and text element.
 
-  //     /* Create an svg element for each node.
-  //       Add a circle and text element.
+      */
 
-  //     */
+      const circle = document.createElementNS(svgns, "circle");
 
-  //     const circle = document.createElementNS(svgns, "circle");
+      circle.setAttributeNS(null, "key", index);
+      circle.setAttributeNS(null, "id", desk.id);
+      circle.setAttributeNS(null, "cx", desk.x);
+      circle.setAttributeNS(null, "cy", desk.y);
+      circle.setAttributeNS(null, "r", 30);
+      if (desk.isAvailable) {
+        circle.setAttributeNS(null, "fill", "green");
+        circle.addEventListener("click", executeAction);
+      } else {
+        circle.setAttributeNS(null, "fill", "gray");
+      }
+      circle.setAttributeNS(null, "stroke", "black");
 
-  //     circle.setAttributeNS(null, "key", index);
-  //     circle.setAttributeNS(null, "id", desk.id);
-  //     circle.setAttributeNS(null, "cx", desk.x);
-  //     circle.setAttributeNS(null, "cy", desk.y);
-  //     circle.setAttributeNS(null, "r", 30);
-  //     circle.setAttributeNS(null, "fill", "red");
-  //     circle.setAttributeNS(null, "stroke", "black");
-  //     circle.addEventListener("dblclick", executeAction);
+      const title = document.createElementNS(svgns, "title");
+      title.innerHTML = `D${initialDeskNumberRef.current}`;
 
-  //     const title = document.createElementNS(svgns, "title");
-  //     title.innerHTML = `D${initialDeskNumberRef.current}`;
+      // const text = document.createElementNS(svgns, "text");
+      // text.innerHTML = `D${deskName}`;
+      // text.setAttributeNS(null, "x", desk.x);
+      // text.setAttributeNS(null, "y", desk.y);
+      // text.setAttributeNS(null, "font-size", "100");
+      // // var textNode = document.createTextNode("val");
 
-  //     // const text = document.createElementNS(svgns, "text");
-  //     // text.innerHTML = `D${deskName}`;
-  //     // text.setAttributeNS(null, "x", desk.x);
-  //     // text.setAttributeNS(null, "y", desk.y);
-  //     // text.setAttributeNS(null, "font-size", "100");
-  //     // // var textNode = document.createTextNode("val");
+      // setDeskName((prev) => prev + 1);
+      initialDeskNumberRef.current += 1;
 
-  //     // setDeskName((prev) => prev + 1);
-  //     initialDeskNumberRef.current += 1;
+      // console.log("deskname ", deskName);
+      // newElement.innerHTML = `Desk #${desk.name}`;
 
-  //     // console.log("deskname ", deskName);
-  //     // newElement.innerHTML = `Desk #${desk.name}`;
+      circle.appendChild(title);
+      // text.appendChild(textNode);
+      // svg.appendChild(circle);
+      // svg.appendChild(text);
+      // node.after(svg);
 
-  //     circle.appendChild(title);
-  //     // text.appendChild(textNode);
-  //     // svg.appendChild(circle);
-  //     // svg.appendChild(text);
-  //     // node.after(svg);
+      node.after(circle);
 
-  //     node.after(circle);
-
-  //     console.log("Created a circle");
-  //   });
-  // };
-  // todo check up
-
-  /*Book Desk*/
-  const singleClick = (event) => {
-    // // console.log(event);
-    // if (event.originalEvent.detail === 1) {
-    //   // console.log("singleClick ran");
-    //   // console.log("coordinates clicked = " + event.x, event.y);
-    //   addDesks(event.x, event.y);
-    //   // console.log("clicked ", event.originalEvent.detail, " times");
-    // }
-    console.log(event);
-    // setSelectedDesk()
+      console.log("Created a circle");
+    });
   };
-
-  //   const doubleClick = () => {
-  //     {
-  //     }
-  //   };
-
-  //   const [handleClick, handleDoubleClick] = useClickPreventionOnDoubleClick(
-  //     singleClick,
-  //     doubleClick
-  //   );
+  // todo check up
 
   return (
     <>
@@ -252,9 +233,6 @@ const ImagePanZoomFunction = () => {
               onChangeValue={(value) => setValue(value)}
               background="#616264"
               detectAutoPan={false}
-              onClick={(e) => singleClick(e)}
-              //   onDoubleClick={handleDoubleClick}
-              // onClick={(e) => console.log(e.originalEvent.detail)}
               miniatureProps={{
                 position: "none",
               }}
@@ -284,33 +262,6 @@ const ImagePanZoomFunction = () => {
           </AutoSizer> */}
           </div>
         </div>
-        {/* <List
-          className="scroll"
-          size="small"
-          column={7}
-          dataSource={deskList}
-          renderItem={(desk, index) => (
-            <List.Item
-              key={index}
-              actions={[
-                <a
-                  key={index}
-                  onClick={() => {
-                    // console.log(desk.id);
-                    executeAction(desk);
-                  }}
-                >
-                  Delete
-                </a>,
-              ]}
-            >
-              <List.Item.Meta
-                title={<a href="https://ant.design">{desk.id}</a>}
-              />
-              <div>Content</div>
-            </List.Item>
-          )}
-        /> */}
       </div>
     </>
   );

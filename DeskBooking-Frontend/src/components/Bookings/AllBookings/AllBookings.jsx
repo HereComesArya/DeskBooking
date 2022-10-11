@@ -6,6 +6,7 @@ import {
   EditOutlined,
   EnvironmentOutlined,
   EnvironmentTwoTone,
+  StopOutlined,
   CloseCircleOutlined,
   ClockCircleOutlined,
   SyncOutlined,
@@ -163,7 +164,7 @@ const AllBookings = () => {
         },
         multiple: 3,
       },
-      ...getColumnSearchProps("deskName"),
+      ...getColumnSearchProps("deskNo "),
       render: (text, record, index) => {
         return record.cancelled ? `-` : `D${record.deskNo}`;
       },
@@ -197,14 +198,13 @@ const AllBookings = () => {
       ...getColumnSearchProps("userName"),
     },
     {
-      //! not checked
+      //checked
       // align: "center",
       title: "Start",
       dataIndex: "startDate",
       // id: "index",
       // key: "index",
       width: "20%",
-      ...getColumnSearchProps("startDate"),
       sorter: {
         compare: (a, b) => {
           console.log(a.startDate, a.startTime);
@@ -223,13 +223,6 @@ const AllBookings = () => {
         },
         multiple: 2,
       },
-      // sorter: (a, b) => {
-      //   a.date - b.date;
-      //   console.log(
-      //     moment(a.date, "DD-MM-YYYY").unix() -
-      //       moment(b.date, "DD-MM-YYYY").unix()
-      //   );
-      // },
       render: (text, record, index) => {
         return (
           moment(record.startTime).format("h:mm A, ") +
@@ -239,15 +232,13 @@ const AllBookings = () => {
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
-      //! not checked
+      //checked
       // align: "center",
       title: "End",
       dataIndex: "endDate",
       // id: "index",
       // key: "index",
       width: "20%",
-      showSorterTooltip: true, // change this
-      ...getColumnSearchProps("endDate"),
       sorter: {
         compare: (a, b) => {
           console.log(a.endDate, a.endTime);
@@ -266,21 +257,12 @@ const AllBookings = () => {
         },
         multiple: 2,
       },
-      // sorter: (a, b) => {
-      //   a.date - b.date;
-      //   console.log(
-      //     moment(a.date, "DD-MM-YYYY").unix() -
-      //       moment(b.date, "DD-MM-YYYY").unix()
-      //   );
-      //   console.log(a.date);
-      // },
       render: (text, record, index) => {
         return (
           moment(record.endTime).format("h:mm A, ") +
           moment(record.endDate).format("D MMM, YYYY")
         );
       },
-      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
       //! not checked
@@ -293,6 +275,16 @@ const AllBookings = () => {
       render: (text, record, index) => {
         // console.log(record);
         //* cancelled, upcomming, ongoing   ( and expired )
+        let endDateTime = `${record.endDate.substr(
+          0,
+          10
+        )}${record.endTime.substr(10)}`;
+
+        let startDateTime = `${record.startDate.substr(
+          0,
+          10
+        )}${record.startTime.substr(10)}`;
+
         if (record.cancelled) {
           //* cancelled by admin
           return (
@@ -300,19 +292,15 @@ const AllBookings = () => {
               cancelled
             </Tag>
           );
-        } else if (moment().isBefore(`${record.startTime}`)) {
-          //! NEEDS FIX, date and time are split. Join and compare
+        } else if (moment().isBefore(moment(startDateTime))) {
           //* upcoming
-          console.log(moment().format());
-          console.log(record.startTime);
           return (
             <Tag icon={<ClockCircleOutlined spin />} color="geekblue">
               upcoming
             </Tag>
           );
         } else {
-          //! NEEDS FIX, Filter out expired bookings
-          //? FIltered on frontend for now.
+          //? expired are FIltered on backend.
           //* ongoing
           return (
             <Tag icon={<SyncOutlined spin />} color="success">
@@ -367,7 +355,7 @@ const AllBookings = () => {
               }}
               style={{ marginLeft: 12 }}
             /> */}
-                <DeleteOutlined
+                <StopOutlined
                   onClick={(e) => {
                     // onDelete(record.spaceId, e);
                     // onDeleteStudent(record);
@@ -380,14 +368,6 @@ const AllBookings = () => {
             );
           },
         },
-    // {
-    //   title: "Address",
-    //   dataIndex: "address",
-    //   key: "address",
-    //     ...getColumnSearchProps("address"),
-    //     sorter: (a, b) => a.address.length - b.address.length,
-    //     sortDirections: ["descend", "ascend"],
-    // },
   ].filter((x) => x !== null);
 
   const [open, setOpen] = useState(false);

@@ -38,7 +38,6 @@ const formatDeskData = (data) => {
   x: x,
   y: y,
 */
-  console.log(data);
   data.forEach((desk, index) => {
     finalData.push({
       id: desk.deskId,
@@ -46,7 +45,7 @@ const formatDeskData = (data) => {
       y: desk.ycoordinate,
     });
   });
-  console.log(finalData);
+  // console.log(finalData);
   return finalData;
 };
 
@@ -68,6 +67,16 @@ const getSpaceAndDeskData = async (searchParams) => {
   const deskData = await getDeskData(searchParams);
   console.log(deskData);
   return { ...spaceData, desks: [...deskData] };
+};
+
+const getAvailSpaceAndDeskData = async (searchParams) => {
+  console.log(searchParams);
+  const spaceData = await getSpaceData(searchParams.id);
+
+  const deskData = await getAvailableDesks(searchParams);
+  console.log(deskData);
+  // console.log(spaceData);
+  return { ...spaceData, desksMain: [...deskData] };
 };
 
 //list of spaces
@@ -139,25 +148,12 @@ const getAvailableDesks = async (searchParams) => {
   let deskList = [];
   await axios
     .get(
-      `/getavail?spaceId=${searchParams.spaceId}&startDate=${searchParams.startDate}&endDate=${searchParams.endDate}&startTime=${searchParams.startTime}&endTime=${searchParams.endTime}`
+      `/getavail?spaceId=${searchParams.id}&startDate=${searchParams.start}&endDate=${searchParams.end}&startTime=${searchParams.start}&endTime=${searchParams.end}`
     )
     .then((res) => {
-      // res.data.forEach((booking, index) => {
-      //   finalData.push({
-      //     key: index,
-      //     bookingId: booking.bookingId,
-      //     // spaceName: booking.name,
-      //     deskId: booking.deskId,
-      //     spaceId: booking.spaceId,
-      //     startTime: booking.startTime,
-      //     endTime: booking.endTime,
-      //     startDate: booking.startDate,
-      //     endDate: booking.endDate,
-      //   });
-      // });
-      console.log(res.data);
+      deskList = res.data;
     });
-  return {};
+  return deskList;
 };
 
 export default getSpaceAndDeskData;
@@ -167,4 +163,5 @@ export {
   getFormattedMyBookingsData,
   getFormattedAllBookingsData,
   getAvailableDesks,
+  getAvailSpaceAndDeskData,
 };

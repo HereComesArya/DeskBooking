@@ -51,55 +51,6 @@ const MyBookings = () => {
     });
   };
 
-  // const [newData, setNewData] = useState([]);
-
-  // useEffect(() => {
-  //   // console.log("in ue");
-  //   const modifiedData = [];
-
-  //   //   const [newData, setNewData] = useState([]);
-  //   // console.log(modifiedData);
-  //   console.log(data);
-  //   // data &&
-  //   //   {
-  //   data.map((dataItem, index) => {
-  //     const {
-  //       userId,
-  //       bookingId,
-  //       roomId,
-  //       startTime,
-  //       endTime,
-  //       deskId,
-  //       user: { firstName },
-  //       user: { lastName },
-  //     } = dataItem;
-
-  //     const booking = new Object();
-  //     booking.key = index;
-  //     booking.deskId = deskId;
-  //     booking.name = firstName + " " + lastName;
-  //     booking.userId = userId;
-  //     booking.roomId = roomId;
-  //     booking.bookingId = bookingId;
-  //     booking.dateFormatted = moment(startTime).format("Do MMM, YYYY");
-  //     booking.date = moment(startTime);
-  //     booking.startTimeFormatted = moment(startTime).format("h: mm A");
-  //     booking.startTime = moment(startTime);
-  //     booking.endTimeFormatted = moment(endTime).format("h: mm A");
-  //     booking.endTime = moment(endTime);
-
-  //     modifiedData.push(booking);
-  //     // console.log(newData);
-  //     // console.log("start " + booking.startTimeFormatted);
-  //     // console.log("end " + booking.endTimeFormatted);
-  //     // console.log("date  " + booking.date);
-  //     // console.log("date  " + booking.dateFormatted);
-  //     //   console.log(modifiedData);
-  //   });
-  //   // }
-  //   // setNewData(modifiedData);
-  // }, [data]);
-
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
@@ -199,11 +150,18 @@ const MyBookings = () => {
       align: "center",
       title: "Desk No.",
       dataIndex: "deskNo",
-      key: "index",
-      id: "index",
+      // key: "index",
+      // id: "index",
       width: "10%",
-      sorter: (a, b) => parseInt(a).deskName - parseInt(b).deskName,
-      ...getColumnSearchProps("deskName"),
+      sorter: {
+        compare: (a, b) => {
+          const a1 = a.deskNo ?? "";
+          const b1 = b.deskNo ?? "";
+          return a1.localeCompare(b1);
+        },
+        multiple: 3,
+      },
+      ...getColumnSearchProps("deskNo"),
       render: (text, record, index) => {
         return record.cancelled ? `-` : `D${record.deskNo}`;
       },
@@ -223,29 +181,40 @@ const MyBookings = () => {
       align: "center",
       title: "Space Name",
       dataIndex: "spaceName",
-      key: "index",
-      id: "index",
+      // key: "index",
+      // id: "index",
       width: "20%",
-      sorter: (a, b) => a.spaceName.localeCompare(b.spaceName),
+      sorter: {
+        compare: (a, b) => a.spaceName.localeCompare(b.spaceName),
+        multiple: 1,
+      },
       ...getColumnSearchProps("spaceName"),
     },
     {
-      //! not checked
+      //checked
       // align: "center",
       title: "Start",
       dataIndex: "start",
-      id: "index",
-      key: "index",
+      // id: "index",
+      // key: "index",
       width: "20%",
-      showSorterTooltip: true, // change this
-      ...getColumnSearchProps("startDate"),
-      sorter: (a, b) => {
-        a.date - b.date;
-        console.log(
-          moment(a.date, "DD-MM-YYYY").unix() -
-            moment(b.date, "DD-MM-YYYY").unix()
-        );
-        console.log(a.date);
+      sorter: {
+        compare: (a, b) => {
+          console.log(a.startDate, a.startTime);
+          console.log(b.startDate, b.startTime);
+
+          let sd1 = a.startDate.substr(0, 10);
+          let sd2 = b.startDate.substr(0, 10);
+
+          let st1 = a.startTime.substr(10);
+          let st2 = b.startTime.substr(10);
+
+          let x = `${sd1}${st1}`;
+          let y = `${sd2}${st2}`;
+          console.log(x, y);
+          return moment(x).diff(moment(y));
+        },
+        multiple: 2,
       },
       render: (text, record, index) => {
         return (
@@ -256,22 +225,30 @@ const MyBookings = () => {
       //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
-      //! not checked
+      //checked
       // align: "center",
       title: "End",
       dataIndex: "endDate",
-      id: "index",
-      key: "index",
+      // id: "index",
+      // key: "index",
       width: "20%",
-      showSorterTooltip: true, // change this
-      ...getColumnSearchProps("endDate"),
-      sorter: (a, b) => {
-        a.date - b.date;
-        console.log(
-          moment(a.date, "DD-MM-YYYY").unix() -
-            moment(b.date, "DD-MM-YYYY").unix()
-        );
-        console.log(a.date);
+      sorter: {
+        compare: (a, b) => {
+          console.log(a.endDate, a.endTime);
+          console.log(b.endDate, b.endTime);
+
+          let sd1 = a.endDate.substr(0, 10);
+          let sd2 = b.endDate.substr(0, 10);
+
+          let st1 = a.endTime.substr(10);
+          let st2 = b.endTime.substr(10);
+
+          let x = `${sd1}${st1}`;
+          let y = `${sd2}${st2}`;
+          console.log(x, y);
+          return moment(x).diff(moment(y));
+        },
+        multiple: 2,
       },
       render: (text, record, index) => {
         return (
@@ -279,7 +256,6 @@ const MyBookings = () => {
           moment(record.endDate).format("D MMM, YYYY")
         );
       },
-      //   sorter: (a, b) => moment(a).unix() - moment(b).unix(),
     },
     {
       //! not checked
@@ -292,6 +268,17 @@ const MyBookings = () => {
       render: (text, record, index) => {
         // console.log(record);
         //* cancelled, upcomming, ongoing   ( and expired )
+
+        let endDateTime = `${record.endDate.substr(
+          0,
+          10
+        )}${record.endTime.substr(10)}`;
+
+        let startDateTime = `${record.startDate.substr(
+          0,
+          10
+        )}${record.startTime.substr(10)}`;
+
         if (record.cancelled) {
           //* cancelled by admin
           return (
@@ -299,18 +286,15 @@ const MyBookings = () => {
               cancelled
             </Tag>
           );
-        } else if (moment().isBefore(`${record.startTime}`)) {
-          //! NEEDS FIX, date and time are split. Join and compare
+        } else if (moment().isBefore(moment(startDateTime))) {
           //* upcoming
-          // console.log(moment().format());
           return (
             <Tag icon={<ClockCircleOutlined spin />} color="geekblue">
               upcoming
             </Tag>
           );
         } else {
-          //! NEEDS FIX, Filter out expired bookings
-          //? FIltered on frontend for now.
+          //? expired FIltered on backend.
           //* ongoing
           return (
             <Tag icon={<SyncOutlined spin />} color="success">

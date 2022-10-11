@@ -13,13 +13,15 @@ import {
   Radio,
 } from "antd";
 const { RangePicker } = DatePicker;
-import {
+import getSpaceAndDeskData, {
+  getAvailSpaceAndDeskData,
   getAvailableDesks,
   getFormattedSpaceData,
 } from "../../../utils/services";
 import ImagePanZoomAddBookings from "../ImagePanZoomBookings/ImagePanZoomAddBookings";
 import { BookingsConfigContext } from "../../../helpers/contexts/AddBookingsLayoutConfig";
 import RoomImage from "../../../assets/images/empty-grid.jpg";
+import axios from "axios";
 
 const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
   const [form] = Form.useForm();
@@ -66,6 +68,8 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
+  const [updateViewer, setUpdateViewer] = useState(false);
+
   const values = {
     image,
     setImage,
@@ -79,37 +83,83 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
     setSelectedDeskId,
     initialDeskNumber,
     setInitialDeskNumber,
+    updateViewer,
+    setUpdateViewer,
   };
 
   const form_spacename = Form.useWatch("spacename", form);
   const form_date = Form.useWatch("date", form);
-  const form_starttime = Form.useWatch("start-time", form);
-  const form_endtime = Form.useWatch("end-time", form);
+
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    const asyncEffect = async () => {
+      if (ready) {
+        const getData = async () => {
+          await getAvailSpaceAndDeskData({
+            id: form_spacename,
+            start: startDate.replaceAll(":", "%3A").replaceAll("+", "%2B"),
+            end: endDate.replaceAll(":", "%3A").replaceAll("+", "%2B"),
+          }).then((data) => {
+            // setIsLoading(false);
+            // setDataSource(data);
+            console.log(data);
+            //setid
+            setSpaceName(data.name);
+            setInitialDeskNumber(data.startingDesk);
+            setDeskList(data.desksMain);
+            if (!data.defaultImage) {
+              setImage(data.image);
+            }
+            setInitialDeskNumber(data.startingDesk);
+            // setOriginalImage(data.image);
+            // setIsDefaultImage(false);
+            // }
+            // setIsFetched(true);
+          });
+        };
+        await getData();
+        setUpdateViewer(true);
+
+        // getAvailSpaceAndDeskData(form_spacename);
+      }
+    };
+    asyncEffect();
+  }, [ready]);
+  useEffect(() => {
     // trigger state updates
-    if ((form_spacename, form_starttime, form_endtime, form_date)) {
-      if (form_spacename && form_starttime && form_endtime && form_date) {
+    if ((form_spacename, form_date)) {
+      if (form_spacename && form_date) {
         console.log(
           form_spacename,
           form_date[0].format(),
-          form_date[1].format(),
-          form_starttime.format(),
-          form_endtime.format()
+          form_date[1].format()
         );
         // get desklist
-
+        console.log("set");
         //set states
         setSelectedSpaceId(form_spacename);
         setStartDate(form_date[0].format());
         setEndDate(form_date[1].format());
-        setStartTime(form_starttime.format());
-        setEndTime(form_endtime.format());
+        // setStartTime(form_starttime.format());
+        // setEndTime(form_endtime.format());
+        setReady((prev) => !prev);
       } else {
+        setSelectedSpaceId("");
+        setStartDate("");
+        setEndDate("");
+        setReady((prev) => !prev);
+
+        setUpdateViewer(false);
       }
     }
-  }, [form_spacename, form_starttime, form_endtime, form_date]);
+  }, [form_spacename, form_date]);
 
+  function resetStates() {
+    setSelectedSpaceId("");
+    setStartDate("");
+    setEndDate("");
+  }
   const formItemLayout = {
     // labelCol: { span: 10 },
     // labelCol: {
@@ -138,7 +188,10 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
       title={bookingId ? "Edit Booking" : "Add Booking"}
       okText="Create"
       cancelText="Cancel"
-      onCancel={onCancel}
+      onCancel={() => {
+        onCancel();
+        resetStates;
+      }}
       destroyOnClose={true}
       onOk={() => {
         form
@@ -197,7 +250,48 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
             rules={[
               {
                 required: true,
-                message: "Please select a date range!",
+                message: "Please enter a range!",
+              },
+              {
+                message: "This range is not available!",
+                validator: async (_, value) => {
+                  value = value ?? "";
+                  console.log("brrr" + moment().format());
+                  console.log(value[0].toISOString());
+                  console.log(value[1].toISOString());
+                  console.log(
+                    `/api/Booking/userbookingsconflict?start=${value[0]
+                      .toISOString()
+                      .replaceAll(":", "%3A")
+                      .replaceAll("+", "%2B")}&end=${value[1]
+                      .toISOString()
+                      .replaceAll(":", "%3A")
+                      .replaceAll("+", "%2B")}`
+                  );
+                  if (value !== "") {
+                    const res = await axios
+                      .get(
+                        `/api/Booking/userbookingsconflict?start=${value[0]
+                          .format()
+                          .replaceAll(":", "%3A")
+                          .replaceAll("+", "%2B")}&end=${value[1]
+                          .format()
+                          .replaceAll(":", "%3A")
+                          .replaceAll("+", "%2B")}`
+                      )
+                      .catch((e) => console.log(e));
+                    //* validation
+                    // console.log(res.data);
+                    if (res.data == false) {
+                      console.log("accept");
+                      return Promise.resolve();
+                    } else {
+                      console.log("reject");
+                      Promise.reject();
+                    }
+                    console.log(res);
+                  }
+                },
               },
             ]}
           >
@@ -210,6 +304,7 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
               }}
             /> */}
             <RangePicker
+              minuteStep={30}
               disabledDate={(currentDate) => {
                 // Can not select days before today and today
                 return currentDate < moment().startOf("day");
@@ -340,7 +435,7 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
         </>
         <>
           <BookingsConfigContext.Provider value={values}>
-            {/* <ImagePanZoomAddBookings></ImagePanZoomAddBookings> */}
+            <ImagePanZoomAddBookings></ImagePanZoomAddBookings>
           </BookingsConfigContext.Provider>
         </>
       </Form>

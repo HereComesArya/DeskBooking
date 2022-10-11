@@ -46,17 +46,6 @@ function Bookings() {
   // const showModal = () => {
   //   setOpen(true);
   // };
-
-  const handleOk = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setOpen(false);
-    }, 3000);
-  };
-  const handleCancel = () => {
-    setOpen(false);
-  };
   const format = "HH:mm";
 
   const validateSpace = (value) => {
@@ -86,6 +75,10 @@ function Bookings() {
   };
   /*For modal*/
 
+  const cancelModal = () => {
+    setOpen(false);
+  };
+
   return (
     <>
       <Header className="header">
@@ -102,13 +95,7 @@ function Bookings() {
         >
           CREATE BOOKING
         </Button>
-        <BookingsModal
-          open={open}
-          onCreate={onCreate}
-          onCancel={() => {
-            setOpen(false);
-          }}
-        />
+        <BookingsModal open={open} onCreate={onCreate} onCancel={cancelModal} />
         {/* <BookingsConfigContext.Provider value={values}>
           <Modal
             // style={{ Width: "420px" }}
@@ -164,7 +151,6 @@ function Bookings() {
           ]}
         />
       </Content>
-      {/* <Footer>Footer</Footer> */}
     </>
   );
 }
