@@ -34,19 +34,19 @@ const MyBookings = () => {
 
   const [editBookingId, setEditBookingId] = useState("");
 
-  const onDelete = (record) => {
+  const onDelete = (bookingId) => {
     Modal.confirm({
       title: "Are you sure, you want to delete this booking?",
       okText: "Yes",
       okType: "danger",
+      style: { marginTop: "100px" },
       onOk: () => {
-        console.log(data);
-        setData((prev) => {
-          const art = data.filter(
-            (booking) => booking.bookingId !== record.bookingId
-          );
-          console.log(art);
-        });
+        axios
+          .delete(`/api/Booking/delete?bookingId=${bookingId}`)
+          .then((res) => console.log(res))
+          .catch((error) => console.log(error));
+        const data = dataSource.filter((item) => item.bookingId !== bookingId);
+        setDataSource(data);
       },
     });
   };
@@ -349,10 +349,8 @@ const MyBookings = () => {
             /> */}
             <DeleteOutlined
               onClick={(e) => {
-                // onDelete(record.spaceId, e);
-                // onDeleteStudent(record);
-                // this.onDelete(record.key, e);
-                console.log("delete ", record.key);
+                onDelete(record.bookingId);
+                console.log("delete ", record.bookingId);
               }}
               style={{ color: "red", marginLeft: 12 }}
             />

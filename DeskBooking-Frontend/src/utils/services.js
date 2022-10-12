@@ -102,7 +102,7 @@ const getFormattedMyBookingsData = async () => {
     res.data.forEach((booking, index) => {
       finalData.push({
         key: index,
-        // bookingId: booking.bookingId,
+        bookingId: booking.bookingId,
         cancelled: booking.cancelled,
         deskId: booking.deskId,
         deskNo: booking.deskName,
@@ -125,7 +125,7 @@ const getFormattedAllBookingsData = async () => {
     res.data.forEach((booking, index) => {
       finalData.push({
         key: index,
-        // bookingId: booking.bookingId,
+        bookingId: booking.bookingId,
         cancelled: booking.cancelled,
         userName: booking.userName,
         deskId: booking.deskId,

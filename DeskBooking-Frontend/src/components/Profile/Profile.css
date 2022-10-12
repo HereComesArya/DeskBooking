@@ -3,15 +3,12 @@
   margin-left: 100px;
 }
 .profile-name-input .ant-form-item-control-input-content {
-  /* flex: auto; */
-  /* max-width: 42%; */
   padding-top: 40px;
   margin-left: 100px;
-  /* font-size: 18px; */
 }
-.tag .ant-tag,
-.tag .ant-tag a,
-.tag .ant-tag a:hover {
+.tags .ant-tag,
+.tags .ant-tag a,
+.tags .ant-tag a:hover {
   background: #fffa8b;
   color: #d48806;
   margin-left: 150px;

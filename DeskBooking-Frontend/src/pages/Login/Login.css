@@ -39,7 +39,9 @@
   box-shadow: 0 4px 8px 0 rgba(28, 27, 27, 0.604),
     0 6px 20px 0 rgba(0, 0, 0, 0.19);
   /* padding-bottom: 1%; */
-  width: 3400px;
+  /* width: 500px; */
+  min-width: 400px;
+  max-width: 435px;
   height: 340px;
 }
 
