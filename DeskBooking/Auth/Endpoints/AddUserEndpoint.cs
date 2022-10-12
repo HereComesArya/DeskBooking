@@ -26,24 +26,30 @@ namespace DeskBooking.Auth.Endpoints
             var redirectUrl = Query<string>("returnUrl") ?? "/";
             string curUserId;
             var email = User.GetEmail();
-            var firstName = User.GetFirstName();
-            var lastName = User.GetLastName();
-            var userFound = _context.Users.Where(u => u.Email == email);
+            //var firstName = User.GetFirstName();
+            //var lastName = User.GetLastName();
+            string firstName = "", lastName = "";
+            var userFound = _context.Users.Where(u => u.Email == email).FirstOrDefault();
             
-            if (!userFound.Any())
+            if (userFound == null)
             {
+                firstName = User.GetFirstName()!;
+                lastName = User.GetLastName() ?? "";
                 Models.User user = new() { Email = email!, FirstName = firstName!, LastName = lastName! };
-                _context.Users.Add(user);                
+                _context.Users.Add(user);
+                userFound = user;
                 await _context.SaveChangesAsync(ct);
                 curUserId = user.UserId.ToString();
             }
             else
             {
-                curUserId = userFound.FirstOrDefault()!.UserId.ToString();
+                curUserId = userFound.UserId.ToString();
             }
-            
+            //var xuser = await _context.Users.FindAsync(curUserId);
             ClaimsIdentity claimsIdentity = new(CookieAuthenticationDefaults.AuthenticationScheme);
             claimsIdentity.AddClaim(new Claim("UserId", curUserId));
+            //claimsIdentity.AddClaim(new Claim("DbFirstName", userFound.FirstName));
+            //claimsIdentity.AddClaim(new Claim("DbLastName", userFound.LastName));
 
             var adminfound = _context.AdminUsers.Where(a => a.Email == email );
             if (adminfound.Any())

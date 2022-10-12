@@ -79,11 +79,15 @@ const Profile = () => {
                 onFinish={(e) => {
                   console.log({
                     name: e.name,
+                    user
                   });
-                  let data = new FormData();
-                  data.append("name", e.name);
+                  // let data = new FormData();
+                  // data.append("name", e.name);
                   //axios.post()
                   //setuser
+                  const obj = {fullName: e.name}
+                  axios.put(`/api/Profile/changename`,e.name, { headers: {'Content-Type': 'application/json'} } ).then(res => console.log(res));
+                  setUser({...user, obj})
                 }}
               >
                 <div className="profile-name-input">

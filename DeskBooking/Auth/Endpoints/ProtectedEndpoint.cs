@@ -1,4 +1,5 @@
-﻿using DeskBooking.DTOs;
+﻿using DeskBooking.Data;
+using DeskBooking.DTOs;
 using DeskBooking.Extensions;
 
 namespace DeskBooking.Auth.Endpoints
@@ -7,11 +8,13 @@ namespace DeskBooking.Auth.Endpoints
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
+        private readonly DataContext _context;
 
-        public ProtectedEndpoint(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public ProtectedEndpoint(IHttpClientFactory httpClientFactory, IConfiguration configuration, DataContext context)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _context = context;
         }
         public override void Configure()
         {
@@ -47,10 +50,14 @@ namespace DeskBooking.Auth.Endpoints
             //var userId = User.GetGoogleIdentitfier();
 
             //ArgumentNullException.ThrowIfNull(userId);
-            string pictureUri = await GetPicture();
+            var pictureUriTask = GetPicture();
+            var user = await _context.Users.FindAsync(int.Parse(User.GetUserId()));
+            var pictureUri = await pictureUriTask;
+            if (user == null)
+                return;
             var obj = new
             {
-                Name = User.GetFirstName(),
+                Name = user.FirstName+ " " + user.LastName,
                 PhotoUri = pictureUri.ToString(),
                 IsAdmin = User.IsAdmin()
             };

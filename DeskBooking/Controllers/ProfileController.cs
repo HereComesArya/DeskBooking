@@ -2,6 +2,7 @@
 using DeskBooking.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using FromBodyAttribute = Microsoft.AspNetCore.Mvc.FromBodyAttribute;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
 
 namespace DeskBooking.Controllers
@@ -18,7 +19,7 @@ namespace DeskBooking.Controllers
         }
 
         [HttpPut("changename")]
-        public async Task<IActionResult> ChangeName(string fullName)
+        public async Task<IActionResult> ChangeName([FromBody]string fullName)
         {
             List<string> names = fullName.Split(' ').ToList();
             string firstName = names.First().ToString();
@@ -35,6 +36,8 @@ namespace DeskBooking.Controllers
             {
                 return BadRequest();
             }
+            //User.AddUpdateClaim("DbFirstName", firstName, HttpContext);
+            //User.AddUpdateClaim("DbLastName", lastName, HttpContext);
             await _context.SaveChangesAsync();
             return Ok();
         }

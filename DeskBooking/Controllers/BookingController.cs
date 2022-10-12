@@ -13,6 +13,7 @@ using HttpDeleteAttribute = Microsoft.AspNetCore.Mvc.HttpDeleteAttribute;
 using IMapper = AutoMapper.IMapper;
 using DeskBooking.DTOs.Booking;
 using HttpPutAttribute = Microsoft.AspNetCore.Mvc.HttpPutAttribute;
+using System.Globalization;
 
 namespace DeskBooking.Controllers
 {
@@ -181,13 +182,14 @@ namespace DeskBooking.Controllers
         }
 
         [HttpGet("userbookingsconflict")]
-        public async Task<bool> UserBookingsConflict( DateTime startDate, DateTime endDate)
+        public async Task<bool> UserBookingsConflict( DateTime startDate,DateTime endDate)
         {
-            //DateTime startDate = DateTime.Parse(start);
-            //DateTime endDate = DateTime.Parse(end);
+
+            //DateTime startDate = DateTime.ParseExact(start, "yyyy-MM-ddTHH:mm:sszzz",CultureInfo.InvariantCulture);
+            //DateTime endDate = DateTime.ParseExact(end, "yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
             //var x = User.GetUserId();
             var bookingsWithinDate = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false &&
-                                b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
+                            b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
 
             var bookingsWithinTime = bookingsWithinDate.Any(b => b.StartTime.TimeOfDay <= endDate.TimeOfDay && b.EndTime.TimeOfDay >= startDate.TimeOfDay);
             return bookingsWithinTime;
