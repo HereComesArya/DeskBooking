@@ -184,9 +184,6 @@ namespace DeskBooking.Controllers
         public async Task<bool> UserBookingsConflict( DateTime startDate,DateTime endDate)
         {
 
-            //DateTime startDate = DateTime.ParseExact(start, "yyyy-MM-ddTHH:mm:sszzz",CultureInfo.InvariantCulture);
-            //DateTime endDate = DateTime.ParseExact(end, "yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture);
-            //var x = User.GetUserId();
             var bookingsWithinDate = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false &&
                             b.StartDate.Date <= endDate.Date && b.EndDate.Date >= startDate.Date).ToListAsync();
 
@@ -230,6 +227,14 @@ namespace DeskBooking.Controllers
                 }
             } 
             return final;
+        }
+
+        [HttpGet("weekbookings")]
+        public async Task<ActionResult<IEnumerable<BookingResponseDto>>> WeekBookingsAsync()
+        {
+            var bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false
+                                    && b.EndTime >= DateTime.Now && b.StartTime <= DateTime.Now.AddDays(7)).ToListAsync();
+            return _mapper.Map <List<BookingResponseDto>>(bookings);
         }
     }
 }
