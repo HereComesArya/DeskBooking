@@ -256,15 +256,18 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
                 message: "This range is not available!",
                 validator: async (_, value) => {
                   value = value ?? "";
-                  console.log("brrr" + moment().format());
-                  console.log(value[0].toISOString());
-                  console.log(value[1].toISOString());
+                  console.log(value[0].format().slice(0, -6).replace("T", " "));
+                  console.log(value[1].format().slice(0, -6).replace("T", " "));
                   console.log(
                     `/api/Booking/userbookingsconflict?start=${value[0]
-                      .toISOString()
+                      .format()
+                      .slice(0, -6)
+                      .replace("T", "%20")
                       .replaceAll(":", "%3A")
                       .replaceAll("+", "%2B")}&end=${value[1]
-                      .toISOString()
+                      .format()
+                      .slice(0, -6)
+                      .replace("T", "%20")
                       .replaceAll(":", "%3A")
                       .replaceAll("+", "%2B")}`
                   );
@@ -273,9 +276,13 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
                       .get(
                         `/api/Booking/userbookingsconflict?start=${value[0]
                           .format()
+                          .slice(0, -6)
+                          .replace("T", "%20")
                           .replaceAll(":", "%3A")
                           .replaceAll("+", "%2B")}&end=${value[1]
                           .format()
+                          .slice(0, -6)
+                          .replace("T", "%20")
                           .replaceAll(":", "%3A")
                           .replaceAll("+", "%2B")}`
                       )
@@ -313,8 +320,8 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
               showTime={{
                 hideDisabledOptions: true,
                 defaultValue: [
-                  moment("00:00:00", "HH:mm:ss"),
-                  moment("11:59:59", "HH:mm:ss"),
+                  moment("00:00", "HH:mm"),
+                  moment("00:00", "HH:mm"),
                 ],
               }}
               format="h:mm A D-MM-YY"

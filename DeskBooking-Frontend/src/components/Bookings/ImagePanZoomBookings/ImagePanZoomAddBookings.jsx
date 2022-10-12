@@ -81,7 +81,7 @@ const ImagePanZoomFunction = () => {
   }, [deskList]);
 
   useEffect(() => {
-    console.log(imgRef.current.parentNode.lastChild);
+    // console.log(imgRef.current.parentNode.lastChild);
     // EmptyViewer(imgRef.current.parentNode.lastChild, true);
     renderCircles(deskList);
     // setDeskName(initialDeskNumber);
