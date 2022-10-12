@@ -134,6 +134,24 @@ namespace DeskBooking.Controllers
             return await _context.Desks.ToListAsync();
             //return deletedDesks;
         }
+            
+        [HttpGet("availnow")]
+        public async Task<IActionResult> CheckAvailableNowAsync()
+        {
+            try
+            {
+                var now = DateTime.Now;
+                var unavailDesks = await _context.Desks.CountAsync(d => d.Bookings.Any(b => b.StartDate.Date <= now.Date && b.EndDate.Date >= now.Date
+                   && b.StartTime.TimeOfDay <= now.TimeOfDay && b.EndTime.TimeOfDay >= now.TimeOfDay && b.Cancelled == false));
+                var totalDesks = await _context.Desks.CountAsync(d => true); // deleted desks already ignored
+                return Ok(totalDesks - unavailDesks);
+            }
+            catch (Exception)
+            {
+
+                return BadRequest("Something went wrong.");
+            }              
+        }
 
     //    [HttpPut("adddeletedbookings")]
     //    public async Task<IActionResult> AddDeletedBookings(DeletedBooking deletedbookings)
