@@ -53,12 +53,11 @@ namespace DeskBooking.Controllers
             if (type != null && type.Equals("history"))
             {
                 bookings = await _context.Bookings.Include(b => b.User)
-                    .Where(b => b.EndDate <= DateTime.Now.AddDays(-7).Date && b.EndTime.TimeOfDay <= DateTime.Now.TimeOfDay).ToListAsync();
+                    .Where(b => b.EndDate.Date <= DateTime.Now.AddDays(-7).Date).ToListAsync();
             }
             else
             {
-                bookings = await _context.Bookings.Include(b => b.User).Where(b => b.EndDate >= DateTime.Now.Date && b.EndTime.TimeOfDay >=
-                        DateTime.Now.TimeOfDay && b.Cancelled == false).ToListAsync();
+                bookings = await _context.Bookings.Include(b => b.User).Where(b => b.EndDate.Date >= DateTime.Now.Date && b.Cancelled == false).ToListAsync();
             }
             var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
             returnData.ForEach(b =>
@@ -80,12 +79,12 @@ namespace DeskBooking.Controllers
             if(type != null && type.Equals("history"))
             {
                  bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() &&
-                    b.EndDate <= DateTime.Now.AddDays(-7).Date && b.EndTime.TimeOfDay <= DateTime.Now.TimeOfDay).ToListAsync();
+                    b.EndDate <= DateTime.Now.AddDays(-7).Date).ToListAsync();
             }            
             else
             {
                  bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() &&
-                    b.EndDate >= DateTime.Now.Date && b.EndTime.TimeOfDay >= DateTime.Now.TimeOfDay).ToListAsync();
+                    b.EndDate >= DateTime.Now.Date).ToListAsync();
             }
             var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
             returnData.ForEach(b =>
