@@ -256,26 +256,26 @@ const BookingsModal = ({ bookingId, open, onCreate, onCancel }) => {
                 message: "This range is not available!",
                 validator: async (_, value) => {
                   value = value ?? "";
-                  console.log("brrr" + moment().format());
+                  //console.log("brrr" + moment().format());
+                  console.log("brr"+moment().format('YYYY-MM-DDTHH:mm:ss'));
                   console.log(value[0].toISOString());
-                  console.log(value[1].toISOString());
                   console.log(
-                    `/api/Booking/userbookingsconflict?start=${value[0]
-                      .toISOString()
+                    `/api/Booking/userbookingsconflict?startDate=${value[0]
+                      .format('YYYY-MM-DDTHH:mm:ss')
                       .replaceAll(":", "%3A")
-                      .replaceAll("+", "%2B")}&end=${value[1]
-                      .toISOString()
+                      .replaceAll("+", "%2B")}&endDate=${value[1]
+                      .format('YYYY-MM-DDTHH:mm:ss')
                       .replaceAll(":", "%3A")
                       .replaceAll("+", "%2B")}`
                   );
                   if (value !== "") {
                     const res = await axios
                       .get(
-                        `/api/Booking/userbookingsconflict?start=${value[0]
-                          .format()
+                        `/api/Booking/userbookingsconflict?startDate=${value[0]
+                          .format('YYYY-MM-DDTHH:mm:ss')
                           .replaceAll(":", "%3A")
-                          .replaceAll("+", "%2B")}&end=${value[1]
-                          .format()
+                          .replaceAll("+", "%2B")}&endDate=${value[1]
+                          .format('YYYY-MM-DDTHH:mm:ss')
                           .replaceAll(":", "%3A")
                           .replaceAll("+", "%2B")}`
                       )
