@@ -32,6 +32,7 @@ const AllBookings = () => {
       });
     };
     getData();
+    console.log("asd");
   }, []);
 
   const [editBookingId, setEditBookingId] = useState("");
@@ -44,7 +45,7 @@ const AllBookings = () => {
       style: { marginTop: "100px" },
       onOk: () => {
         axios
-          .delete(`/api/Booking/cancel?bookingId=${bookingId}`)
+          .put(`/api/Booking/cancel?bookingId=${bookingId}`)
           .then((res) => console.log(res))
           .catch((error) => console.log(error));
         const data = dataSource.filter((item) => item.bookingId !== bookingId);

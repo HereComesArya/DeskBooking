@@ -23,6 +23,8 @@ const ImagePanZoomFunction = () => {
     setInitialDeskNumber,
     updateViewer,
     setUpdateViewer,
+    selectedDeskName,
+    setSelectedDeskName,
   } = useContext(BookingsConfigContext);
 
   /* Ref for starting Desk Number */
@@ -80,12 +82,23 @@ const ImagePanZoomFunction = () => {
     console.log(deskList);
   }, [deskList]);
 
+  const [firstTime, setFirstTime] = useState(true);
+
   useEffect(() => {
-    // console.log(imgRef.current.parentNode.lastChild);
-    // EmptyViewer(imgRef.current.parentNode.lastChild, true);
-    renderCircles(deskList);
-    // setDeskName(initialDeskNumber);
-    // reloadNow((prev) => !prev);
+    console.log("triggered form");
+    console.log(deskList);
+    // let oldDeskList = deskList;
+
+    const asyncEffect = async () => {
+      if (!firstTime) {
+        console.log("doing");
+        const done = await EmptyViewer(imgRef.current);
+      }
+      renderCircles(deskList);
+    };
+    asyncEffect();
+    // EmptyViewer(imgRef.current);
+    // renderCircles(deskList);
   }, [updateViewer]);
 
   const updateWidthAndHeight = () => {
@@ -103,40 +116,28 @@ const ImagePanZoomFunction = () => {
 
   // todo check
   const executeAction = async (e) => {
-    if (previousSelectedNode) {
-      previousSelectedNode.target.style.fill = "green";
-    }
-    e.target.style.fill = "pink";
-    setPreviousSelectedNode(e);
+    // if (previousSelectedNode) {
+    //   previousSelectedNode.target.style.fill = "green";
+    // } else {
+    //   e.target.style.fill = "pink";
+    //   setPreviousSelectedNode(e);
+    // }
     // console.log("delete node id", e.target.id); //gives id of node
-    console.log(e);
-
-    // setTimeout(removeCircle(e), 100);
-    // console.log("after rem circles");
+    console.log(e.target.getAttribute("id"));
+    setSelectedDeskId(e.target.getAttribute("id"));
+    // console.log(e.target.firstChild.innerHTML);
+    setSelectedDeskName(e.target.firstChild.innerHTML);
   };
 
-  // const removeCircle = (e) => {
-  //   console.log("in removeCircle");
-  //   const neDeskList = deskRef.current.filter((desk) => desk.id != e.target.id);
-  //   setDeskList(neDeskList);
-  //   // console.log(imgRef.current.parentNode.lastChild);
-  //   // console.log(imgRef.current);
-  //   changeTitles(e.target, false);
-  //   e.target.remove();
-  //   initialDeskNumberRef.current--;
-  // };
-
-  // todo check
-  // // ? what???
   //!!remove all circles
-  const EmptyViewer = (element, fromEffect) => {
-    if (element.localName === "circle") {
-      let sibling = fromEffect ? element : element.previousSibling;
-      while (sibling.localName === "circle") {
-        sibling.remove();
-        sibling = sibling.previousSibling;
-      }
+  const EmptyViewer = (element) => {
+    console.log(element);
+    let sibling = element.nextSibling;
+    while (sibling.localName === "circle") {
+      sibling.remove();
+      sibling = sibling.nextSibling;
     }
+    return Promise.resolve(1);
   };
 
   //change colours
@@ -172,7 +173,7 @@ const ImagePanZoomFunction = () => {
       const circle = document.createElementNS(svgns, "circle");
 
       circle.setAttributeNS(null, "key", index);
-      circle.setAttributeNS(null, "id", desk.id);
+      circle.setAttributeNS(null, "id", desk.deskId);
       circle.setAttributeNS(null, "cx", desk.x);
       circle.setAttributeNS(null, "cy", desk.y);
       circle.setAttributeNS(null, "r", 30);
@@ -228,6 +229,9 @@ const ImagePanZoomFunction = () => {
               height={height}
               ref={(Viewer2) => (Viewer = Viewer2)}
               tool={tool}
+              toolbarProps={{
+                position: "none",
+              }}
               onChangeTool={(tool) => setTool(tool)}
               value={value}
               onChangeValue={(value) => setValue(value)}
@@ -244,6 +248,7 @@ const ImagePanZoomFunction = () => {
                 height={1589}
               >
                 <image
+                  // onClick={(e) => console.log(e)}
                   overflow="visible"
                   width={1920}
                   height={1589}

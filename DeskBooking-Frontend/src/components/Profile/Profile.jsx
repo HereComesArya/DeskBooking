@@ -9,21 +9,21 @@ import "./Profile.css";
 import "antd/dist/antd.css";
 
 const Profile = () => {
-  const [post, setPost] = useState([]);
   const [defaultName, setDefaultName] = useState("");
   const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     setDefaultName(user.name);
-  }, [post]);
+    console.log(user);
+  }, [user]);
 
   const [form] = Form.useForm();
   useEffect(() => form.resetFields(), [defaultName]);
 
   const divStyles = {
-    webkitBoxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
-    mozBoxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
-    boxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
+    WebkitBoxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
+    MozBoxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
+    BoxShadow: "22px 19px 54px -22px rgba(0,0,0,0.75)",
 
     margin: "auto   ",
     padding: "50px ",
@@ -68,7 +68,7 @@ const Profile = () => {
               />
             </div>
 
-            <div className="tag">
+            <div className="tags">
               <Tag>{user.isAdmin ? "Admin" : "User"}</Tag>
             </div>
 
@@ -79,15 +79,19 @@ const Profile = () => {
                 onFinish={(e) => {
                   console.log({
                     name: e.name,
-                    user
+                    user,
                   });
                   // let data = new FormData();
                   // data.append("name", e.name);
                   //axios.post()
                   //setuser
-                  const obj = {fullName: e.name}
-                  axios.put(`/api/Profile/changename`,e.name, { headers: {'Content-Type': 'application/json'} } ).then(res => console.log(res));
-                  setUser({...user, obj})
+                  const obj = { fullName: e.name };
+                  axios
+                    .put(`/api/Profile/changename`, e.name, {
+                      headers: { "Content-Type": "application/json" },
+                    })
+                    .then((res) => console.log(res));
+                  setUser({ ...user, name: e.name });
                 }}
               >
                 <div className="profile-name-input">

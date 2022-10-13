@@ -234,9 +234,6 @@ const MyBookings = () => {
       width: "20%",
       sorter: {
         compare: (a, b) => {
-          console.log(a.endDate, a.endTime);
-          console.log(b.endDate, b.endTime);
-
           let sd1 = a.endDate.substr(0, 10);
           let sd2 = b.endDate.substr(0, 10);
 

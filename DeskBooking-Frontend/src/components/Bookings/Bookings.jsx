@@ -132,6 +132,7 @@ function Bookings() {
 
       <Content className="bookings-content">
         <Tabs
+          destroyInactiveTabPane
           defaultActiveKey="1"
           onChange={onChange}
           type="card"
