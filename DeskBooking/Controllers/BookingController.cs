@@ -232,9 +232,40 @@ namespace DeskBooking.Controllers
         [HttpGet("weekbookings")]
         public async Task<ActionResult<IEnumerable<BookingResponseDto>>> WeekBookingsAsync()
         {
+            var deskNames = await GetDeskNamesAsync();
             var bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false
                                     && b.EndTime >= DateTime.Now && b.StartTime <= DateTime.Now.AddDays(7)).ToListAsync();
-            return _mapper.Map <List<BookingResponseDto>>(bookings);
+            var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
+            returnData.ForEach(b =>
+            {
+                b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
+                var space = _context.Spaces.IgnoreQueryFilters().FirstOrDefault(s => s.SpaceId == b.SpaceId);
+                b.SpaceName = space?.Name ?? "";
+                b.SpaceDirections = space?.Directions ?? "";
+            });
+            return returnData;
+        }
+        [HttpGet("upcomingnow")]
+        public async Task<ActionResult<IEnumerable<BookingResponseDto>>> UpcomingBookingsAsync(int count)
+        {
+            var deskNames = await GetDeskNamesAsync();
+            var bookings = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false
+                                    && b.EndTime >= DateTime.Now && b.StartTime <= DateTime.Now.AddDays(1).Date).Take(count).ToListAsync();
+            if(bookings.Count < count)
+            {
+                var temp = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false
+                                    && b.EndTime >= DateTime.Now.AddDays(1).Date).ToListAsync();
+                bookings.AddRange(temp.Except(bookings));
+            }
+            var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
+            returnData.ForEach(b =>
+            {
+                b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());
+                var space = _context.Spaces.IgnoreQueryFilters().FirstOrDefault(s => s.SpaceId == b.SpaceId);
+                b.SpaceName = space?.Name ?? "";
+                b.SpaceDirections = space?.Directions ?? "";
+            });
+            return returnData;
         }
     }
 }
