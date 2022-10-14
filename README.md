@@ -1,2 +1,2 @@
 # DeskBooking
-repo for desk booking application
+This is an application for a basic desk booking service
