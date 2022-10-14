@@ -1,0 +1,16 @@
+  .container {
+    /* display: flex; */
+    justify-content: center;
+  }
+
+  .floorplan{
+    display: inline-block;
+  }
+
+  .item {
+    min-width: 400px;
+    min-height: 335px;
+  }
+
+  
+  

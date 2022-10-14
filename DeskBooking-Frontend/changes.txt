@@ -1,0 +1,43 @@
+Line 19-22 App.jsx
+put maainApp in AuthGuard and uncomment routes
+
+Line 68: AddSpaces.jsx
+const addRef = useRef(true); //change to false
+  
+Line 21: MainApp.jsx
+setUser(true); //remove
+
+
+Line 7: AddSpaces.jsx
+useEffect(() => {
+    //to fetch desk list in manage desks
+    //remove for add desks after copying to manage spaces
+  }, []);
+
+
+
+//NEW COMMIT - 27/09/22
+Line 9: App.jsx
+is ==>>  const [user, setUser] = useState({ isAdmin: true })
+revert to -->  const [user, setUser] = useState(null);
+
+
+Line 19-23: App.jsx
+uncomment AuthGuard and routes
+
+
+Line 55: ConfigureLayoutSettings.jsx
+==>>     axios.get("https://jsonplaceholder.typicode.com/users").then((res) => {
+revert to -->    axios.get("/api/space/getall").then((res) => {
+
+
+Line 167 & 175: ConfigureLayoutSettings.jsx
+Add a new field to the table to store the starting desk number. Refer to these lines
+
+
+
+Line 226: ManageSpaces.jsx
+fix set location. pass state to add-space without showing parameters in url
+
+Line 109: ManageSpaces.jsx
+onDelete function - Need to add "axios.delete" call.

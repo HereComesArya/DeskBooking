@@ -1,0 +1,18 @@
+.manage-spaces-header {
+  background-color: white !important;
+  flex-direction: row;
+  justify-content: space-around;
+  /* padding: 0px 10% 0 5% !important; */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: x-large !important;
+}
+.manage-spaces-header-text {
+  font-weight: 900 !important;
+}
+
+.new-booking-button {
+  background-color: #22d167 !important;
+  margin-right: 10px !important;
+}

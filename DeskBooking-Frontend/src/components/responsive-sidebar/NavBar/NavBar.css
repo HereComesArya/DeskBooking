@@ -1,0 +1,27 @@
+.navbar {
+  background-color: white;
+  padding-left: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  display: flex;
+  /* align-items: center; */
+  justify-content: space-between;
+}
+
+/* .menu {
+  margin-left: auto;
+} */
+
+@media (min-width: 992px) {
+  .menu {
+    display: none !important;
+  }
+  .navbar {
+    display: none;
+  }
+}
+
+.logo {
+  height: 32px;
+  /* margin-left: 1rem; */
+}
