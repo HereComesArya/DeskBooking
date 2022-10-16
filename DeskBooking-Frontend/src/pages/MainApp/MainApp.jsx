@@ -16,6 +16,7 @@ import {
 import NavBar from "../../components/responsive-sidebar/NavBar/NavBar";
 import SideBar from "../../components/responsive-sidebar/SideBar/SideBar";
 import Bookings from "../../components/Bookings/Bookings";
+import Dashboard from "../../components/Dashboard/Dashboard";
 import AddSpaces from "../../components/Spaces/AddSpaces/AddSpaces";
 
 import "./MainApp.css";
@@ -83,7 +84,7 @@ function MainApp() {
         <SideBar style={{ height: "100%" }} menu={SideMenu} />
         <Layout className="content" style={{ backgroundColor: "white" }}>
           {/* <Routes> */}
-          <Route path="/">
+          <Route path="/" component={Dashboard}>
             <h1>Dashboard</h1>
           </Route>
           <Route path="/bookings" component={Bookings}></Route>

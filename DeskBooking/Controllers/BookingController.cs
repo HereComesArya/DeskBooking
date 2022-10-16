@@ -255,9 +255,10 @@ namespace DeskBooking.Controllers
             {
                 var temp = await _context.Bookings.Where(b => b.UserId.ToString() == User.GetUserId() && b.Cancelled == false
                                     && b.EndTime >= DateTime.Now.AddDays(1).Date).ToListAsync();
-                bookings.AddRange(temp.Except(bookings));
+                bookings.AddRange(temp.Except(bookings).Take(bookings.Count - count));
             }
             var returnData = _mapper.Map<List<BookingResponseDto>>(bookings);
+            
             returnData.ForEach(b =>
             {
                 b.DeskName = deskNames.GetValueOrDefault(b.SpaceId.ToString() + b.DeskId.ToString());

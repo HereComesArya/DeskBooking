@@ -168,7 +168,7 @@ namespace DeskBooking.Controllers
 
                 return BadRequest("cannot remove space");
             }
-
+                
         }
     }
 }
